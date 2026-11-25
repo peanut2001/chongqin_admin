@@ -1,0 +1,14 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '5173:5173'
+    volumes:
+      - .:/app
+      # 使用容器内安装的 node_modules，避免被宿主机目录覆盖
+      - /app/node_modules
+    environment:
+      # Windows/macOS 挂载目录无法传递文件变更事件，开启轮询以支持热更新
+      - VITE_USE_POLLING=true
