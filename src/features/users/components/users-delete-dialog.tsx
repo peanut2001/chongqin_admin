@@ -7,9 +7,9 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { useDeleteUser } from '../api'
 import { roles } from '../data/data'
 import { type User } from '../data/schema'
-import { useUsersStore } from '../data/users-store'
 
 type UserDeleteDialogProps = {
   open: boolean
@@ -23,14 +23,17 @@ export function UsersDeleteDialog({
   currentRow,
 }: UserDeleteDialogProps) {
   const [value, setValue] = useState('')
-  const removeUsers = useUsersStore((s) => s.removeUsers)
+  const deleteUser = useDeleteUser()
 
   const handleDelete = () => {
     if (value.trim() !== currentRow.username) return
 
-    onOpenChange(false)
-    removeUsers([currentRow.id])
-    toast.success(`已删除用户 ${currentRow.username}`)
+    deleteUser.mutate(currentRow.id, {
+      onSuccess: () => {
+        onOpenChange(false)
+        toast.success(`已删除用户 ${currentRow.username}`)
+      },
+    })
   }
 
   return (
@@ -39,6 +42,7 @@ export function UsersDeleteDialog({
       onOpenChange={onOpenChange}
       form='users-delete-form'
       disabled={value.trim() !== currentRow.username}
+      isLoading={deleteUser.isPending}
       title={
         <span className='text-destructive'>
           <AlertTriangle
@@ -66,7 +70,7 @@ export function UsersDeleteDialog({
               {roles.find(({ value }) => value === currentRow.role)?.label ??
                 currentRow.role}
             </span>{' '}
-            的该用户，且无法撤销。
+            的该用户，其练习、浏览、判读记录会一并删除，且无法撤销。如只是暂停使用，建议改为「停用」。
           </p>
 
           <Label className='my-2'>

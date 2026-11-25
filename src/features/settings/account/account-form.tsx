@@ -1,18 +1,10 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { showSubmittedData } from '@/lib/show-submitted-data'
-import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
+import { apiErrorTitle, apiFieldErrors } from '@/lib/api/client'
+import { useChangePassword } from '@/lib/api/me'
 import { Button } from '@/components/ui/button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
 import {
   Form,
   FormControl,
@@ -22,67 +14,86 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import { DatePicker } from '@/components/date-picker'
+import { PasswordInput } from '@/components/password-input'
 
-const languages = [
-  { label: '英语', value: 'en' },
-  { label: '法语', value: 'fr' },
-  { label: '德语', value: 'de' },
-  { label: '西班牙语', value: 'es' },
-  { label: '葡萄牙语', value: 'pt' },
-  { label: '俄语', value: 'ru' },
-  { label: '日语', value: 'ja' },
-  { label: '韩语', value: 'ko' },
-  { label: '中文', value: 'zh' },
-] as const
-
-const accountFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, '请输入名称。')
-    .min(2, '名称至少需要 2 个字符。')
-    .max(30, '名称不能超过 30 个字符。'),
-  dob: z.date('请选择出生日期。'),
-  language: z.string('请选择语言。'),
-})
-
-type AccountFormValues = z.infer<typeof accountFormSchema>
-
-// This can come from your database or API.
-const defaultValues: Partial<AccountFormValues> = {
-  name: '',
-}
-
-export function AccountForm() {
-  const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountFormSchema),
-    defaultValues,
+const passwordFormSchema = z
+  .object({
+    currentPassword: z.string().min(1, '请输入当前密码。'),
+    newPassword: z
+      .string()
+      .min(8, '密码长度至少为 8 个字符。')
+      .regex(/[a-z]/, '密码必须包含至少一个小写字母。')
+      .regex(/\d/, '密码必须包含至少一个数字。'),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: '两次输入的密码不一致。',
+    path: ['confirmPassword'],
   })
 
-  function onSubmit(data: AccountFormValues) {
-    showSubmittedData(data)
-  }
+type PasswordFormValues = z.infer<typeof passwordFormSchema>
+
+export function AccountForm() {
+  const changePassword = useChangePassword()
+  const form = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  })
+
+  const onSubmit = ({ currentPassword, newPassword }: PasswordFormValues) =>
+    changePassword.mutate(
+      { currentPassword, newPassword },
+      {
+        onSuccess: () => {
+          toast.success('密码已修改，其他设备上的登录已失效。')
+          form.reset()
+        },
+        onError: (err) => {
+          const fields = apiFieldErrors(err)
+          const keys = Object.keys(fields).filter(
+            (k) => k === 'currentPassword' || k === 'newPassword'
+          )
+          keys.forEach((k) =>
+            form.setError(k as keyof PasswordFormValues, {
+              message: fields[k],
+            })
+          )
+          if (!keys.length) toast.error(apiErrorTitle(err))
+        },
+      }
+    )
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
         <FormField
           control={form.control}
-          name='name'
+          name='currentPassword'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>名称</FormLabel>
+              <FormLabel>当前密码</FormLabel>
               <FormControl>
-                <Input placeholder='你的名称' {...field} />
+                <PasswordInput autoComplete='current-password' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='newPassword'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>新密码</FormLabel>
+              <FormControl>
+                <PasswordInput autoComplete='new-password' {...field} />
               </FormControl>
               <FormDescription>
-                这是将显示在你的个人资料和邮件中的名称。
+                至少 8 位，需包含小写字母和数字。修改后其他设备上的登录会失效。
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -90,78 +101,20 @@ export function AccountForm() {
         />
         <FormField
           control={form.control}
-          name='dob'
+          name='confirmPassword'
           render={({ field }) => (
-            <FormItem className='flex flex-col'>
-              <FormLabel>出生日期</FormLabel>
-              <DatePicker selected={field.value} onSelect={field.onChange} />
-              <FormDescription>你的出生日期将用于计算年龄。</FormDescription>
+            <FormItem>
+              <FormLabel>确认新密码</FormLabel>
+              <FormControl>
+                <PasswordInput autoComplete='new-password' {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name='language'
-          render={({ field }) => (
-            <FormItem className='flex flex-col'>
-              <FormLabel>语言</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className={cn(
-                        'w-50 justify-between',
-                        !field.value && 'text-muted-foreground'
-                      )}
-                    >
-                      {field.value
-                        ? languages.find(
-                            (language) => language.value === field.value
-                          )?.label
-                        : '选择语言'}
-                      <CaretSortIcon className='ms-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className='w-50 p-0'>
-                  <Command>
-                    <CommandInput placeholder='搜索语言...' />
-                    <CommandEmpty>未找到语言。</CommandEmpty>
-                    <CommandGroup>
-                      <CommandList>
-                        {languages.map((language) => (
-                          <CommandItem
-                            value={language.label}
-                            key={language.value}
-                            onSelect={() => {
-                              form.setValue('language', language.value)
-                            }}
-                          >
-                            <CheckIcon
-                              className={cn(
-                                'size-4',
-                                language.value === field.value
-                                  ? 'opacity-100'
-                                  : 'opacity-0'
-                              )}
-                            />
-                            {language.label}
-                          </CommandItem>
-                        ))}
-                      </CommandList>
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormDescription>这是仪表盘中将使用的语言。</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type='submit'>更新账户</Button>
+        <Button type='submit' disabled={changePassword.isPending}>
+          修改密码
+        </Button>
       </form>
     </Form>
   )

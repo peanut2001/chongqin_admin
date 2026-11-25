@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BookOpenCheck } from 'lucide-react'
+import { BookOpenCheck, Loader2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,35 +22,56 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DefaultHeader } from '@/components/layout/default-header'
 import { Main } from '@/components/layout/main'
 import { SimpleProgress } from '@/components/simple-progress'
+import { usePracticeRecords, useQuestionSets, useStartPractice } from './api'
 import { PracticePanel } from './components/practice-panel'
-import {
-  practiceRecords,
-  questionSets,
-  type QuestionSet,
-} from './data/questions'
+import { type PracticeSession } from './data/questions'
+
+const dateFmt = new Intl.DateTimeFormat('zh-CN', {
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
+function formatDuration(seconds: number | null) {
+  if (seconds === null) return '—'
+  const m = Math.floor(seconds / 60)
+  return m > 0 ? `${m} 分钟` : `${seconds} 秒`
+}
 
 export function QuestionBank() {
-  const [activeSet, setActiveSet] = useState<QuestionSet | null>(null)
-  const totalQuestions = questionSets.reduce((sum, s) => sum + s.total, 0)
+  const { data: sets, isLoading } = useQuestionSets()
+  const [session, setSession] = useState<PracticeSession | null>(null)
+  const [recordsPage, setRecordsPage] = useState(1)
+  const records = usePracticeRecords(recordsPage)
+  const start = useStartPractice()
+
+  // 「开始练习」点击时才创建练习（不放在 effect 里，避免开发模式下重复创建）
+  const startSet = (setId: string) =>
+    start.mutate(setId, { onSuccess: setSession })
+
+  const totalQuestions = (sets ?? []).reduce((sum, s) => sum + s.total, 0)
 
   return (
     <>
       <DefaultHeader />
 
       <Main>
-        {activeSet ? (
+        {session ? (
           <PracticePanel
-            key={activeSet.id}
-            set={activeSet}
-            onExit={() => setActiveSet(null)}
+            key={session.id}
+            session={session}
+            onExit={() => setSession(null)}
+            onRestart={() => startSet(session.set.id)}
+            restarting={start.isPending}
           />
         ) : (
           <>
             <div className='mb-4'>
               <h1 className='text-2xl font-bold tracking-tight'>题库练习</h1>
               <p className='text-muted-foreground'>
-                共 {questionSets.length} 个章节、{totalQuestions}{' '}
-                道题目，支持单选、多选、判断题，提交后即时显示解析。
+                共 {sets?.length ?? 0} 个练习集、{totalQuestions}{' '}
+                道题目，支持单选、多选、判断题与真实病例诊断题，提交后即时显示解析。
               </p>
             </div>
 
@@ -61,8 +82,11 @@ export function QuestionBank() {
               </TabsList>
 
               <TabsContent value='sets'>
+                {isLoading && (
+                  <p className='text-sm text-muted-foreground'>正在加载题库…</p>
+                )}
                 <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-                  {questionSets.map((s) => (
+                  {(sets ?? []).map((s) => (
                     <Card key={s.id} className='flex flex-col'>
                       <CardHeader>
                         <CardTitle className='flex items-center gap-2'>
@@ -72,25 +96,42 @@ export function QuestionBank() {
                         <CardDescription>{s.description}</CardDescription>
                       </CardHeader>
                       <CardContent className='flex-1 space-y-3'>
-                        <div className='flex gap-2'>
+                        <div className='flex flex-wrap gap-2'>
                           <Badge variant='secondary'>题库 {s.total} 题</Badge>
                           <Badge variant='outline'>
-                            本次可练 {s.questions.length} 题
+                            {s.sessionSize
+                              ? `每次随机 ${s.sessionSize} 题`
+                              : `每次 ${s.total} 题`}
                           </Badge>
                         </div>
-                        <div className='space-y-1'>
-                          <div className='flex justify-between text-xs text-muted-foreground'>
-                            <span>班级平均正确率</span>
-                            <span>{s.avgAccuracy}%</span>
+                        {s.avgAccuracy !== null ? (
+                          <div className='space-y-1'>
+                            <div className='flex justify-between text-xs text-muted-foreground'>
+                              <span>全体平均正确率</span>
+                              <span>{s.avgAccuracy}%</span>
+                            </div>
+                            <SimpleProgress value={s.avgAccuracy} />
                           </div>
-                          <SimpleProgress value={s.avgAccuracy} />
-                        </div>
+                        ) : (
+                          <p className='text-xs text-muted-foreground'>
+                            作答人次较少，暂不统计正确率
+                          </p>
+                        )}
+                        <p className='text-xs text-muted-foreground'>
+                          我已作答 {s.my.answered} 题
+                          {s.my.accuracy !== null &&
+                            `，正确率 ${s.my.accuracy}%`}
+                        </p>
                       </CardContent>
                       <CardFooter>
                         <Button
                           className='w-full'
-                          onClick={() => setActiveSet(s)}
+                          disabled={start.isPending || s.total === 0}
+                          onClick={() => startSet(s.id)}
                         >
+                          {start.isPending && start.variables === s.id && (
+                            <Loader2 className='animate-spin' />
+                          )}
                           开始练习
                         </Button>
                       </CardFooter>
@@ -101,13 +142,13 @@ export function QuestionBank() {
 
               <TabsContent value='records'>
                 <Card>
-                  <CardContent>
+                  <CardContent className='space-y-3'>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>记录编号</TableHead>
                           <TableHead>学生</TableHead>
-                          <TableHead>章节</TableHead>
+                          <TableHead>学号</TableHead>
+                          <TableHead>练习集</TableHead>
                           <TableHead className='text-end'>题数</TableHead>
                           <TableHead className='text-end'>正确率</TableHead>
                           <TableHead>用时</TableHead>
@@ -115,15 +156,17 @@ export function QuestionBank() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {practiceRecords.map((r) => {
-                          const rate = Math.round((r.correct / r.count) * 100)
+                        {(records.data?.items ?? []).map((r) => {
+                          const rate = r.count
+                            ? Math.round((r.correct / r.count) * 100)
+                            : 0
                           return (
                             <TableRow key={r.id}>
-                              <TableCell className='text-muted-foreground'>
-                                {r.id}
-                              </TableCell>
                               <TableCell className='font-medium'>
-                                {r.student}
+                                {r.student.name}
+                              </TableCell>
+                              <TableCell className='text-muted-foreground'>
+                                {r.student.studentNo ?? '—'}
                               </TableCell>
                               <TableCell>{r.setName}</TableCell>
                               <TableCell className='text-end'>
@@ -142,15 +185,51 @@ export function QuestionBank() {
                                   {rate}%
                                 </span>
                               </TableCell>
-                              <TableCell>{r.duration}</TableCell>
+                              <TableCell>
+                                {formatDuration(r.durationSeconds)}
+                              </TableCell>
                               <TableCell className='text-muted-foreground'>
-                                {r.finishedAt}
+                                {dateFmt.format(new Date(r.finishedAt))}
                               </TableCell>
                             </TableRow>
                           )
                         })}
+                        {records.data?.items.length === 0 && (
+                          <TableRow>
+                            <TableCell
+                              colSpan={7}
+                              className='h-20 text-center text-muted-foreground'
+                            >
+                              还没有练习记录。
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
+                    {records.data && records.data.total > 10 && (
+                      <div className='flex items-center justify-end gap-2 text-sm text-muted-foreground'>
+                        <span>
+                          第 {recordsPage} 页，共{' '}
+                          {Math.ceil(records.data.total / 10)} 页
+                        </span>
+                        <Button
+                          size='sm'
+                          variant='outline'
+                          disabled={recordsPage === 1}
+                          onClick={() => setRecordsPage((p) => p - 1)}
+                        >
+                          上一页
+                        </Button>
+                        <Button
+                          size='sm'
+                          variant='outline'
+                          disabled={recordsPage * 10 >= records.data.total}
+                          onClick={() => setRecordsPage((p) => p + 1)}
+                        >
+                          下一页
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

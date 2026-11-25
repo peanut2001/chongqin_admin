@@ -12,3 +12,55 @@ services:
     environment:
       # Windows/macOS 挂载目录无法传递文件变更事件，开启轮询以支持热更新
       - VITE_USE_POLLING=true
+      # Vite 开发服务器把 /api 代理到后端容器（同源，免 CORS）
+      - VITE_API_PROXY_TARGET=http://api:5000
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      # 方便本机直接调试接口；前端走 Vite 代理
+      - '5000:5000'
+    volumes:
+      - ./backend:/app
+      - api_uploads:/data/uploads
+    environment:
+      - FLASK_APP=wsgi:app
+      - APP_CONFIG=dev
+      - DATABASE_URL=postgresql+psycopg://chongqin:chongqin@db:5432/chongqin
+      - TEST_DATABASE_URL=postgresql+psycopg://chongqin:chongqin@db:5432/chongqin_test
+      - JWT_SECRET_KEY=dev-only-jwt-secret-please-change-in-production-0123456789
+      - MEDIA_SIGNING_KEY=dev-only-media-signing-key
+      - UPLOAD_DIR=/data/uploads
+      - CONTENT_DIR=/app/content
+      - APP_TZ=Asia/Shanghai
+    depends_on:
+      db:
+        condition: service_healthy
+    # 启动时自动执行数据库迁移；写成内联命令，避免 Windows 换行符破坏 .sh 脚本
+    command: ['sh', '-c', 'flask db upgrade && flask run --host 0.0.0.0 --port 5000 --debug']
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      # 映射到 5433，避免与本机可能存在的 PostgreSQL 冲突
+      - '5433:5432'
+    environment:
+      - POSTGRES_DB=chongqin
+      - POSTGRES_USER=chongqin
+      - POSTGRES_PASSWORD=chongqin
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U chongqin -d chongqin']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pg_data:
+  api_uploads:

@@ -1,0 +1,10 @@
+# 后端代码与脚本统一 LF，避免 Windows CRLF 导致容器内脚本 / SQL 出错
+backend/** text=auto eol=lf
+db/** text=auto eol=lf
+*.sh text eol=lf
+
+# 二进制资源
+*.webp binary
+*.gif binary
+*.png binary
+*.jpg binary

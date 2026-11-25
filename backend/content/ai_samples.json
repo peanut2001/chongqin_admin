@@ -1,0 +1,188 @@
+{
+ "modalities": [
+  "胸部 CT",
+  "胸部 X 线",
+  "头颅 MRI",
+  "腹部 CT",
+  "病理切片"
+ ],
+ "samples": [
+  {
+   "id": "S-01",
+   "name": "胸部 CT · 肺结节",
+   "modality": "胸部 CT",
+   "topicId": "CASE-0001",
+   "image": {
+    "caseId": "BL-0101",
+    "position": 1
+   },
+   "demoResult": {
+    "findings": [
+     {
+      "label": "右肺上叶结节（分叶、毛刺）",
+      "confidence": 0.94,
+      "box": {
+       "x": 22,
+       "y": 28,
+       "w": 18,
+       "h": 16
+      }
+     },
+     {
+      "label": "胸膜凹陷",
+      "confidence": 0.81,
+      "box": {
+       "x": 14,
+       "y": 24,
+       "w": 10,
+       "h": 12
+      }
+     },
+     {
+      "label": "纵隔淋巴结稍大",
+      "confidence": 0.63,
+      "box": {
+       "x": 46,
+       "y": 40,
+       "w": 9,
+       "h": 9
+      }
+     }
+    ],
+    "impression": "右肺上叶实性结节，恶性风险较高（Lung-RADS 4B），建议结合增强 CT 与病理检查。",
+    "suggestions": [
+     "增强 CT 评估强化特点",
+     "CT 引导下穿刺活检",
+     "必要时行 PET-CT 分期"
+    ],
+    "elapsedMs": 1820
+   },
+   "sortOrder": 0
+  },
+  {
+   "id": "S-02",
+   "name": "胸部 X 线 · 实变影",
+   "modality": "胸部 X 线",
+   "topicId": "CASE-0002",
+   "image": {
+    "caseId": "BL-0201",
+    "position": 1
+   },
+   "demoResult": {
+    "findings": [
+     {
+      "label": "右肺中叶实变影",
+      "confidence": 0.91,
+      "box": {
+       "x": 18,
+       "y": 45,
+       "w": 26,
+       "h": 20
+      }
+     },
+     {
+      "label": "支气管充气征",
+      "confidence": 0.77,
+      "box": {
+       "x": 26,
+       "y": 50,
+       "w": 10,
+       "h": 10
+      }
+     }
+    ],
+    "impression": "右肺中叶大片实变，考虑大叶性肺炎可能。",
+    "suggestions": [
+     "结合血常规及 CRP",
+     "抗感染治疗后 2-4 周复查"
+    ],
+    "elapsedMs": 960
+   },
+   "sortOrder": 1
+  },
+  {
+   "id": "S-03",
+   "name": "头颅 MRI · DWI 高信号",
+   "modality": "头颅 MRI",
+   "topicId": "CASE-0005",
+   "image": {
+    "caseId": "BL-0501",
+    "position": 1
+   },
+   "demoResult": {
+    "findings": [
+     {
+      "label": "右侧基底节区 DWI 高信号",
+      "confidence": 0.96,
+      "box": {
+       "x": 54,
+       "y": 38,
+       "w": 16,
+       "h": 18
+      }
+     },
+     {
+      "label": "右侧放射冠受累",
+      "confidence": 0.84,
+      "box": {
+       "x": 56,
+       "y": 24,
+       "w": 12,
+       "h": 12
+      }
+     }
+    ],
+    "impression": "右侧大脑中动脉供血区急性脑梗死可能性大。",
+    "suggestions": [
+     "结合 ADC 图确认扩散受限",
+     "评估 DWI-FLAIR 不匹配",
+     "完善 MRA / CTA 评估责任血管"
+    ],
+    "elapsedMs": 2140
+   },
+   "sortOrder": 2
+  },
+  {
+   "id": "S-04",
+   "name": "腹部 CT · 肝占位",
+   "modality": "腹部 CT",
+   "topicId": "CASE-0003",
+   "image": {
+    "caseId": "BL-0301",
+    "position": 1
+   },
+   "demoResult": {
+    "findings": [
+     {
+      "label": "肝 S8 段富血供占位",
+      "confidence": 0.92,
+      "box": {
+       "x": 20,
+       "y": 22,
+       "w": 22,
+       "h": 20
+      }
+     },
+     {
+      "label": "肝脏表面结节状（肝硬化）",
+      "confidence": 0.79,
+      "box": {
+       "x": 10,
+       "y": 18,
+       "w": 40,
+       "h": 40
+      }
+     }
+    ],
+    "impression": "肝硬化背景下富血供占位，符合 LI-RADS 5，考虑肝细胞癌。",
+    "suggestions": [
+     "结合 AFP 等肿瘤标志物",
+     "评估门静脉癌栓",
+     "MDT 讨论治疗方案"
+    ],
+    "elapsedMs": 2460
+   },
+   "sortOrder": 3
+  }
+ ]
+}

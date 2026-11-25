@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { LongText } from '@/components/long-text'
 import { callTypes, roles, statuses } from '../data/data'
+import { displayName } from '../data/display-name'
 import { type User } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 
@@ -57,12 +58,12 @@ export const usersColumns: ColumnDef<User>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='名称' />
     ),
-    cell: ({ row }) => {
-      const { firstName, lastName } = row.original
-      const fullName = `${firstName} ${lastName}`
-      return <LongText className='max-w-36'>{fullName}</LongText>
-    },
+    cell: ({ row }) => (
+      <LongText className='max-w-36'>{displayName(row.original)}</LongText>
+    ),
     meta: { className: 'w-36' },
+    // 排序由后端完成，后端不支持按姓名排序
+    enableSorting: false,
   },
   {
     accessorKey: 'email',
@@ -132,6 +133,18 @@ export const usersColumns: ColumnDef<User>[] = [
     },
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    id: 'className',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='班级' />
+    ),
+    cell: ({ row }) => (
+      <div className='text-nowrap text-muted-foreground'>
+        {row.original.className ?? '—'}
+      </div>
+    ),
+    enableSorting: false,
   },
   {
     id: 'actions',

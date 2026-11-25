@@ -1,4 +1,4 @@
-import { Link, useSearch } from '@tanstack/react-router'
+import { useSearch } from '@tanstack/react-router'
 import {
   Card,
   CardContent,
@@ -21,13 +21,7 @@ export function SignIn() {
           <CardDescription>
             请在下方输入邮箱和密码以
             <br className='max-sm:hidden' />
-            登录你的账户。还没有账户？{' '}
-            <Link
-              to='/sign-up'
-              className='text-nowrap underline underline-offset-4 hover:text-primary'
-            >
-              注册
-            </Link>
+            登录你的账户。账号由管理员开通。
           </CardDescription>
         </CardHeader>
         <CardContent>

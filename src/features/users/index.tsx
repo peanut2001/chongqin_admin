@@ -9,14 +9,12 @@ import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
 import { UsersProvider } from './components/users-provider'
 import { UsersTable } from './components/users-table'
-import { useUsersStore } from './data/users-store'
 
 const route = getRouteApi('/_authenticated/users/')
 
 export function Users() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
-  const users = useUsersStore((s) => s.users)
 
   return (
     <UsersProvider>
@@ -37,7 +35,7 @@ export function Users() {
           </div>
           <UsersPrimaryButtons />
         </div>
-        <UsersTable data={users} search={search} navigate={navigate} />
+        <UsersTable search={search} navigate={navigate} />
       </Main>
 
       <UsersDialogs />

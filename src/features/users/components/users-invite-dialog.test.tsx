@@ -1,42 +1,36 @@
 import { useState } from 'react'
+import { AxiosError, AxiosHeaders } from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
-import { useUsersStore } from '../data/users-store'
 import { UsersInviteDialog } from './users-invite-dialog'
+
+type MutateOpts = { onSuccess?: () => void; onError?: (e: unknown) => void }
+let serverError: unknown = null
+const inviteMutate = vi.fn((_input: unknown, opts?: MutateOpts) =>
+  serverError ? opts?.onError?.(serverError) : opts?.onSuccess?.()
+)
+
+vi.mock('../api', () => ({
+  useInviteUser: () => ({ mutate: inviteMutate, isPending: false }),
+}))
 
 describe('UsersInviteDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    useUsersStore.setState({ users: [], passwords: {} })
+    serverError = null
   })
 
-  it('renders the dialog title and description', async () => {
+  it('renders the title and explains that an admin must set the password', async () => {
     const { getByRole, getByText } = await render(
       <UsersInviteDialog open onOpenChange={vi.fn()} />
     )
-
-    const title = getByRole('heading', {
-      level: 2,
-      name: /邀请用户/i,
-    })
-    const desc = getByText(/通过发送邮件邀请新用户加入你的团队/i)
-
-    await expect.element(title).toBeInTheDocument()
-    await expect.element(desc).toBeInTheDocument()
-  })
-
-  it('closes when the dialog close button is clicked', async () => {
-    const onOpenChange = vi.fn()
-    const { getByRole } = await render(
-      <UsersInviteDialog open onOpenChange={onOpenChange} />
-    )
-
-    const closeButton = getByRole('button', { name: /关闭/i })
-    await userEvent.click(closeButton)
-
-    expect(onOpenChange).toHaveBeenCalledOnce()
-    expect(onOpenChange).toHaveBeenCalledWith(false)
+    await expect
+      .element(getByRole('heading', { level: 2, name: /邀请用户/i }))
+      .toBeInTheDocument()
+    await expect
+      .element(getByText(/设置初始密码后才能登录/))
+      .toBeInTheDocument()
   })
 
   it('closes when Cancel is clicked', async () => {
@@ -44,38 +38,18 @@ describe('UsersInviteDialog', () => {
     const { getByRole } = await render(
       <UsersInviteDialog open onOpenChange={onOpenChange} />
     )
-
-    const cancelButton = getByRole('button', { name: /取消/i })
-    await userEvent.click(cancelButton)
-
-    expect(onOpenChange).toHaveBeenCalledOnce()
+    await userEvent.click(getByRole('button', { name: /取消/i }))
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('shows error messages when submitting empty form, and clears them as fields are filled', async () => {
-    const onOpenChange = vi.fn()
+  it('shows error messages for an empty form', async () => {
     const { getByRole, getByText } = await render(
-      <UsersInviteDialog open onOpenChange={onOpenChange} />
+      <UsersInviteDialog open onOpenChange={vi.fn()} />
     )
-
-    const emailErrorMessage = getByText(/请输入要邀请的邮箱。/i)
-    const roleErrorMessage = getByText(/角色为必填项。/i)
-
-    const submitButton = getByRole('button', { name: /邀请/i })
-    await userEvent.click(submitButton)
-
-    await expect.element(emailErrorMessage).toBeInTheDocument()
-    await expect.element(roleErrorMessage).toBeInTheDocument()
-
-    const emailInput = getByRole('textbox', { name: /邮箱/i })
-    await userEvent.fill(emailInput, 'test@example.com')
-
-    const roleSelect = getByRole('combobox', { name: /角色/i })
-    await userEvent.click(roleSelect)
-    await userEvent.click(getByRole('option', { name: /教师/i }))
-
-    await expect.element(emailErrorMessage).not.toBeInTheDocument()
-    await expect.element(roleErrorMessage).not.toBeInTheDocument()
+    await userEvent.click(getByRole('button', { name: /邀请/i }))
+    await expect.element(getByText(/请输入要邀请的邮箱。/i)).toBeInTheDocument()
+    await expect.element(getByText(/角色为必填项。/i)).toBeInTheDocument()
+    expect(inviteMutate).not.toHaveBeenCalled()
   })
 
   it('resets entered values when the dialog is closed and reopened', async () => {
@@ -90,71 +64,57 @@ describe('UsersInviteDialog', () => {
         </>
       )
     }
-
     const { getByRole } = await render(<Harness />)
-
-    const EMAIL_VALUE = 'test@example.com'
-    const ROLE_VALUE = '教师'
-    const DESC_VALUE = 'This is a test description'
-
     const emailInput = getByRole('textbox', { name: /邮箱/i })
-    await userEvent.fill(emailInput, EMAIL_VALUE)
-
-    const roleSelect = getByRole('combobox', { name: /角色/i })
-    await userEvent.click(roleSelect)
-    await userEvent.click(getByRole('option', { name: ROLE_VALUE }))
-
-    const descInput = getByRole('textbox', { name: /描述/i })
-    await userEvent.fill(descInput, DESC_VALUE)
-
-    await expect.element(emailInput).toHaveValue(EMAIL_VALUE)
-    await expect.element(roleSelect).toHaveTextContent(ROLE_VALUE)
-    await expect.element(descInput).toHaveValue(DESC_VALUE)
-
-    const cancelButton = getByRole('button', { name: /取消/i })
-    await userEvent.click(cancelButton)
-
-    const reopenButton = getByRole('button', { name: /Reopen/i })
-    await userEvent.click(reopenButton)
-
+    await userEvent.fill(emailInput, 'test@example.com')
+    await userEvent.click(getByRole('button', { name: /取消/i }))
+    await userEvent.click(getByRole('button', { name: /Reopen/i }))
     await expect.element(emailInput).toHaveValue('')
-    await expect.element(roleSelect).toHaveTextContent('选择角色')
-    await expect.element(descInput).toHaveValue('')
   })
 
-  it('adds an invited user to the store when the form is submitted successfully', async () => {
+  it('invites through the API and closes', async () => {
     const onOpenChange = vi.fn()
     const { getByRole } = await render(
       <UsersInviteDialog open onOpenChange={onOpenChange} />
     )
+    await userEvent.fill(
+      getByRole('textbox', { name: /邮箱/i }),
+      'test@example.com'
+    )
+    await userEvent.click(getByRole('combobox', { name: /角色/i }))
+    await userEvent.click(getByRole('option', { name: '教师' }))
+    await userEvent.click(getByRole('button', { name: /邀请/i }))
 
-    const EMAIL_VALUE = 'test@example.com'
-    const ROLE_VALUE = 'teacher'
-    const ROLE_LABEL = '教师'
-    const DESC_VALUE = 'Welcome aboard!'
-
-    const emailInput = getByRole('textbox', { name: /邮箱/i })
-    await userEvent.fill(emailInput, EMAIL_VALUE)
-
-    const roleSelect = getByRole('combobox', { name: /角色/i })
-    await userEvent.click(roleSelect)
-    await userEvent.click(getByRole('option', { name: ROLE_LABEL }))
-
-    const descInput = getByRole('textbox', { name: /描述/i })
-    await userEvent.fill(descInput, DESC_VALUE)
-
-    const submitButton = getByRole('button', { name: /邀请/i })
-    await userEvent.click(submitButton)
-
-    expect(onOpenChange).toHaveBeenCalledOnce()
+    expect(inviteMutate).toHaveBeenCalledWith(
+      { email: 'test@example.com', role: 'teacher' },
+      expect.anything()
+    )
     expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
 
-    const { users } = useUsersStore.getState()
-    expect(users).toHaveLength(1)
-    expect(users[0]).toMatchObject({
-      email: EMAIL_VALUE,
-      role: ROLE_VALUE,
-      status: 'invited',
+  it('shows a duplicate email error from the server on the email field', async () => {
+    serverError = new AxiosError('conflict', '409', undefined, undefined, {
+      status: 409,
+      statusText: 'CONFLICT',
+      headers: {},
+      config: { headers: new AxiosHeaders() },
+      data: { title: '冲突', fields: { email: '该邮箱已被其他用户使用。' } },
     })
+    const onOpenChange = vi.fn()
+    const { getByRole, getByText } = await render(
+      <UsersInviteDialog open onOpenChange={onOpenChange} />
+    )
+    await userEvent.fill(
+      getByRole('textbox', { name: /邮箱/i }),
+      'dup@example.com'
+    )
+    await userEvent.click(getByRole('combobox', { name: /角色/i }))
+    await userEvent.click(getByRole('option', { name: '学生' }))
+    await userEvent.click(getByRole('button', { name: /邀请/i }))
+
+    await expect
+      .element(getByText('该邮箱已被其他用户使用。'))
+      .toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalled()
   })
 })

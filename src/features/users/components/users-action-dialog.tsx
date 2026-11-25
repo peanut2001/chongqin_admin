@@ -1,10 +1,12 @@
 'use client'
 
 import { z } from 'zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
+import { apiErrorTitle, apiFieldErrors, refreshSession } from '@/lib/api/client'
+import { useMeta } from '@/lib/api/meta'
 import { type Role } from '@/lib/permissions'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,9 +28,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
+import { useCreateUser, useUpdateUser } from '../api'
 import { roles } from '../data/data'
-import { type User } from '../data/schema'
-import { emailExists, useUsersStore } from '../data/users-store'
+import { type User, type UserInput } from '../data/schema'
 
 const formSchema = z
   .object({
@@ -36,6 +38,9 @@ const formSchema = z
     lastName: z.string().min(1, '请输入姓。'),
     username: z.string().min(1, '用户名为必填项。'),
     phoneNumber: z.string().min(1, '手机号为必填项。'),
+    // 仅学生使用
+    studentNo: z.string(),
+    classId: z.string(),
     email: z.email({
       error: (iss) => (iss.input === '' ? '邮箱为必填项。' : undefined),
     }),
@@ -109,16 +114,24 @@ export function UsersActionDialog({
 }: UserActionDialogProps) {
   const isEdit = !!currentRow
   const { auth } = useAuthStore()
-  const addUser = useUsersStore((s) => s.addUser)
-  const updateUser = useUsersStore((s) => s.updateUser)
-  // 管理员不能修改自己的角色，避免把自己降级后失去管理权限
+  const createUser = useCreateUser()
+  const updateUser = useUpdateUser()
+  const { data: meta } = useMeta()
+  // 管理员不能修改自己的角色，避免把自己降级后失去管理权限（后端同样会拒绝）
   const isSelf = isEdit && currentRow.id === auth.user?.id
 
   const form = useForm<UserForm>({
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
       ? {
-          ...currentRow,
+          firstName: currentRow.firstName,
+          lastName: currentRow.lastName,
+          username: currentRow.username,
+          email: currentRow.email,
+          role: currentRow.role,
+          phoneNumber: currentRow.phoneNumber,
+          studentNo: currentRow.studentNo ?? '',
+          classId: currentRow.classId ? String(currentRow.classId) : '',
           password: '',
           confirmPassword: '',
           isEdit,
@@ -130,56 +143,66 @@ export function UsersActionDialog({
           email: '',
           role: '',
           phoneNumber: '',
+          studentNo: '',
+          classId: '',
           password: '',
           confirmPassword: '',
           isEdit,
         },
   })
+  const isStudent =
+    useWatch({ control: form.control, name: 'role' }) === 'student'
+  const saving = createUser.isPending || updateUser.isPending
+
+  // 后端字段名与表单字段名一致（camelCase），冲突 / 校验错误直接显示在对应输入框
+  const showServerErrors = (err: unknown) => {
+    const fields = apiFieldErrors(err)
+    const names = Object.keys(fields).filter((k) => k in form.getValues())
+    names.forEach((name) =>
+      form.setError(name as keyof UserForm, { message: fields[name] })
+    )
+    if (names.length === 0) toast.error(apiErrorTitle(err))
+  }
 
   const onSubmit = (values: UserForm) => {
-    if (emailExists(values.email, currentRow?.id)) {
-      form.setError('email', { message: '该邮箱已被其他用户使用。' })
-      return
-    }
-
-    const fields = {
+    const role = values.role as Role
+    const input: UserInput = {
       firstName: values.firstName,
       lastName: values.lastName,
       username: values.username,
       email: values.email,
       phoneNumber: values.phoneNumber,
-      role: values.role as Role,
+      role,
+      studentNo: role === 'student' ? values.studentNo || null : null,
+      classId:
+        role === 'student' && values.classId ? Number(values.classId) : null,
     }
-    const password = values.password || undefined
+    if (values.password) input.password = values.password
+
+    const done = (message: string) => {
+      toast.success(message)
+      form.reset()
+      onOpenChange(false)
+    }
 
     if (isEdit) {
-      updateUser(currentRow.id, fields, password)
-      // 编辑的是自己时，同步右上角/侧边栏显示的登录信息
-      if (isSelf && auth.user) {
-        auth.setUser({
-          ...auth.user,
-          name: `${fields.firstName} ${fields.lastName}`,
-          email: fields.email,
-        })
-      }
-      toast.success(`已更新用户 ${fields.username}`)
-    } else {
-      const now = new Date()
-      addUser(
+      updateUser.mutate(
+        { id: currentRow.id, ...input },
         {
-          id: crypto.randomUUID(),
-          ...fields,
-          status: 'active',
-          createdAt: now,
-          updatedAt: now,
-        },
-        password
+          onSuccess: () => {
+            // 编辑的是自己时，从服务端刷新右上角 / 侧边栏的登录信息
+            if (isSelf) void refreshSession()
+            done(`已更新用户 ${input.username}`)
+          },
+          onError: showServerErrors,
+        }
       )
-      toast.success(`已添加用户 ${fields.username}`)
+    } else {
+      createUser.mutate(input, {
+        onSuccess: () => done(`已添加用户 ${input.username}`),
+        onError: showServerErrors,
+      })
     }
-
-    form.reset()
-    onOpenChange(false)
   }
 
   const isPasswordTouched = !!form.formState.dirtyFields.password
@@ -324,6 +347,51 @@ export function UsersActionDialog({
                   </FormItem>
                 )}
               />
+              {isStudent && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name='studentNo'
+                    render={({ field }) => (
+                      <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                        <FormLabel className='col-span-2 text-end'>
+                          学号
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='例如：S2025031'
+                            className='col-span-4'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className='col-span-4 col-start-3' />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='classId'
+                    render={({ field }) => (
+                      <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                        <FormLabel className='col-span-2 text-end'>
+                          班级
+                        </FormLabel>
+                        <SelectDropdown
+                          defaultValue={field.value}
+                          onValueChange={field.onChange}
+                          placeholder='选择班级'
+                          className='col-span-4'
+                          items={(meta?.classes ?? []).map((c) => ({
+                            label: c.name,
+                            value: String(c.id),
+                          }))}
+                        />
+                        <FormMessage className='col-span-4 col-start-3' />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
               <FormField
                 control={form.control}
                 name='password'
@@ -365,7 +433,7 @@ export function UsersActionDialog({
           </Form>
         </div>
         <DialogFooter>
-          <Button type='submit' form='user-form'>
+          <Button type='submit' form='user-form' disabled={saving}>
             保存更改
           </Button>
         </DialogFooter>

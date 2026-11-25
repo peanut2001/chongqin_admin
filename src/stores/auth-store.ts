@@ -1,74 +1,44 @@
 import { create } from 'zustand'
-import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
 import { type Role } from '@/lib/permissions'
 
-const ACCESS_TOKEN = 'thisisjustarandomstring'
-const AUTH_USER = 'auth_user'
-
+/** 登录用户（来自后端 /auth/login、/auth/refresh 的 user 字段） */
 export interface AuthUser {
   id: string
   name: string
   email: string
+  username: string
   role: Role
-  exp: number
+  avatarUrl: string | null
+  studentNo: string | null
+  className: string | null
 }
 
 interface AuthState {
   auth: {
     user: AuthUser | null
-    setUser: (user: AuthUser | null) => void
+    /** access token 只保存在内存中；刷新页面后由 httpOnly refresh cookie 换回 */
     accessToken: string
-    setAccessToken: (accessToken: string) => void
-    resetAccessToken: () => void
+    setSession: (accessToken: string, user: AuthUser) => void
+    setUser: (user: AuthUser) => void
     reset: () => void
   }
 }
 
-function readCookieJson<T>(name: string): T | null {
-  const raw = getCookie(name)
-  if (!raw) return null
-  try {
-    return JSON.parse(decodeURIComponent(raw)) as T
-  } catch {
-    return null
-  }
-}
-
-export const useAuthStore = create<AuthState>()((set) => {
-  const initToken = readCookieJson<string>(ACCESS_TOKEN) ?? ''
-  const initUser = readCookieJson<AuthUser>(AUTH_USER)
-  return {
-    auth: {
-      user: initUser,
-      setUser: (user) =>
-        set((state) => {
-          if (user) {
-            setCookie(AUTH_USER, encodeURIComponent(JSON.stringify(user)))
-          } else {
-            removeCookie(AUTH_USER)
-          }
-          return { ...state, auth: { ...state.auth, user } }
-        }),
-      accessToken: initToken,
-      setAccessToken: (accessToken) =>
-        set((state) => {
-          setCookie(ACCESS_TOKEN, JSON.stringify(accessToken))
-          return { ...state, auth: { ...state.auth, accessToken } }
-        }),
-      resetAccessToken: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          return { ...state, auth: { ...state.auth, accessToken: '' } }
-        }),
-      reset: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          removeCookie(AUTH_USER)
-          return {
-            ...state,
-            auth: { ...state.auth, user: null, accessToken: '' },
-          }
-        }),
-    },
-  }
-})
+export const useAuthStore = create<AuthState>()((set) => ({
+  auth: {
+    user: null,
+    accessToken: '',
+    setSession: (accessToken, user) =>
+      set((state) => ({
+        ...state,
+        auth: { ...state.auth, accessToken, user },
+      })),
+    setUser: (user) =>
+      set((state) => ({ ...state, auth: { ...state.auth, user } })),
+    reset: () =>
+      set((state) => ({
+        ...state,
+        auth: { ...state.auth, user: null, accessToken: '' },
+      })),
+  },
+}))

@@ -7,13 +7,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { weeklyActivity } from '@/features/learning-stats/data/stats'
+import { type WeeklyActivity } from '@/features/learning-stats/api'
 
 /** 各教学周学习活跃度（堆叠柱状图） */
-export function Overview() {
+export function Overview({ data }: { data: WeeklyActivity[] }) {
   return (
     <ResponsiveContainer width='100%' height={350}>
-      <BarChart data={weeklyActivity}>
+      <BarChart data={data}>
         <XAxis
           dataKey='week'
           stroke='#888888'
@@ -46,7 +46,7 @@ export function Overview() {
         />
         <Bar
           dataKey='practice'
-          name='题库练习'
+          name='练习题数'
           stackId='a'
           fill='var(--chart-2)'
         />

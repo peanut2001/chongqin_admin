@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { BadgeCheck, Bell, ChevronsUpDown, LogOut, UserCog } from 'lucide-react'
+import { BadgeCheck, ChevronsUpDown, LogOut, UserCog } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { roleLabels } from '@/lib/permissions'
 import useDialogState from '@/hooks/use-dialog-state'
@@ -81,12 +81,6 @@ export function NavUser() {
                   <Link to='/settings/account'>
                     <BadgeCheck />
                     账户
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to='/settings/notifications'>
-                    <Bell />
-                    通知
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>

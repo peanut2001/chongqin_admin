@@ -5,7 +5,7 @@ import { ProfileForm } from './profile-form'
 
 export function SettingsProfile() {
   return (
-    <ContentSection title='个人资料' desc='这是其他人在网站上看到的你的信息。'>
+    <ContentSection title='个人资料' desc='头像与个人信息。'>
       <div className='space-y-8'>
         <AvatarUpload />
         <Separator />

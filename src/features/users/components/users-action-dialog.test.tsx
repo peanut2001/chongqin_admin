@@ -1,8 +1,8 @@
+import { AxiosError, AxiosHeaders } from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
 import { type UserEvent, userEvent } from 'vitest/browser'
 import { type User } from '../data/schema'
-import { useUsersStore } from '../data/users-store'
 import { UsersActionDialog } from './users-action-dialog'
 
 const VALIDATION_MESSAGES = {
@@ -28,17 +28,55 @@ const MOCK_USER: User = {
   phoneNumber: '+19999999999',
   status: 'active',
   role: 'admin',
-  createdAt: new Date('2026-01-01'),
-  updatedAt: new Date('2026-02-02'),
+  studentNo: null,
+  classId: null,
+  className: null,
+  avatarUrl: null,
+  lastLoginAt: null,
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-02-02T00:00:00Z',
 }
 
-const findUser = (id: string) =>
-  useUsersStore.getState().users.find((u) => u.id === id)
+type MutateOpts = { onSuccess?: () => void; onError?: (e: unknown) => void }
+// 默认模拟服务端成功；个别用例改为返回错误
+let serverError: unknown = null
+const respond = (opts?: MutateOpts) =>
+  serverError ? opts?.onError?.(serverError) : opts?.onSuccess?.()
+const createMutate = vi.fn((_input: unknown, opts?: MutateOpts) =>
+  respond(opts)
+)
+const updateMutate = vi.fn((_input: unknown, opts?: MutateOpts) =>
+  respond(opts)
+)
+
+vi.mock('../api', () => ({
+  useCreateUser: () => ({ mutate: createMutate, isPending: false }),
+  useUpdateUser: () => ({ mutate: updateMutate, isPending: false }),
+}))
+
+vi.mock('@/lib/api/meta', () => ({
+  useMeta: () => ({
+    data: {
+      semester: null,
+      classes: [{ id: 1, name: '1 班', studentCount: 3 }],
+    },
+  }),
+}))
+
+function conflict(fields: Record<string, string>) {
+  return new AxiosError('conflict', '409', undefined, undefined, {
+    status: 409,
+    statusText: 'CONFLICT',
+    headers: {},
+    config: { headers: new AxiosHeaders() },
+    data: { title: '提交的信息与已有用户冲突。', code: 'conflict', fields },
+  })
+}
 
 describe('UsersActionDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    useUsersStore.setState({ users: [MOCK_USER], passwords: {} })
+    serverError = null
   })
 
   describe('add user', () => {
@@ -46,155 +84,94 @@ describe('UsersActionDialog', () => {
       const { getByRole, getByText } = await render(
         <UsersActionDialog open onOpenChange={vi.fn()} />
       )
-
-      const title = getByRole('heading', {
-        level: 2,
-        name: /添加新用户/i,
-      })
-      const description = getByText(/在此创建新用户。完成后点击保存。/i)
-
-      await expect.element(title).toBeInTheDocument()
-      await expect.element(description).toBeInTheDocument()
+      await expect
+        .element(getByRole('heading', { level: 2, name: /添加新用户/i }))
+        .toBeInTheDocument()
+      await expect
+        .element(getByText(/在此创建新用户。完成后点击保存。/i))
+        .toBeInTheDocument()
     })
 
     it('shows validation messages when the form is submitted with empty fields', async () => {
       const { getByRole, getByText } = await render(
         <UsersActionDialog open onOpenChange={vi.fn()} />
       )
+      await userEvent.click(getByRole('button', { name: /保存更改/i }))
 
-      const submitButton = getByRole('button', { name: /保存更改/i })
-      await userEvent.click(submitButton)
-
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.firstName))
-        .toBeInTheDocument()
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.lastName))
-        .toBeInTheDocument()
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.username))
-        .toBeInTheDocument()
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.phoneNumber))
-        .toBeInTheDocument()
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.email))
-        .toBeInTheDocument()
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.role))
-        .toBeInTheDocument()
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.password))
-        .toBeInTheDocument()
-    })
-
-    it('keeps confirm password disabled until password field is touched', async () => {
-      const { getByRole } = await render(
-        <UsersActionDialog open onOpenChange={vi.fn()} />
-      )
-
-      const password = getByRole('textbox', { name: /^密码$/i })
-      const confirmPassword = getByRole('textbox', {
-        name: /确认密码/i,
-      })
-      await expect.element(confirmPassword).toBeDisabled()
-
-      await userEvent.type(password, 'a')
-      await expect.element(confirmPassword).toBeEnabled()
+      for (const key of [
+        'firstName',
+        'lastName',
+        'username',
+        'phoneNumber',
+        'email',
+        'role',
+        'password',
+      ] as const) {
+        await expect
+          .element(getByText(VALIDATION_MESSAGES[key]))
+          .toBeInTheDocument()
+      }
+      expect(createMutate).not.toHaveBeenCalled()
     })
 
     it('shows password validation messages when password is invalid', async () => {
       const { getByRole, getByText } = await render(
         <UsersActionDialog open onOpenChange={vi.fn()} />
       )
-
       const password = getByRole('textbox', { name: /^密码$/i })
-      const confirmPassword = getByRole('textbox', {
-        name: /确认密码/i,
-      })
+      const confirmPassword = getByRole('textbox', { name: /确认密码/i })
       await userEvent.type(password, 'a')
       await userEvent.type(confirmPassword, 'b')
-      const submitButton = getByRole('button', { name: /保存更改/i })
-
-      await userEvent.click(submitButton)
-
+      await userEvent.click(getByRole('button', { name: /保存更改/i }))
       await expect
         .element(getByText(VALIDATION_MESSAGES.passwordMismatch))
         .toBeInTheDocument()
 
       await userEvent.fill(password, 'short')
-
       await expect
         .element(getByText(VALIDATION_MESSAGES.passwordLength))
         .toBeInTheDocument()
-
       await userEvent.fill(password, 'ONLYUPPERCASE')
-
       await expect
         .element(getByText(VALIDATION_MESSAGES.passwordLowercase))
         .toBeInTheDocument()
-
       await userEvent.fill(password, 'onlylowercase')
-
       await expect
         .element(getByText(VALIDATION_MESSAGES.passwordNumber))
         .toBeInTheDocument()
-
-      await userEvent.fill(password, 'S3cur3P@ssw0rd')
-      await userEvent.fill(confirmPassword, 'S3cur3P@ssw0rd')
-
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.passwordMismatch))
-        .not.toBeInTheDocument()
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.passwordLength))
-        .not.toBeInTheDocument()
-      await expect
-        .element(getByText(VALIDATION_MESSAGES.passwordNumber))
-        .not.toBeInTheDocument()
     })
 
-    it('adds the user to the store when the form is submitted successfully', async () => {
+    it('creates the user through the API and closes', async () => {
       const onOpenChange = vi.fn()
-      useUsersStore.setState({ users: [], passwords: {} })
-
       const screen = await render(
         <UsersActionDialog open onOpenChange={onOpenChange} />
       )
-
       await fillRequiredProfileFields(userEvent, screen, MOCK_USER)
-
       await fillPasswords(userEvent, screen, 'S3cur3P@ssw0rd', 'S3cur3P@ssw0rd')
+      await userEvent.click(screen.getByRole('button', { name: /保存更改/i }))
 
-      const submitButton = screen.getByRole('button', { name: /保存更改/i })
-      await userEvent.click(submitButton)
-
-      expect(onOpenChange).toHaveBeenCalledOnce()
-      expect(onOpenChange).toHaveBeenCalledWith(false)
-
-      const { users, passwords } = useUsersStore.getState()
-      expect(users).toHaveLength(1)
-      expect(users[0]).toMatchObject({
+      await vi.waitFor(() => expect(createMutate).toHaveBeenCalledOnce())
+      expect(createMutate.mock.calls[0][0]).toMatchObject({
         firstName: MOCK_USER.firstName,
         lastName: MOCK_USER.lastName,
         username: MOCK_USER.username,
         email: MOCK_USER.email,
-        role: MOCK_USER.role,
         phoneNumber: MOCK_USER.phoneNumber,
-        status: 'active',
+        role: 'admin',
+        password: 'S3cur3P@ssw0rd',
+        studentNo: null,
+        classId: null,
       })
-      expect(passwords[users[0].id]).toBe('S3cur3P@ssw0rd')
+      expect(onOpenChange).toHaveBeenCalledWith(false)
     })
 
-    it('rejects an email that is already used by another user', async () => {
+    it('shows server conflicts on the matching field and stays open', async () => {
+      serverError = conflict({ email: '该邮箱已被其他用户使用。' })
       const onOpenChange = vi.fn()
       const screen = await render(
         <UsersActionDialog open onOpenChange={onOpenChange} />
       )
-
-      await fillRequiredProfileFields(userEvent, screen, {
-        email: MOCK_USER.email,
-      })
+      await fillRequiredProfileFields(userEvent, screen, MOCK_USER)
       await fillPasswords(userEvent, screen, 'S3cur3P@ssw0rd', 'S3cur3P@ssw0rd')
       await userEvent.click(screen.getByRole('button', { name: /保存更改/i }))
 
@@ -202,7 +179,28 @@ describe('UsersActionDialog', () => {
         .element(screen.getByText('该邮箱已被其他用户使用。'))
         .toBeInTheDocument()
       expect(onOpenChange).not.toHaveBeenCalled()
-      expect(useUsersStore.getState().users).toHaveLength(1)
+    })
+
+    it('asks for student number and class when the role is student', async () => {
+      const screen = await render(
+        <UsersActionDialog open onOpenChange={vi.fn()} />
+      )
+      await fillRequiredProfileFields(userEvent, screen, {
+        roleOption: '学生',
+      })
+      await expect.element(screen.getByLabelText(/^学号$/i)).toBeInTheDocument()
+      await userEvent.fill(screen.getByLabelText(/^学号$/i), 'S2025099')
+      await userEvent.click(screen.getByRole('combobox', { name: /班级/i }))
+      await userEvent.click(screen.getByRole('option', { name: '1 班' }))
+      await fillPasswords(userEvent, screen, 'abc12345', 'abc12345')
+      await userEvent.click(screen.getByRole('button', { name: /保存更改/i }))
+
+      await vi.waitFor(() => expect(createMutate).toHaveBeenCalledOnce())
+      expect(createMutate.mock.calls[0][0]).toMatchObject({
+        role: 'student',
+        studentNo: 'S2025099',
+        classId: 1,
+      })
     })
   })
 
@@ -211,15 +209,12 @@ describe('UsersActionDialog', () => {
       const { getByRole, getByText } = await render(
         <UsersActionDialog open onOpenChange={vi.fn()} currentRow={MOCK_USER} />
       )
-
-      const title = getByRole('heading', {
-        level: 2,
-        name: /编辑用户/i,
-      })
-      const description = getByText(/在此更新用户信息。完成后点击保存。/i)
-
-      await expect.element(title).toBeInTheDocument()
-      await expect.element(description).toBeInTheDocument()
+      await expect
+        .element(getByRole('heading', { level: 2, name: /编辑用户/i }))
+        .toBeInTheDocument()
+      await expect
+        .element(getByText(/在此更新用户信息。完成后点击保存。/i))
+        .toBeInTheDocument()
     })
 
     it('submits without password changes', async () => {
@@ -231,80 +226,47 @@ describe('UsersActionDialog', () => {
           currentRow={MOCK_USER}
         />
       )
+      await userEvent.click(screen.getByRole('button', { name: /保存更改/i }))
 
-      const submitButton = screen.getByRole('button', { name: /保存更改/i })
-      await userEvent.click(submitButton)
-
-      expect(onOpenChange).toHaveBeenCalledOnce()
-      expect(onOpenChange).toHaveBeenCalledWith(false)
-
-      expect(findUser(MOCK_USER.id)).toMatchObject({
-        firstName: MOCK_USER.firstName,
+      await vi.waitFor(() => expect(updateMutate).toHaveBeenCalledOnce())
+      const payload = updateMutate.mock.calls[0][0] as Record<string, unknown>
+      expect(payload).toMatchObject({
+        id: MOCK_USER.id,
         email: MOCK_USER.email,
-        role: MOCK_USER.role,
       })
-      expect(useUsersStore.getState().passwords[MOCK_USER.id]).toBeUndefined()
+      expect(payload).not.toHaveProperty('password')
+      expect(onOpenChange).toHaveBeenCalledWith(false)
     })
 
     it('requires confirm password when password is changed', async () => {
       const { getByRole, getByText } = await render(
         <UsersActionDialog open onOpenChange={vi.fn()} currentRow={MOCK_USER} />
       )
-
-      const password = getByRole('textbox', { name: /^密码$/i })
-      const confirmPassword = getByRole('textbox', {
-        name: /确认密码/i,
-      })
-
-      await userEvent.fill(password, 'S3cur3P@ssw0rd')
-      await expect.element(confirmPassword).toBeEnabled()
-
-      const submitButton = getByRole('button', { name: /保存更改/i })
-      await userEvent.click(submitButton)
-
+      await userEvent.fill(
+        getByRole('textbox', { name: /^密码$/i }),
+        'S3cur3P@ssw0rd'
+      )
+      await userEvent.click(getByRole('button', { name: /保存更改/i }))
       await expect
         .element(getByText(VALIDATION_MESSAGES.passwordMismatch))
         .toBeInTheDocument()
+      expect(updateMutate).not.toHaveBeenCalled()
     })
 
-    it('updates the user in the store when the form is submitted successfully', async () => {
-      const onOpenChange = vi.fn()
+    it('sends the new password when it is changed', async () => {
       const screen = await render(
-        <UsersActionDialog
-          open
-          onOpenChange={onOpenChange}
-          currentRow={MOCK_USER}
-        />
+        <UsersActionDialog open onOpenChange={vi.fn()} currentRow={MOCK_USER} />
       )
+      await userEvent.fill(screen.getByLabelText(/^名$/i), 'John')
+      await fillPasswords(userEvent, screen, 'S3cur3P@ssw0rd', 'S3cur3P@ssw0rd')
+      await userEvent.click(screen.getByRole('button', { name: /保存更改/i }))
 
-      const EDIT_SUCCESS_FIRST_NAME = 'John'
-      const EDIT_SUCCESS_PASSWORD = 'S3cur3P@ssw0rd'
-
-      await userEvent.fill(
-        screen.getByLabelText(/^名$/i),
-        EDIT_SUCCESS_FIRST_NAME
-      )
-      await fillPasswords(
-        userEvent,
-        screen,
-        EDIT_SUCCESS_PASSWORD,
-        EDIT_SUCCESS_PASSWORD
-      )
-
-      const submitButton = screen.getByRole('button', { name: /保存更改/i })
-      await userEvent.click(submitButton)
-
-      expect(onOpenChange).toHaveBeenCalledOnce()
-      expect(onOpenChange).toHaveBeenCalledWith(false)
-
-      expect(findUser(MOCK_USER.id)).toMatchObject({
-        firstName: EDIT_SUCCESS_FIRST_NAME,
-        lastName: MOCK_USER.lastName,
-        username: MOCK_USER.username,
+      await vi.waitFor(() => expect(updateMutate).toHaveBeenCalledOnce())
+      expect(updateMutate.mock.calls[0][0]).toMatchObject({
+        id: MOCK_USER.id,
+        firstName: 'John',
+        password: 'S3cur3P@ssw0rd',
       })
-      expect(useUsersStore.getState().passwords[MOCK_USER.id]).toBe(
-        EDIT_SUCCESS_PASSWORD
-      )
     })
   })
 })
@@ -335,10 +297,12 @@ async function fillRequiredProfileFields(
     await user.fill(el, value)
   }
 
-  const roleSelect = screen.getByRole('combobox', { name: /角色/i })
-  await user.click(roleSelect)
+  await user.click(screen.getByRole('combobox', { name: /角色/i }))
   await user.click(
-    screen.getByRole('option', { name: overrides?.roleOption ?? '管理员' })
+    screen.getByRole('option', {
+      name: overrides?.roleOption ?? '管理员',
+      exact: true,
+    })
   )
 }
 
@@ -348,8 +312,6 @@ async function fillPasswords(
   a: string,
   b: string
 ) {
-  const password = screen.getByLabelText(/^密码$/i)
-  const confirmPassword = screen.getByLabelText(/^确认密码$/i)
-  await user.fill(password, a)
-  await user.fill(confirmPassword, b)
+  await user.fill(screen.getByLabelText(/^密码$/i), a)
+  await user.fill(screen.getByLabelText(/^确认密码$/i), b)
 }

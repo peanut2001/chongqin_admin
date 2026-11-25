@@ -22,11 +22,21 @@ export default defineConfig({
     },
   },
   server: {
-    // Docker 挂载卷下文件事件无法传递，需轮询才能热更新
-    watch:
-      process.env.VITE_USE_POLLING === 'true'
+    watch: {
+      // Docker 挂载卷下文件事件无法传递，需轮询才能热更新
+      ...(process.env.VITE_USE_POLLING === 'true'
         ? { usePolling: true, interval: 300 }
-        : undefined,
+        : {}),
+      // 后端目录（含大量病例图片与 Python 文件）与前端无关，不必监听
+      ignored: ['**/backend/**', '**/db/**'],
+    },
+    proxy: {
+      // 前后端同源：/api 由开发服务器代理到 Flask，免 CORS，refresh cookie 可用
+      '/api': {
+        target: process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:5000',
+        changeOrigin: true,
+      },
+    },
   },
   test: {
     silent: 'passed-only',

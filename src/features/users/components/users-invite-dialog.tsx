@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { MailPlus, Send } from 'lucide-react'
 import { toast } from 'sonner'
-import { type Role } from '@/lib/permissions'
+import { apiErrorTitle, apiFieldErrors } from '@/lib/api/client'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -25,8 +25,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { SelectDropdown } from '@/components/select-dropdown'
+import { useInviteUser } from '../api'
 import { roles } from '../data/data'
-import { emailExists, useUsersStore } from '../data/users-store'
 
 const formSchema = z.object({
   email: z.email({
@@ -52,33 +52,27 @@ export function UsersInviteDialog({
     defaultValues: { email: '', role: '', desc: '' },
   })
 
-  const addUser = useUsersStore((s) => s.addUser)
+  const invite = useInviteUser()
 
   const onSubmit = (values: UserInviteForm) => {
-    if (emailExists(values.email)) {
-      form.setError('email', { message: '该邮箱已存在。' })
-      return
-    }
-
-    // 被邀请的用户状态为「已邀请」，管理员激活后才能登录
-    const username = values.email.split('@')[0]
-    const now = new Date()
-    addUser({
-      id: crypto.randomUUID(),
-      firstName: username,
-      lastName: '',
-      username,
-      email: values.email,
-      phoneNumber: '',
-      status: 'invited',
-      role: values.role as Role,
-      createdAt: now,
-      updatedAt: now,
-    })
-    toast.success(`已向 ${values.email} 发送邀请`)
-
-    form.reset()
-    onOpenChange(false)
+    // 受邀用户状态为「已邀请」；暂无邮件服务，需管理员在「编辑」中设置密码后才能登录
+    invite.mutate(
+      { email: values.email, role: values.role },
+      {
+        onSuccess: () => {
+          toast.success(
+            `已创建受邀账号 ${values.email}，请在编辑中为其设置初始密码`
+          )
+          form.reset()
+          onOpenChange(false)
+        },
+        onError: (err) => {
+          const fields = apiFieldErrors(err)
+          if (fields.email) form.setError('email', { message: fields.email })
+          else toast.error(apiErrorTitle(err))
+        },
+      }
+    )
   }
 
   return (
@@ -95,7 +89,7 @@ export function UsersInviteDialog({
             <MailPlus /> 邀请用户
           </DialogTitle>
           <DialogDescription>
-            通过发送邮件邀请新用户加入你的团队。分配角色以确定其访问权限。
+            为新用户预先创建账号并分配角色。平台暂未接入邮件服务，受邀账号需由管理员在「编辑」中设置初始密码后才能登录。
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

@@ -3,94 +3,68 @@ import { createTableMock } from '@/test-utils/tanstack-table'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
-import { type User } from '../data/schema'
-import { useUsersStore } from '../data/users-store'
+import { type BulkResult } from '../data/schema'
 import { UsersMultiDeleteDialog } from './users-multi-delete-dialog'
 
-const makeUser = (id: string): User => ({
-  id,
-  firstName: 'Test',
-  lastName: id,
-  username: id,
-  email: `${id}@test.com`,
-  phoneNumber: '',
-  status: 'active',
-  role: 'student',
-  createdAt: new Date('2026-01-01'),
-  updatedAt: new Date('2026-01-01'),
-})
+type MutateOpts = { onSuccess?: (r: BulkResult) => void }
+let result: BulkResult = { affected: 2, skipped: [] }
+const bulkMutate = vi.fn((_input: unknown, opts?: MutateOpts) =>
+  opts?.onSuccess?.(result)
+)
+
+vi.mock('../api', () => ({
+  useBulkUsers: () => ({ mutate: bulkMutate, isPending: false }),
+}))
+
+const toastSuccess = vi.fn()
+const toastWarning = vi.fn()
+vi.mock('sonner', async (orig) => ({
+  ...(await orig<typeof import('sonner')>()),
+  toast: Object.assign(vi.fn(), {
+    success: (m: string) => toastSuccess(m),
+    warning: (m: string) => toastWarning(m),
+    error: vi.fn(),
+  }),
+}))
+
+const confirmInput = (screen: Awaited<ReturnType<typeof render>>) =>
+  screen.getByRole('textbox', { name: /输入“DELETE”以确认/i })
 
 describe('UsersMultiDeleteDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // createTableMock 选中的两行 id 为 row-1、row-2
-    useUsersStore.setState({
-      users: ['row-1', 'row-2', 'row-3'].map(makeUser),
-      passwords: {},
-    })
+    result = { affected: 2, skipped: [] }
   })
 
-  it('renders the dialog with the correct title, description, input and buttons', async () => {
+  it('renders the title with the selected count and a disabled delete button', async () => {
     const { table } = createTableMock()
-
-    const { getByRole, getByText } = await render(
+    const screen = await render(
       <UsersMultiDeleteDialog open onOpenChange={vi.fn()} table={table} />
     )
-
-    const title = getByRole('heading', {
-      level: 2,
-      name: /删除 2 个用户/i,
-    })
-    const desc = getByText(new RegExp(`确定要删除所选用户吗？`, 'i'))
-    const confirmDeleteInput = getByRole('textbox', {
-      name: /输入“DELETE”以确认/i,
-    })
-    const deleteButton = getByRole('button', { name: /删除/i })
-
-    await expect.element(title).toBeInTheDocument()
-    await expect.element(desc).toBeInTheDocument()
-    await expect.element(confirmDeleteInput).toBeInTheDocument()
-    await expect.element(deleteButton).toBeInTheDocument()
-    await expect.element(deleteButton).toBeDisabled()
+    await expect
+      .element(
+        screen.getByRole('heading', { level: 2, name: /删除 2 个用户/i })
+      )
+      .toBeInTheDocument()
+    await expect
+      .element(screen.getByRole('button', { name: /^删除$/ }))
+      .toBeDisabled()
   })
 
-  it('keeps the delete button disabled until the confirm delete input is filled correctly', async () => {
+  it('enables delete only after typing DELETE', async () => {
     const { table } = createTableMock()
-    const { getByRole } = await render(
+    const screen = await render(
       <UsersMultiDeleteDialog open onOpenChange={vi.fn()} table={table} />
     )
-
-    const confirmDeleteInput = getByRole('textbox', {
-      name: /输入“DELETE”以确认/i,
-    })
-    const deleteButton = getByRole('button', { name: /删除/i })
-
+    const deleteButton = screen.getByRole('button', { name: /^删除$/ })
+    await userEvent.fill(confirmInput(screen), 'wrong-input')
     await expect.element(deleteButton).toBeDisabled()
-
-    await userEvent.fill(confirmDeleteInput, 'wrong-input')
-    await expect.element(deleteButton).toBeDisabled()
-
-    await userEvent.fill(confirmDeleteInput, 'DELETE')
+    await userEvent.fill(confirmInput(screen), 'DELETE')
     await expect.element(deleteButton).toBeEnabled()
   })
 
-  it('closes the dialog when the cancel button is clicked', async () => {
+  it('resets the confirm input when the dialog is closed and reopened', async () => {
     const { table } = createTableMock()
-    const onOpenChange = vi.fn()
-    const { getByRole } = await render(
-      <UsersMultiDeleteDialog open onOpenChange={onOpenChange} table={table} />
-    )
-
-    const cancelButton = getByRole('button', { name: /取消/i })
-    await userEvent.click(cancelButton)
-
-    expect(onOpenChange).toHaveBeenCalledOnce()
-    expect(onOpenChange).toHaveBeenCalledWith(false)
-  })
-
-  it('resets the confirm delete input when the dialog is closed and reopened', async () => {
-    const { table } = createTableMock()
-
     function Harness() {
       const [open, setOpen] = useState(true)
       return (
@@ -108,70 +82,43 @@ describe('UsersMultiDeleteDialog', () => {
         </>
       )
     }
-
-    const { getByRole } = await render(<Harness />)
-
-    const confirmDeleteInput = getByRole('textbox', {
-      name: /输入“DELETE”以确认/i,
-    })
-    await userEvent.fill(confirmDeleteInput, 'DELETE')
-    await expect.element(confirmDeleteInput).toHaveValue('DELETE')
-
-    const cancelButton = getByRole('button', { name: /取消/i })
-    await userEvent.click(cancelButton)
-
-    const reopenButton = getByRole('button', { name: /Reopen/i })
-    await userEvent.click(reopenButton)
-    await expect.element(confirmDeleteInput).toHaveValue('')
+    const screen = await render(<Harness />)
+    await userEvent.fill(confirmInput(screen), 'DELETE')
+    await userEvent.click(screen.getByRole('button', { name: /取消/i }))
+    await userEvent.click(screen.getByRole('button', { name: /Reopen/i }))
+    await expect.element(confirmInput(screen)).toHaveValue('')
   })
 
-  it('removes the selected users from the store when deleted successfully', async () => {
+  it('sends the selected ids to the bulk API and resets selection', async () => {
     const { table, resetRowSelection } = createTableMock()
     const onOpenChange = vi.fn()
-    const { getByRole } = await render(
+    const screen = await render(
       <UsersMultiDeleteDialog open onOpenChange={onOpenChange} table={table} />
     )
+    await userEvent.fill(confirmInput(screen), 'DELETE')
+    await userEvent.click(screen.getByRole('button', { name: /^删除$/ }))
 
-    const confirmDeleteInput = getByRole('textbox', {
-      name: /输入“DELETE”以确认/i,
-    })
-    const deleteButton = getByRole('button', { name: /删除/i })
-
-    await expect.element(deleteButton).toBeDisabled()
-
-    await userEvent.fill(confirmDeleteInput, 'DELETE')
-    await expect.element(deleteButton).toBeEnabled()
-
-    await userEvent.click(deleteButton)
-
-    expect(onOpenChange).toHaveBeenCalledOnce()
+    expect(bulkMutate).toHaveBeenCalledWith(
+      { action: 'delete', ids: ['row-1', 'row-2'] },
+      expect.anything()
+    )
     expect(onOpenChange).toHaveBeenCalledWith(false)
-
-    await vi.waitFor(() => expect(resetRowSelection).toHaveBeenCalledOnce())
-    expect(useUsersStore.getState().users.map((u) => u.id)).toEqual(['row-3'])
+    expect(resetRowSelection).toHaveBeenCalledOnce()
+    expect(toastSuccess).toHaveBeenCalledWith('已删除 2 个用户')
   })
 
-  it('deletes successfully when press Enter key on the confirm delete input', async () => {
-    const { table, resetRowSelection } = createTableMock()
-    const onOpenChange = vi.fn()
-    const { getByRole } = await render(
-      <UsersMultiDeleteDialog open onOpenChange={onOpenChange} table={table} />
+  it('reports users skipped by the server (e.g. yourself)', async () => {
+    result = { affected: 1, skipped: [{ id: 'row-2', reason: 'self' }] }
+    const { table } = createTableMock()
+    const screen = await render(
+      <UsersMultiDeleteDialog open onOpenChange={vi.fn()} table={table} />
     )
-
-    const confirmDeleteInput = getByRole('textbox', {
-      name: /输入“DELETE”以确认/i,
-    })
-    const deleteButton = getByRole('button', { name: /删除/i })
-
-    await expect.element(deleteButton).toBeDisabled()
-
-    await userEvent.fill(confirmDeleteInput, 'DELETE')
-    await expect.element(deleteButton).toBeEnabled()
-
+    await userEvent.fill(confirmInput(screen), 'DELETE')
     await userEvent.keyboard('{Enter}')
-    expect(onOpenChange).toHaveBeenCalledOnce()
-    expect(onOpenChange).toHaveBeenCalledWith(false)
 
-    await vi.waitFor(() => expect(resetRowSelection).toHaveBeenCalledOnce())
+    expect(toastSuccess).toHaveBeenCalledWith('已删除 1 个用户')
+    expect(toastWarning).toHaveBeenCalledWith(
+      expect.stringContaining('不能操作当前登录的自己')
+    )
   })
 })

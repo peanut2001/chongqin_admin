@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
+  type ColumnFiltersState,
+  type OnChangeFn,
+  type PaginationState,
+  type RowSelectionState,
   type SortingState,
   type VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
@@ -22,51 +21,96 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { useUsers } from '../api'
 import { roles, statuses } from '../data/data'
-import { type User } from '../data/schema'
+import { type User, type UsersQuery } from '../data/schema'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { usersColumns as columns } from './users-columns'
 
 type DataTableProps = {
-  data: User[]
   search: Record<string, unknown>
   navigate: NavigateFn
 }
 
-export function UsersTable({ data, search, navigate }: DataTableProps) {
-  // Local UI-only states
-  const [rowSelection, setRowSelection] = useState({})
+const EMPTY: User[] = []
+
+/** 关键字输入防抖，避免每敲一个字就请求一次 */
+function useDebounced<T>(value: T, delay = 300) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(t)
+  }, [value, delay])
+  return debounced
+}
+
+/**
+ * 用户表格：分页、筛选、排序全部由后端完成（manual 模式），
+ * 筛选与分页状态同步在地址栏，刷新页面可恢复。
+ */
+export function UsersTable({ search, navigate }: DataTableProps) {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [sorting, setSorting] = useState<SortingState>([])
 
-  // Local state management for table (uncomment to use local-only state, not synced with URL)
-  // const [columnFilters, onColumnFiltersChange] = useState<ColumnFiltersState>([])
-  // const [pagination, onPaginationChange] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
-
   // Synced with URL states (keys/defaults mirror users route search schema)
-  const {
-    columnFilters,
-    onColumnFiltersChange,
-    pagination,
-    onPaginationChange,
-    ensurePageInRange,
-  } = useTableUrlState({
+  const urlState = useTableUrlState({
     search,
     navigate,
     pagination: { defaultPage: 1, defaultPageSize: 10 },
     globalFilter: { enabled: false },
     columnFilters: [
-      // username per-column text filter
       { columnId: 'username', searchKey: 'username', type: 'string' },
       { columnId: 'status', searchKey: 'status', type: 'array' },
       { columnId: 'role', searchKey: 'role', type: 'array' },
     ],
   })
+  const { columnFilters, pagination, ensurePageInRange } = urlState
+
+  // 翻页、筛选、排序变化时清空勾选，避免批量操作作用到看不见的行
+  const onPaginationChange: OnChangeFn<PaginationState> = (u) => {
+    setRowSelection({})
+    urlState.onPaginationChange(u)
+  }
+  const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (u) => {
+    setRowSelection({})
+    urlState.onColumnFiltersChange(u)
+  }
+  const onSortingChange: OnChangeFn<SortingState> = (u) => {
+    setRowSelection({})
+    setSorting(u)
+  }
+
+  const filterValue = (id: string) =>
+    columnFilters.find((f) => f.id === id)?.value
+  const keyword = useDebounced(String(filterValue('username') ?? ''))
+  const query: UsersQuery = {
+    page: pagination.pageIndex + 1,
+    pageSize: pagination.pageSize,
+    status: (filterValue('status') as UsersQuery['status']) ?? [],
+    role: (filterValue('role') as UsersQuery['role']) ?? [],
+    username: keyword.trim(),
+    sort: sorting[0]
+      ? `${sorting[0].id}.${sorting[0].desc ? 'desc' : 'asc'}`
+      : undefined,
+  }
+  const { data, isLoading, isError } = useUsers(query)
+
+  const facets = data?.facets
+  const facetMaps = useMemo(
+    () => ({
+      status: new Map(Object.entries(facets?.status ?? {})),
+      role: new Map(Object.entries(facets?.role ?? {})),
+    }),
+    [facets]
+  )
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data,
+    data: data?.items ?? EMPTY,
     columns,
+    getRowId: (row) => row.id,
+    rowCount: data?.total ?? 0,
     state: {
       sorting,
       pagination,
@@ -74,23 +118,25 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
       columnFilters,
       columnVisibility,
     },
+    manualPagination: true,
+    manualFiltering: true,
+    manualSorting: true,
     enableRowSelection: true,
     onPaginationChange,
     onColumnFiltersChange,
     onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
+    onSortingChange,
     onColumnVisibilityChange: setColumnVisibility,
-    getPaginationRowModel: getPaginationRowModel(),
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    // 筛选弹窗里的数量来自后端分面统计
+    getFacetedUniqueValues: (_table, columnId) => () =>
+      facetMaps[columnId as keyof typeof facetMaps] ?? new Map(),
   })
 
+  const pageCount = table.getPageCount()
   useEffect(() => {
-    ensurePageInRange(table.getPageCount())
-  }, [table, ensurePageInRange])
+    if (data) ensurePageInRange(pageCount)
+  }, [data, pageCount, ensurePageInRange])
 
   return (
     <div
@@ -101,7 +147,7 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
     >
       <DataTableToolbar
         table={table}
-        searchPlaceholder='筛选用户…'
+        searchPlaceholder='搜索用户名 / 姓名 / 邮箱…'
         searchKey='username'
         filters={[
           {
@@ -173,9 +219,13 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'
+                  className='h-24 text-center text-muted-foreground'
                 >
-                  暂无结果。
+                  {isLoading
+                    ? '加载中…'
+                    : isError
+                      ? '加载失败，请刷新重试。'
+                      : '暂无结果。'}
                 </TableCell>
               </TableRow>
             )}

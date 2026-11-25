@@ -2,6 +2,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   ComposedChart,
   Legend,
   Line,
@@ -12,7 +13,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { chapterMastery, moduleUsage, weeklyActivity } from '../data/stats'
+import {
+  type ChapterMastery,
+  type ModuleUsage,
+  type WeeklyActivity,
+} from '../api'
 
 const axisProps = {
   stroke: '#888888',
@@ -31,18 +36,42 @@ const tooltipStyle = {
   labelStyle: { color: 'var(--popover-foreground)' },
 }
 
-/** 每周练习量 + 平均正确率 */
-export function WeeklyTrendChart({ height = 320 }: { height?: number }) {
+const moduleColors: Record<string, string> = {
+  cases: 'var(--chart-1)',
+  practice: 'var(--chart-2)',
+  ai: 'var(--chart-3)',
+}
+
+function Empty({ height, text }: { height: number; text: string }) {
+  return (
+    <div
+      className='flex items-center justify-center text-sm text-muted-foreground'
+      style={{ height }}
+    >
+      {text}
+    </div>
+  )
+}
+
+/** 每周练习题数、AI 判读次数 + 平均正确率 */
+export function WeeklyTrendChart({
+  data,
+  height = 320,
+}: {
+  data: WeeklyActivity[]
+  height?: number
+}) {
+  if (data.length === 0) return <Empty height={height} text='学期尚未开始' />
   return (
     <ResponsiveContainer width='100%' height={height}>
-      <ComposedChart data={weeklyActivity}>
+      <ComposedChart data={data}>
         <CartesianGrid strokeDasharray='3 3' vertical={false} opacity={0.3} />
         <XAxis dataKey='week' {...axisProps} />
-        <YAxis yAxisId='left' {...axisProps} />
+        <YAxis yAxisId='left' allowDecimals={false} {...axisProps} />
         <YAxis
           yAxisId='right'
           orientation='right'
-          domain={[50, 100]}
+          domain={[0, 100]}
           tickFormatter={(v) => `${v}%`}
           {...axisProps}
         />
@@ -51,7 +80,7 @@ export function WeeklyTrendChart({ height = 320 }: { height?: number }) {
         <Bar
           yAxisId='left'
           dataKey='practice'
-          name='练习次数'
+          name='练习题数'
           fill='var(--chart-2)'
           radius={[4, 4, 0, 0]}
         />
@@ -76,11 +105,18 @@ export function WeeklyTrendChart({ height = 320 }: { height?: number }) {
   )
 }
 
-/** 各章节掌握度 */
-export function ChapterMasteryChart({ height = 260 }: { height?: number }) {
+/** 各章节掌握度（作答正确率） */
+export function ChapterMasteryChart({
+  data,
+  height = 260,
+}: {
+  data: ChapterMastery[]
+  height?: number
+}) {
+  if (data.length === 0) return <Empty height={height} text='暂无作答数据' />
   return (
     <ResponsiveContainer width='100%' height={height}>
-      <BarChart data={chapterMastery} layout='vertical' margin={{ left: 8 }}>
+      <BarChart data={data} layout='vertical' margin={{ left: 8 }}>
         <XAxis
           type='number'
           domain={[0, 100]}
@@ -101,18 +137,31 @@ export function ChapterMasteryChart({ height = 260 }: { height?: number }) {
 }
 
 /** 功能模块学习时长占比 */
-export function ModuleUsageChart({ height = 260 }: { height?: number }) {
+export function ModuleUsageChart({
+  data,
+  height = 260,
+}: {
+  data: ModuleUsage[]
+  height?: number
+}) {
+  if (data.every((d) => d.value === 0)) {
+    return <Empty height={height} text='暂无学习记录' />
+  }
   return (
     <ResponsiveContainer width='100%' height={height}>
       <PieChart>
         <Pie
-          data={moduleUsage}
+          data={data}
           dataKey='value'
           nameKey='name'
           innerRadius='55%'
           outerRadius='80%'
           paddingAngle={2}
-        />
+        >
+          {data.map((d) => (
+            <Cell key={d.key} fill={moduleColors[d.key] ?? 'var(--chart-4)'} />
+          ))}
+        </Pie>
         <Tooltip
           {...tooltipStyle}
           formatter={(v) => [`${v} 小时`, '学习时长']}

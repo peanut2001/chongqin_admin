@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useMeta } from '@/lib/api/meta'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -26,11 +27,16 @@ import { DefaultHeader } from '@/components/layout/default-header'
 import { Main } from '@/components/layout/main'
 import { SimpleProgress } from '@/components/simple-progress'
 import {
+  formatRelativeTime,
+  type StudentStat,
+  useStatsOverview,
+  useStudentStats,
+} from './api'
+import {
   ChapterMasteryChart,
   ModuleUsageChart,
   WeeklyTrendChart,
 } from './components/stats-charts'
-import { classes, semester, studentStats, type StudentStat } from './data/stats'
 
 type SortKey = 'accuracy' | 'studyHours' | 'practiceCount'
 
@@ -40,34 +46,28 @@ const sortText: Record<SortKey, string> = {
   practiceCount: '按练习题数',
 }
 
-/** 正确率 < 65% 或学习时长 < 30 小时视为需关注 */
-const needsAttention = (s: StudentStat) => s.accuracy < 65 || s.studyHours < 30
+const ALL = 'all'
 
 export function LearningStats() {
-  const [klass, setKlass] = useState(classes[0])
+  const { data: meta } = useMeta()
+  const [klass, setKlass] = useState(ALL)
   const [sortKey, setSortKey] = useState<SortKey>('accuracy')
+  const classId = klass === ALL ? undefined : Number(klass)
+
+  const overview = useStatsOverview(classId)
+  const studentsQuery = useStudentStats(classId)
 
   const students = useMemo(
     () =>
-      studentStats
-        .filter((s) => klass === classes[0] || s.className === klass)
-        .sort((a, b) => b[sortKey] - a[sortKey]),
-    [klass, sortKey]
+      // 没有作答（正确率为空）的学生排在最后
+      [...(studentsQuery.data ?? [])].sort(
+        (a, b) => (b[sortKey] ?? -1) - (a[sortKey] ?? -1)
+      ),
+    [studentsQuery.data, sortKey]
   )
 
-  const summary = useMemo(() => {
-    const n = students.length || 1
-    const sum = (
-      k: keyof Pick<StudentStat, 'studyHours' | 'practiceCount' | 'accuracy'>
-    ) => students.reduce((acc, s) => acc + s[k], 0)
-    return {
-      count: students.length,
-      avgHours: (sum('studyHours') / n).toFixed(1),
-      totalPractice: sum('practiceCount'),
-      avgAccuracy: Math.round(sum('accuracy') / n),
-      attention: students.filter(needsAttention).length,
-    }
-  }, [students])
+  const semester = overview.data?.semester ?? meta?.semester
+  const kpis = overview.data?.kpis
 
   return (
     <>
@@ -78,8 +78,9 @@ export function LearningStats() {
           <div>
             <h1 className='text-2xl font-bold tracking-tight'>学情统计</h1>
             <p className='text-muted-foreground'>
-              {semester.course} · {semester.name} · 第 {semester.currentWeek}/
-              {semester.totalWeeks} 教学周
+              {semester
+                ? `${semester.course} · ${semester.name} · 第 ${semester.currentWeek}/${semester.totalWeeks} 教学周`
+                : '尚未设置当前学期'}
             </p>
           </div>
           <Select value={klass} onValueChange={setKlass}>
@@ -87,35 +88,48 @@ export function LearningStats() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {classes.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
+              <SelectItem value={ALL}>全部班级</SelectItem>
+              {(meta?.classes ?? []).map((c) => (
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
+        {overview.isError && (
+          <p className='text-sm text-destructive'>统计数据加载失败。</p>
+        )}
+
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
           <KpiCard
             title='在学人数'
-            value={`${summary.count} 人`}
-            hint={`需关注 ${summary.attention} 人`}
+            value={kpis ? `${kpis.studentCount} 人` : '—'}
+            hint={
+              kpis
+                ? `近 7 天活跃 ${kpis.activeStudents7d} 人，需关注 ${kpis.needsAttention} 人`
+                : ''
+            }
           />
           <KpiCard
             title='人均学习时长'
-            value={`${summary.avgHours} h`}
-            hint='本学期累计'
+            value={kpis ? `${kpis.avgStudyHours} h` : '—'}
+            hint='本学期累计（练习 + 病例浏览 + AI 判读）'
           />
           <KpiCard
             title='累计练习题数'
-            value={summary.totalPractice.toLocaleString()}
-            hint='含章节练习与组卷'
+            value={kpis ? kpis.totalPractice.toLocaleString() : '—'}
+            hint={
+              kpis
+                ? `病例浏览 ${kpis.totalCaseViews.toLocaleString()} 次，AI 判读 ${kpis.totalAiReads.toLocaleString()} 次`
+                : ''
+            }
           />
           <KpiCard
             title='平均正确率'
-            value={`${summary.avgAccuracy}%`}
-            hint='按学生个人正确率平均'
+            value={kpis?.avgAccuracy != null ? `${kpis.avgAccuracy}%` : '—'}
+            hint='全部作答的总体正确率'
           />
         </div>
 
@@ -123,11 +137,11 @@ export function LearningStats() {
           <CardHeader>
             <CardTitle>学习趋势</CardTitle>
             <CardDescription>
-              各教学周练习次数、AI 判读次数与平均正确率
+              各教学周练习题数、AI 判读次数与平均正确率
             </CardDescription>
           </CardHeader>
           <CardContent className='ps-2'>
-            <WeeklyTrendChart />
+            <WeeklyTrendChart data={overview.data?.weeklyActivity ?? []} />
           </CardContent>
         </Card>
 
@@ -135,19 +149,19 @@ export function LearningStats() {
           <Card>
             <CardHeader>
               <CardTitle>章节掌握度</CardTitle>
-              <CardDescription>按章节统计的班级平均正确率</CardDescription>
+              <CardDescription>按练习集统计的作答正确率</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChapterMasteryChart />
+              <ChapterMasteryChart data={overview.data?.chapterMastery ?? []} />
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
               <CardTitle>模块使用分布</CardTitle>
-              <CardDescription>各功能模块累计学习时长</CardDescription>
+              <CardDescription>各功能模块累计学习时长（小时）</CardDescription>
             </CardHeader>
             <CardContent>
-              <ModuleUsageChart />
+              <ModuleUsageChart data={overview.data?.moduleUsage ?? []} />
             </CardContent>
           </Card>
         </div>
@@ -157,7 +171,9 @@ export function LearningStats() {
             <div className='space-y-1.5'>
               <CardTitle>学生学情明细</CardTitle>
               <CardDescription>
-                正确率低于 65% 或学习时长不足 30 小时的学生标记为「需关注」
+                正确率低于 65% 或学习时长不足
+                {kpis ? ` ${kpis.attentionHoursThreshold} ` : ' '}
+                小时（按学期进度折算）的学生标记为「需关注」
               </CardDescription>
             </div>
             <Select
@@ -193,42 +209,56 @@ export function LearningStats() {
               </TableHeader>
               <TableBody>
                 {students.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className='text-muted-foreground'>
-                      {s.id}
-                    </TableCell>
-                    <TableCell className='font-medium'>
-                      <span className='flex items-center gap-2'>
-                        {s.name}
-                        {needsAttention(s) && (
-                          <Badge variant='destructive'>需关注</Badge>
-                        )}
-                      </span>
-                    </TableCell>
-                    <TableCell>{s.className}</TableCell>
-                    <TableCell className='text-end'>{s.studyHours}</TableCell>
-                    <TableCell className='text-end'>
-                      {s.practiceCount}
-                    </TableCell>
-                    <TableCell>
-                      <div className='flex items-center gap-2'>
-                        <SimpleProgress value={s.accuracy} className='w-20' />
-                        <span className='text-sm'>{s.accuracy}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className='text-end'>{s.caseViews}</TableCell>
-                    <TableCell className='text-end'>{s.aiReads}</TableCell>
-                    <TableCell className='text-muted-foreground'>
-                      {s.lastActive}
+                  <StudentRow key={s.userId} s={s} />
+                ))}
+                {studentsQuery.data?.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={9}
+                      className='h-20 text-center text-muted-foreground'
+                    >
+                      该班级暂无学生。
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       </Main>
     </>
+  )
+}
+
+function StudentRow({ s }: { s: StudentStat }) {
+  return (
+    <TableRow>
+      <TableCell className='text-muted-foreground'>{s.id}</TableCell>
+      <TableCell className='font-medium'>
+        <span className='flex items-center gap-2'>
+          {s.name}
+          {s.needsAttention && <Badge variant='destructive'>需关注</Badge>}
+        </span>
+      </TableCell>
+      <TableCell>{s.className ?? '—'}</TableCell>
+      <TableCell className='text-end'>{s.studyHours}</TableCell>
+      <TableCell className='text-end'>{s.practiceCount}</TableCell>
+      <TableCell>
+        {s.accuracy !== null ? (
+          <div className='flex items-center gap-2'>
+            <SimpleProgress value={s.accuracy} className='w-20' />
+            <span className='text-sm'>{s.accuracy}%</span>
+          </div>
+        ) : (
+          <span className='text-sm text-muted-foreground'>未作答</span>
+        )}
+      </TableCell>
+      <TableCell className='text-end'>{s.caseViews}</TableCell>
+      <TableCell className='text-end'>{s.aiReads}</TableCell>
+      <TableCell className='text-muted-foreground'>
+        {formatRelativeTime(s.lastActive)}
+      </TableCell>
+    </TableRow>
   )
 }
 

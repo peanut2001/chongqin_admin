@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router'
+import { KeyRound } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -8,31 +10,31 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { AuthLayout } from '../auth-layout'
-import { ForgotPasswordForm } from './components/forgot-password-form'
 
+/** 平台账号由管理员开通，暂无邮件服务，忘记密码需联系管理员重置 */
 export function ForgotPassword() {
   return (
     <AuthLayout>
       <Card className='max-w-sm gap-4 sm:min-w-sm'>
         <CardHeader>
-          <CardTitle className='text-lg tracking-tight'>忘记密码</CardTitle>
-          <CardDescription>
-            请输入你的注册邮箱， <br /> 我们将向你发送重置密码的链接。
-          </CardDescription>
+          <CardTitle className='flex items-center gap-2 text-lg tracking-tight'>
+            <KeyRound className='size-5' />
+            忘记密码
+          </CardTitle>
+          <CardDescription>平台账号由管理员统一开通与管理。</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ForgotPasswordForm />
+        <CardContent className='space-y-2 text-sm text-muted-foreground'>
+          <p>
+            请联系课程管理员或任课教师，由管理员在「用户管理」中为你重置密码。
+          </p>
+          <p>
+            重置后请使用新密码登录，并尽快在「设置 → 账户」中修改为自己的密码。
+          </p>
         </CardContent>
         <CardFooter>
-          <p className='mx-auto px-8 text-center text-sm text-balance text-muted-foreground'>
-            还没有账户？{' '}
-            <Link
-              to='/sign-up'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              注册
-            </Link>
-          </p>
+          <Button asChild variant='outline' className='w-full'>
+            <Link to='/sign-in'>返回登录</Link>
+          </Button>
         </CardFooter>
       </Card>
     </AuthLayout>

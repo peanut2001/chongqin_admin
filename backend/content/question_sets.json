@@ -1,0 +1,3197 @@
+[
+ {
+  "id": "case-diagnosis",
+  "name": "真实病例诊断",
+  "shortName": "真实病例",
+  "description": "病例库真实病例：读病史、看影像，选出最可能的诊断",
+  "kind": "case_diagnosis",
+  "sessionSize": 10,
+  "sortOrder": 0,
+  "questions": [
+   {
+    "code": "Q-BL-0101",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为周围型肺癌。肺内不规则软组织密度结节或肿块，可见分叶、短毛刺及胸膜凹陷，增强后多呈中度不均匀强化；需同时评估纵隔及肺门淋巴结。",
+    "topicId": "CASE-0001",
+    "caseId": "BL-0101",
+    "presentation": "An 81-year-old man developed symptoms including an upper respiratory tract infection and sought medical attention at a local hospital to determine the cause. His performance status (PS) was 1. He underwent aortic valve replacement (bioprosthesis), mitral valve replacement (bioprosthesis), tricuspid annuloplasty, and left atrial appendage closure via median sternotomy for moderate aortic regurgitation, severe mitral regurgitation, and moderate tricuspid regurgitation 3 years ago. Computed tomography (CT) revealed a 58 mm mass in the left upper lobe (LUL, Fig. 1A).",
+    "images": [
+     {
+      "caseId": "BL-0101",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0101",
+      "position": 2
+     }
+    ],
+    "sortOrder": 0
+   },
+   {
+    "code": "Q-BL-0102",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为周围型肺癌。肺内不规则软组织密度结节或肿块，可见分叶、短毛刺及胸膜凹陷，增强后多呈中度不均匀强化；需同时评估纵隔及肺门淋巴结。",
+    "topicId": "CASE-0001",
+    "caseId": "BL-0102",
+    "presentation": "A 53-year-old Caucasian female initially presented with a large, complex left ovarian cyst accompanied by an elevated CA-125 level. At the time of admission, she denied constitutional symptoms, such as fevers, chills, or weight loss, and reported no pain. Her medical history was otherwise significant for a prior tubal ligation and a left breast lumpectomy. She is a former smoker who quit more than 30 days prior to initial presentation.",
+    "images": [
+     {
+      "caseId": "BL-0102",
+      "position": 4
+     },
+     {
+      "caseId": "BL-0102",
+      "position": 1
+     }
+    ],
+    "sortOrder": 1
+   },
+   {
+    "code": "Q-BL-0103",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为周围型肺癌。肺内不规则软组织密度结节或肿块，可见分叶、短毛刺及胸膜凹陷，增强后多呈中度不均匀强化；需同时评估纵隔及肺门淋巴结。",
+    "topicId": "CASE-0001",
+    "caseId": "BL-0103",
+    "presentation": "A 71-year-old never-smoking woman was referred to our institution in January 2023 during the COVID-19 pandemic. Her ECOG performance status was 1, and she had no history of hypertension, diabetes, cardiovascular disease, or chronic lung disease. A chest computed tomography (CT) scan performed for symptomatic COVID-19 pneumonia management incidentally revealed a 29-mm subpleural mass in the left upper lobe. Her medical history was unremarkable. At presentation, she reported a cough with expectoration but denied fever, chest pain, hemoptysis, or dyspnea. Physical examination showed stable vital signs (temperature 36.5 C, heart rate 78 bpm, respiratory rate 18 bpm, blood pressure 125/80 mmHg, and oxygen saturation 97% on room air) and clear breath sounds without rales or rhonchi. Laboratory tests, including white blood cell count, C-reactive protein, and procalcitonin, were within normal limits.",
+    "images": [
+     {
+      "caseId": "BL-0103",
+      "position": 3
+     },
+     {
+      "caseId": "BL-0103",
+      "position": 1
+     }
+    ],
+    "sortOrder": 2
+   },
+   {
+    "code": "Q-BL-0104",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "C",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为周围型肺癌。肺内不规则软组织密度结节或肿块，可见分叶、短毛刺及胸膜凹陷，增强后多呈中度不均匀强化；需同时评估纵隔及肺门淋巴结。",
+    "topicId": "CASE-0001",
+    "caseId": "BL-0104",
+    "presentation": "A 64-year-old woman with a past medical history of chronic renal disease, headaches, hypertension, and depression presented to the urgent care clinic in December 2020 with complaints of pain in her left ribs and back that worsened during breathing. On examination, this area was tender. There was no history of injury, shortness of breath, or weight loss.",
+    "images": [
+     {
+      "caseId": "BL-0104",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0104",
+      "position": 1
+     }
+    ],
+    "sortOrder": 3
+   },
+   {
+    "code": "Q-BL-0105",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为周围型肺癌。肺内不规则软组织密度结节或肿块，可见分叶、短毛刺及胸膜凹陷，增强后多呈中度不均匀强化；需同时评估纵隔及肺门淋巴结。",
+    "topicId": "CASE-0001",
+    "caseId": "BL-0105",
+    "presentation": "In early March 2024, a 61-year-old male patient was admitted for a persistent cough with white sputum, which had been ongoing for three months without any identifiable cause. He denied experiencing hemoptysis, chest pain, or tightness.",
+    "images": [
+     {
+      "caseId": "BL-0105",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0105",
+      "position": 2
+     }
+    ],
+    "sortOrder": 4
+   },
+   {
+    "code": "Q-BL-0106",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为周围型肺癌。肺内不规则软组织密度结节或肿块，可见分叶、短毛刺及胸膜凹陷，增强后多呈中度不均匀强化；需同时评估纵隔及肺门淋巴结。",
+    "topicId": "CASE-0001",
+    "caseId": "BL-0106",
+    "presentation": "A 56-year-old Japanese male with no history of smoking was referred to the hospital with symptoms of exertional dyspnea. A chest X-ray revealed a right-sided pleural effusion.",
+    "images": [
+     {
+      "caseId": "BL-0106",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0106",
+      "position": 2
+     }
+    ],
+    "sortOrder": 5
+   },
+   {
+    "code": "Q-BL-0201",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肺炎"
+     },
+     {
+      "key": "D",
+      "text": "肺结核"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为肺炎。肺叶或肺段分布的片状致密影，边界可由叶间裂限定，其内常见支气管充气征；相邻心缘或膈面可因轮廓征而模糊。",
+    "topicId": "CASE-0002",
+    "caseId": "BL-0201",
+    "presentation": "In July of 2002, a 36-year old obese woman [weight 200 pounds, height 5 feet 1 inch] with history of type 2 diabetes for 5 years, presented to the emergency department with 5 days history of fever, chills and cough with yellowish phlegm and sharp pain in her right lower chest that aggravated with deep breathing. Physical examination was unremarkable. She was afebrile and lungs were clear. Homen's sign was negative. Initial laboratory data showed slightly elevated d-dimer of 0.374 ug/mL [normal <0.25 ug/mL]. A chest X-ray (figure 1) showed right lower lobe infiltrate.",
+    "images": [
+     {
+      "caseId": "BL-0201",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0201",
+      "position": 2
+     }
+    ],
+    "sortOrder": 6
+   },
+   {
+    "code": "Q-BL-0202",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肺结核"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为肺炎。肺叶或肺段分布的片状致密影，边界可由叶间裂限定，其内常见支气管充气征；相邻心缘或膈面可因轮廓征而模糊。",
+    "topicId": "CASE-0002",
+    "caseId": "BL-0202",
+    "presentation": "A 77-year-old man with a history of diabetes mellitus and peripheral arterial disease was hospitalized for persistent anorexia for over a week following a COVID-19 infection. He had a 50-pack-per-year smoking history and was unvaccinated against COVID-19. In addition, he was previously employed in a non-industrial setting with no known exposure to asbestos or dust.",
+    "images": [
+     {
+      "caseId": "BL-0202",
+      "position": 4
+     },
+     {
+      "caseId": "BL-0202",
+      "position": 1
+     }
+    ],
+    "sortOrder": 7
+   },
+   {
+    "code": "Q-BL-0203",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺炎"
+     },
+     {
+      "key": "B",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肺结核"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为肺炎。肺叶或肺段分布的片状致密影，边界可由叶间裂限定，其内常见支气管充气征；相邻心缘或膈面可因轮廓征而模糊。",
+    "topicId": "CASE-0002",
+    "caseId": "BL-0203",
+    "presentation": "A 39-year-old woman was admitted to our hospital for a laparoscopy-assisted vaginal hysterectomy under general anaesthesia (induced with midazolam, fentanyl and propofol, and maintained with sevoflurane in oxygen/air mixture). The patient reported an unremarkable medical and family history and stated that she had never smoked. She also denied the following: (a) regular exposure to environmental tobacco smoke (at home or at her workplace), (b) abuse of illicit or recreational drugs, (c) food or medication allergies, (d) recent camping or wild animal contact. A more detailed history revealed that the patient was otherwise healthy and had taken no medications prior to the present illness. Three days after her surgery (with prophylactic ampicillin/sulbactam administered as i.v.",
+    "images": [
+     {
+      "caseId": "BL-0203",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0203",
+      "position": 1
+     }
+    ],
+    "sortOrder": 8
+   },
+   {
+    "code": "Q-BL-0204",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "B",
+      "text": "肺炎"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肺结核"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为肺炎。肺叶或肺段分布的片状致密影，边界可由叶间裂限定，其内常见支气管充气征；相邻心缘或膈面可因轮廓征而模糊。",
+    "topicId": "CASE-0002",
+    "caseId": "BL-0204",
+    "presentation": "A 30-year-old male patient with no medical history except smoking presented to the emergency department with nausea, dyspnea, and malaise for the past seven days. On presentation, the patient was hypoxic, tachycardic, and febrile to 103 degrees Fahrenheit. Chest radiography at the time showed large right lower lobe opacities (Figure 1). Labs showed hyponatremia with a sodium of 123 mmol/L (normal 135-148 mmol/L), hypokalemia of 2.9 mmol/L (normal 3.3-5.1 mmol/L), leukocytosis of 14.0 k/mm3 (normal 5.0-10.0 k/mm3), and borderline elevated lactic acid of 2.6 mmol/L (normal 0.7-2.5 mmol/L). An electrocardiogram was concerning for S-T elevation, and cardiology was consulted. The troponin measured was negative at <0.01 ng/mL (normal 0.0-0.1 ng/mL), and cardiology suspected pericarditis after a repeat electrocardiogram.",
+    "images": [
+     {
+      "caseId": "BL-0204",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0204",
+      "position": 2
+     }
+    ],
+    "sortOrder": 9
+   },
+   {
+    "code": "Q-BL-0205",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肺炎"
+     },
+     {
+      "key": "D",
+      "text": "肺结核"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为肺炎。肺叶或肺段分布的片状致密影，边界可由叶间裂限定，其内常见支气管充气征；相邻心缘或膈面可因轮廓征而模糊。",
+    "topicId": "CASE-0002",
+    "caseId": "BL-0205",
+    "presentation": "A previously healthy 46-year-old man presented to emergency department with a 2-day history of cough and high-grade fever. On the morning of presentation, he had developed sudden onset shortness of breath while at rest. He had a history of cigarette smoking for 4 months before the development of symptoms. He initially smoked two to three cigarettes on weekends when with friends but had been smoking three to four cigarettes on a daily basis for the last few weeks. He had no previous history of asthma, atopy or illicit drug use. He denied being exposed to any animals, birds or livestock. He had not travelled during the last one year and denied being exposed to chemical fumes. On admission, vitals were as follows: blood pressure of 110/88 mm Hg, pulse of 100/min and respiratory rate of 18/min. He was noted to have SpO2 of 75% on room air which improved to 91% on 10 L of oxygen via nasal cannula.",
+    "images": [
+     {
+      "caseId": "BL-0205",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0205",
+      "position": 1
+     }
+    ],
+    "sortOrder": 10
+   },
+   {
+    "code": "Q-BL-0207",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肺结核"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为肺炎。肺叶或肺段分布的片状致密影，边界可由叶间裂限定，其内常见支气管充气征；相邻心缘或膈面可因轮廓征而模糊。",
+    "topicId": "CASE-0002",
+    "caseId": "BL-0207",
+    "presentation": "A 45-year-old female with a history of early-stage (stage 1) seronegative rheumatoid arthritis, well controlled on low-dose prednisone, presented to the ED with cough, ongoing fevers, and night sweats. The patient described three days of worsening dyspnea present at rest.",
+    "images": [
+     {
+      "caseId": "BL-0207",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0207",
+      "position": 2
+     }
+    ],
+    "sortOrder": 11
+   },
+   {
+    "code": "Q-BL-0305",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为肝细胞癌。动脉期明显强化、门脉期及延迟期廓清，呈“快进快出”表现，可见假包膜；多伴肝硬化背景，需评估门静脉有无癌栓。",
+    "topicId": "CASE-0003",
+    "caseId": "BL-0305",
+    "presentation": "In July 2020, a 73-year-old male patient presented at our institution with mild abdominal pain and an attack of intense cold. Due to previously known urolithiasis, ultrasound, and MSCT scan were performed.",
+    "images": [
+     {
+      "caseId": "BL-0305",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0305",
+      "position": 2
+     }
+    ],
+    "sortOrder": 12
+   },
+   {
+    "code": "Q-BL-0306",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为肝细胞癌。动脉期明显强化、门脉期及延迟期廓清，呈“快进快出”表现，可见假包膜；多伴肝硬化背景，需评估门静脉有无癌栓。",
+    "topicId": "CASE-0003",
+    "caseId": "BL-0306",
+    "presentation": "We present the case of a 77-year-old male patient, Eastern Cooperative Oncology Group - Performance Scale (ECOG-PS) 0, with priors of non-alcoholic steatohepatitis (NASH)-related cirrhosis of the liver, arterial hypertension, dyslipidemia, and type 2 diabetes mellitus, previously treated with candesartan, hydrochlorothiazide, bisoprolol, atorvastatin, metformin, and sitagliptin.",
+    "images": [
+     {
+      "caseId": "BL-0306",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0306",
+      "position": 2
+     }
+    ],
+    "sortOrder": 13
+   },
+   {
+    "code": "Q-BL-0308",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为肝细胞癌。动脉期明显强化、门脉期及延迟期廓清，呈“快进快出”表现，可见假包膜；多伴肝硬化背景，需评估门静脉有无癌栓。",
+    "topicId": "CASE-0003",
+    "caseId": "BL-0308",
+    "presentation": "On May 6, 2020, a 38-year-old woman presented to our hospital due to abdominal pain that persisted for 3 months. She has had chronic hepatitis B for over 30 years and had not received treatment for the condition. She had no other underlying disease. On assessment of her performance index according to the Eastern Cooperative Oncology Group scoring system, she had a score of 1. Initial laboratory investigations showed the total bilirubin level was 1.93 mg/dL, albumin was 3.9 g/dL, and prothrombin time international normalized ratio was 1.13. As shown in Figure 1 , a computed tomography (CT) scan performed at the time of her presentation showed a solitary hepatic mass measuring 160 mm x 110 mm, with no other nodules.",
+    "images": [
+     {
+      "caseId": "BL-0308",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0308",
+      "position": 2
+     }
+    ],
+    "sortOrder": 14
+   },
+   {
+    "code": "Q-BL-0309",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "C",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "肝细胞癌"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为肝细胞癌。动脉期明显强化、门脉期及延迟期廓清，呈“快进快出”表现，可见假包膜；多伴肝硬化背景，需评估门静脉有无癌栓。",
+    "topicId": "CASE-0003",
+    "caseId": "BL-0309",
+    "presentation": "A 64-years-old male with a history of chronic hepatitis B virus (HBV) infection presented to our institution in April 2014 after a liver mass was incidentally discovered during a routine health examination. The patient had a significant medical history, including a 30-years smoking habit (20 cigarettes per day) and a 30-years history of daily alcohol consumption (200 g per day).",
+    "images": [
+     {
+      "caseId": "BL-0309",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0309",
+      "position": 1
+     }
+    ],
+    "sortOrder": 15
+   },
+   {
+    "code": "Q-BL-0401",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性阑尾炎"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0401",
+    "presentation": "A 13-year-old boy presented with pain in the lower right abdomen, which had lasted for 2 days. He was otherwise healthy and without any comorbidity. He had no prior episodes of abdominal pain, nor a history of weight loss or intermittent fever. Symptoms of carcinoid syndrome were absent as well.",
+    "images": [
+     {
+      "caseId": "BL-0401",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0401",
+      "position": 2
+     }
+    ],
+    "sortOrder": 16
+   },
+   {
+    "code": "Q-BL-0402",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "急性阑尾炎"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0402",
+    "presentation": "A 10-year-old female presented with hours of severe abdominal pain. She reported no fever, vomiting or diarrhea; VAS was 8. CBC was unremarkable, and CRP was 3.63 mg/dL.",
+    "images": [
+     {
+      "caseId": "BL-0402",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0402",
+      "position": 2
+     }
+    ],
+    "sortOrder": 17
+   },
+   {
+    "code": "Q-BL-0403",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "急性阑尾炎"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0403",
+    "presentation": "A 9-year-old male with a history of Celiac disease presented with hours of abdominal pain that migrated to the RLQ. He denied fever, vomiting and diarrhea. VAS was 4. Examination was significant for right upper and lower abdominal tenderness with positive Rovsing and obturator signs. CBC was unremarkable, CRP 2.37 mg/dL.",
+    "images": [
+     {
+      "caseId": "BL-0403",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0403",
+      "position": 2
+     }
+    ],
+    "sortOrder": 18
+   },
+   {
+    "code": "Q-BL-0404",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肺炎"
+     },
+     {
+      "key": "D",
+      "text": "急性阑尾炎"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0404",
+    "presentation": "A 38-year-old female was admitted to our hospital for evaluation of severe pain in the lower abdomen, which had persisted for half a day but was not accompanied by vomiting or diarrhea. The patient was conscious and in good nutritional status. This female had a normal menstrual cycle, no history of chronic diseases such as diabetes or hypertension, no known allergies, and no recorded infectious diseases like tuberculosis, typhoid fever, hepatitis, etc. A physical examination revealed a body temperature of 36.5 C, blood pressure of 110/86 mmHg, pulse rate of 88 beats per minute, and respiratory rate of 20 breaths per minute. The patient's skin, mucous membranes, and sclera showed no signs of jaundice or swelling of superficial lymph nodes. Abdominal examination indicated tenderness and rebound pain, particularly at McBurney's point.",
+    "images": [
+     {
+      "caseId": "BL-0404",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0404",
+      "position": 1
+     }
+    ],
+    "sortOrder": 19
+   },
+   {
+    "code": "Q-BL-0405",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性阑尾炎"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0405",
+    "presentation": "A 50-year-old male, with no medical or surgical history, presented to the ER with a history of abdominal pain for two days. Pain started in the right lower area of the abdomen, and then became generalized all over the abdomen. Pain was constant, severe, and associated with anorexia, nausea, several episodes of vomiting, constipation, and abdominal distension. On examination, he was tachycardiac, with a distended abdomen, diffuse tenderness, and guarding all over. Investigations showed leukocytosis (white blood cells (WBC): 12,000/microL).",
+    "images": [
+     {
+      "caseId": "BL-0405",
+      "position": 3
+     },
+     {
+      "caseId": "BL-0405",
+      "position": 1
+     }
+    ],
+    "sortOrder": 20
+   },
+   {
+    "code": "Q-BL-0407",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "急性阑尾炎"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0407",
+    "presentation": "A 13-year-old Black male with unknown past medical history presented to the emergency department (ED) with a several-month history of progressive, unintentional weight loss, intermittent non-bloody, non-bilious emesis, decreased oral intake, generalized weakness, and self-reported fevers and chills. It is presumed that he did not receive a prior work-up due to numerous social and financial barriers to care access. Five days prior to admission, he developed left lower extremity swelling and bilateral leg pain, which had progressively worsened. On arrival, he appeared cachectic, was unable to ambulate, and had bilateral lower extremity edema.",
+    "images": [
+     {
+      "caseId": "BL-0407",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0407",
+      "position": 2
+     }
+    ],
+    "sortOrder": 21
+   },
+   {
+    "code": "Q-BL-0408",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "急性阑尾炎"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0408",
+    "presentation": "A 21-year old female patient presented at the emergency department of a hospital with progressive pain in the middle and lower right abdomen, nausea and vomiting. The symptoms began 12 h prior to her arrival. Defecation and stool consistency were non-contributory. Fever and chills were denied. Lactose intolerance was the only reported pre-existing condition. The rectal temperature of the patient was 37.4 C. The patient was alert and oriented. The described pain in the middle and lower right abdomen could be induced by pressure. Apart from these findings, the physical examination was non-contributory. Specifically, the patient's abdomen was soft, and there were no signs of guarding or peritoneal signs. Auscultation of the abdomen was non-contributory. A digital rectal examination did not provoke any pain in the recto-uterine pouch. The sphincter tone was normal.",
+    "images": [
+     {
+      "caseId": "BL-0408",
+      "position": 1
+     }
+    ],
+    "sortOrder": 22
+   },
+   {
+    "code": "Q-BL-0409",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肺炎"
+     },
+     {
+      "key": "D",
+      "text": "急性阑尾炎"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0409",
+    "presentation": "A 13-year-old female presented with hours of periumbilical pain without fever vomiting or diarrhea; VAS was 2. Examination showed bilateral lower quadrant tenderness without peritoneal signs. Complete blood count (CBC) was normal, and C-reactive protein (CRP) was 4.6 mg/dL.",
+    "images": [
+     {
+      "caseId": "BL-0409",
+      "position": 1
+     }
+    ],
+    "sortOrder": 23
+   },
+   {
+    "code": "Q-BL-0411",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性阑尾炎"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肺炎"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为急性阑尾炎。右下腹盲端管状结构，外径增粗、加压不可压缩，壁增厚，周围脂肪回声增强，可伴粪石强回声及声影。",
+    "topicId": "CASE-0004",
+    "caseId": "BL-0411",
+    "presentation": "A 47-year-old man presented with a 3-month history of pyrexia, rigors, fatigue, and weight loss. The patient had no significant past medical history and no family history of cancer. An outpatient ultrasound showed an ill-defined mixed echogenic focus in the liver and portal vein thrombosis [Figure 1]. On hospital admission, he was noted to be febrile with a temperature of 38.6 C and blood tests showed a normocytic anemia (83 g/L), leukocytosis (13.5 x 109/L), elevated serum bilirubin (22 mumol/L), and elevated serum alkaline phosphatase (312 U/L). Hepatitis virus screen and blood cultures were negative.",
+    "images": [
+     {
+      "caseId": "BL-0411",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0411",
+      "position": 2
+     }
+    ],
+    "sortOrder": 24
+   },
+   {
+    "code": "Q-BL-0501",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "B",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为急性脑梗死。病灶在 DWI 上呈高信号、ADC 图呈低信号（细胞毒性水肿），FLAIR 信号随时间逐渐升高；MRA 可显示责任血管狭窄或闭塞。",
+    "topicId": "CASE-0005",
+    "caseId": "BL-0501",
+    "presentation": "A 51-year-old, previously healthy, woman experienced headache. Blood pressure had been monitored about one year earlier and she had been normotensive. At the time of admission she had hypertension with a blood pressure of 220/110 mmHg. CT of the brain was normal and cerebrospinal fluid examination was also normal. A physical examination showed nothing remarkable except for high blood pressure. The patient was discharged without further investigation or treatment. Some days later, she noticed a tingling sensation in the right part of her body. This was probably due to a seizure, and she was re-admitted. She had persistent severe headache on the days that followed, intermittently requiring morphine. Nausea and vomiting occurred frequently, decreased alertness was observed, and blurred vision gradually developed.",
+    "images": [
+     {
+      "caseId": "BL-0501",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0501",
+      "position": 2
+     }
+    ],
+    "sortOrder": 25
+   },
+   {
+    "code": "Q-BL-0503",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为急性脑梗死。病灶在 DWI 上呈高信号、ADC 图呈低信号（细胞毒性水肿），FLAIR 信号随时间逐渐升高；MRA 可显示责任血管狭窄或闭塞。",
+    "topicId": "CASE-0005",
+    "caseId": "BL-0503",
+    "presentation": "A 41-year-old male presented to our emergency department with right-sided limb weakness and dysarthria of 4 h duration. The patient presented with sudden-onset right-sided limb weakness, dysarthria, and diaphoresis without any obvious precipitating factors 4 h prior to the initial medical evaluation.",
+    "images": [
+     {
+      "caseId": "BL-0503",
+      "position": 4
+     },
+     {
+      "caseId": "BL-0503",
+      "position": 1
+     }
+    ],
+    "sortOrder": 26
+   },
+   {
+    "code": "Q-BL-0504",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "急性脑梗死"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为急性脑梗死。病灶在 DWI 上呈高信号、ADC 图呈低信号（细胞毒性水肿），FLAIR 信号随时间逐渐升高；MRA 可显示责任血管狭窄或闭塞。",
+    "topicId": "CASE-0005",
+    "caseId": "BL-0504",
+    "presentation": "A 42-year-old previously healthy Thai man developed slow ataxia, motor aphasia and frontal lobe releasing signs, gradually progressing over two months.",
+    "images": [
+     {
+      "caseId": "BL-0504",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0504",
+      "position": 1
+     }
+    ],
+    "sortOrder": 27
+   },
+   {
+    "code": "Q-BL-0508",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为急性脑梗死。病灶在 DWI 上呈高信号、ADC 图呈低信号（细胞毒性水肿），FLAIR 信号随时间逐渐升高；MRA 可显示责任血管狭窄或闭塞。",
+    "topicId": "CASE-0005",
+    "caseId": "BL-0508",
+    "presentation": "A 23-year-old Chinese woman with no significant medical history presented to the emergency department with a 1-hour sudden onset of right-sided weakness, right facial palsy, and aphasia. She was not under any medication and had no known family history, including cardiac, cerebrovascular, or other chronic diseases. During admission, a blood pressure difference between the arms was noted, with the left arm at 112/65 mmHg and the right arm at 99/60 mmHg. There was no appreciable carotid bruit, with the electrocardiogram showing regular sinus rhythm. A physical examination revealed absent left carotid pulse, complete aphasia, right-sided central facial palsy, and right-sided hemiplegia (limb power grade 0/5).",
+    "images": [
+     {
+      "caseId": "BL-0508",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0508",
+      "position": 1
+     }
+    ],
+    "sortOrder": 28
+   },
+   {
+    "code": "Q-BL-0601",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为脑膜瘤。宽基底附着于硬脑膜的脑外肿块，T1WI 多呈等信号、T2WI 等或稍高信号，增强后明显均匀强化，常见“脑膜尾征”及白质塌陷征。",
+    "topicId": "CASE-0006",
+    "caseId": "BL-0601",
+    "presentation": "The patient was a 22-year-old male student, without significant past medical history, who originally presented to the emergency department complaining of headaches of 10 days' duration. He described these headaches as constant, frontotemporal, \"vice grip\"-like, interfering with sleep. The patient also reported nausea and neck muscle stiffness, with severe pain upon sneezing. He denied blurry vision, anosmia, seizures, or any other focal neurologic deficit. In retrospect, he had had episodic and occasional headaches over the course of his life, sometimes with migraine-like symptoms, but only lately had these become more intense and persistent.",
+    "images": [
+     {
+      "caseId": "BL-0601",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0601",
+      "position": 2
+     }
+    ],
+    "sortOrder": 29
+   },
+   {
+    "code": "Q-BL-0602",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为脑膜瘤。宽基底附着于硬脑膜的脑外肿块，T1WI 多呈等信号、T2WI 等或稍高信号，增强后明显均匀强化，常见“脑膜尾征”及白质塌陷征。",
+    "topicId": "CASE-0006",
+    "caseId": "BL-0602",
+    "presentation": "A 23-year-old Chinese male presented with a 4-month history of progressive left upper limb and facial nerve palsy. In the month prior to admission, he was suffering from impairment of the left upper limb movement, as well as mild dysphasia.",
+    "images": [
+     {
+      "caseId": "BL-0602",
+      "position": 3
+     },
+     {
+      "caseId": "BL-0602",
+      "position": 1
+     }
+    ],
+    "sortOrder": 30
+   },
+   {
+    "code": "Q-BL-0603",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "脑膜瘤"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为脑膜瘤。宽基底附着于硬脑膜的脑外肿块，T1WI 多呈等信号、T2WI 等或稍高信号，增强后明显均匀强化，常见“脑膜尾征”及白质塌陷征。",
+    "topicId": "CASE-0006",
+    "caseId": "BL-0603",
+    "presentation": "A 22-year-old man with a history of head trauma a week ago was admitted to our hospital with complaints of headache for one week. He had no nausea, vomiting and blurred vision. On examination, he was alert, oriented, but malaise. He denied of paralysis and cranial nerves palsies. His muscle strength was grade V.",
+    "images": [
+     {
+      "caseId": "BL-0603",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0603",
+      "position": 1
+     }
+    ],
+    "sortOrder": 31
+   },
+   {
+    "code": "Q-BL-0604",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "B",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为脑膜瘤。宽基底附着于硬脑膜的脑外肿块，T1WI 多呈等信号、T2WI 等或稍高信号，增强后明显均匀强化，常见“脑膜尾征”及白质塌陷征。",
+    "topicId": "CASE-0006",
+    "caseId": "BL-0604",
+    "presentation": "We report a 63-year-old female who experiences pain and numbness in both lower limbs, and her symptoms rapidly progressed over the past 5 months. The study was approved by the ethics committee of Deyang People's Hospital. Two years ago, the patient developed pain in the left lower limb without obvious causes, mainly in the lateral thigh, the lateral leg, and the lateral dorsolateral foot, accompanied by numbness, intermittent pain, and resulting disability. After symptomatic treatment, the symptoms were alleviated. However, 5 months ago, the patient did not get significant improvement after being treated.",
+    "images": [
+     {
+      "caseId": "BL-0604",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0604",
+      "position": 2
+     }
+    ],
+    "sortOrder": 32
+   },
+   {
+    "code": "Q-BL-0605",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为脑膜瘤。宽基底附着于硬脑膜的脑外肿块，T1WI 多呈等信号、T2WI 等或稍高信号，增强后明显均匀强化，常见“脑膜尾征”及白质塌陷征。",
+    "topicId": "CASE-0006",
+    "caseId": "BL-0605",
+    "presentation": "A male patient, 56 years old, Caucasian, referred due to difficulty in pronouncing words, chewing and mild swallowing difficulties is presented. The complaints started 7-8 months before the examination and gradually worsened. Until then, he was treated for hypertension and regularly used prescribed therapy with well-regulated blood pressure values. A neurological examination revealed paralysis of the right hypoglossal nerve of the peripheral type with hemiatrophy of the right half of the tongue ( Figure 1 ). Mild dysarthria was observed during the conversation with the patient. Findings on the other cranial nerves were normal on both sides. Examining the upper and lower extremities, cerebellar and sensibility tests revealed normal findings on both sides.",
+    "images": [
+     {
+      "caseId": "BL-0605",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0605",
+      "position": 3
+     }
+    ],
+    "sortOrder": 33
+   },
+   {
+    "code": "Q-BL-0606",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为脑膜瘤。宽基底附着于硬脑膜的脑外肿块，T1WI 多呈等信号、T2WI 等或稍高信号，增强后明显均匀强化，常见“脑膜尾征”及白质塌陷征。",
+    "topicId": "CASE-0006",
+    "caseId": "BL-0606",
+    "presentation": "A 31-year-old primagravid female at 27 weeks gestation presented to the emergency room with a three-week history of progressive, painless bilateral blurred vision associated with intermittent headaches. Her past medical history was unremarkable. Notably, the patient had no complications with her current pregnancy, or a history of cancer or thromboembolic disease. On initial presentation, visual acuity was diminished to 20/200 in both eyes. There was no afferent pupillary defect or restriction of extraocular movements. She could only identify 4/15 color plates of the right eye and 5/15 of the left eye. Confrontation visual fields were full on the right but constricted on the left. No overt optic disc edema was observed. Given the history of pregnancy and progressive vision loss, magnetic resonance imaging (MRI) of the brain and orbits was obtained.",
+    "images": [
+     {
+      "caseId": "BL-0606",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0606",
+      "position": 2
+     }
+    ],
+    "sortOrder": 34
+   },
+   {
+    "code": "Q-BL-0701",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "主动脉夹层"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为主动脉夹层。主动脉腔内可见内膜片，将管腔分为真腔与假腔；累及升主动脉为 Stanford A 型，需评估破口位置及分支血管受累情况。",
+    "topicId": "CASE-0007",
+    "caseId": "BL-0701",
+    "presentation": "A 42-year-old man (height 170 cm, weight 75 kg) who experienced severe precordialgia, which persisted for 1 h, was admitted to a local second-level hospital for emergency treatment. Although he had a history of hypertension for 5 years, he did not take antihypertensive drugs according to the advice of doctors. He had no trauma, surgery, or family history. There was no apparent cause of the sudden precordialgia. His blood pressure was 115/76 mmHg, and his heart rate was 105 bpm at admission. ECG showed ST-segment elevation (II/III/aVF) (Figure 1A), and myocardial enzyme levels were CK-MB 18.35 ng/ml and troponin 0.42 ng/ml. No scheduled cardiac ultrasound examination was performed, and the patient was treated for acute ST-segment elevation myocardial infarction, received 300 mg of aspirin and 180 mg of ticagrelor, and was immediately sent to the interventional catheter room.",
+    "images": [
+     {
+      "caseId": "BL-0701",
+      "position": 3
+     },
+     {
+      "caseId": "BL-0701",
+      "position": 1
+     }
+    ],
+    "sortOrder": 35
+   },
+   {
+    "code": "Q-BL-0702",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为主动脉夹层。主动脉腔内可见内膜片，将管腔分为真腔与假腔；累及升主动脉为 Stanford A 型，需评估破口位置及分支血管受累情况。",
+    "topicId": "CASE-0007",
+    "caseId": "BL-0702",
+    "presentation": "The patient's clinical trajectory began in February 2024, when the 56-year-old female presented to an outside hospital with recurrent cough and sputum production.",
+    "images": [
+     {
+      "caseId": "BL-0702",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0702",
+      "position": 2
+     }
+    ],
+    "sortOrder": 36
+   },
+   {
+    "code": "Q-BL-0704",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为主动脉夹层。主动脉腔内可见内膜片，将管腔分为真腔与假腔；累及升主动脉为 Stanford A 型，需评估破口位置及分支血管受累情况。",
+    "topicId": "CASE-0007",
+    "caseId": "BL-0704",
+    "presentation": "A 47 year old gentleman presented to his general practitioner with acute onset lower back pain. The pain had commenced during coitus and radiated down the right leg.",
+    "images": [
+     {
+      "caseId": "BL-0704",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0704",
+      "position": 2
+     }
+    ],
+    "sortOrder": 37
+   },
+   {
+    "code": "Q-BL-0705",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为主动脉夹层。主动脉腔内可见内膜片，将管腔分为真腔与假腔；累及升主动脉为 Stanford A 型，需评估破口位置及分支血管受累情况。",
+    "topicId": "CASE-0007",
+    "caseId": "BL-0705",
+    "presentation": "An 84-year-old female with a history of cerebral infarction, hypertension, and appendicitis presented with a sudden onset of chest and back pain. She had been independent in activities of daily living. After a walk, she felt unwell and lay down to rest, gradually developing left-sided back pain that intensified and prompted her visit to our emergency department. On admission, blood pressure was 173/86 mmHg in the right arm, 173/65 mmHg in the left arm, 70/49 mmHg in the right leg (Ankle-Brachial Index (ABI) = 0.4), and 110/75 mmHg in the left leg (ABI = 0.65). She had no heart murmurs or abnormal lung sounds, a soft and flat abdomen, numbness in the left foot, and persistent pain in the left back. Bilateral dorsalis pedis pulses were not palpable. Echography suggested decreased flow through the superior mesenteric artery.",
+    "images": [
+     {
+      "caseId": "BL-0705",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0705",
+      "position": 2
+     }
+    ],
+    "sortOrder": 38
+   },
+   {
+    "code": "Q-BL-0706",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "主动脉夹层"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为主动脉夹层。主动脉腔内可见内膜片，将管腔分为真腔与假腔；累及升主动脉为 Stanford A 型，需评估破口位置及分支血管受累情况。",
+    "topicId": "CASE-0007",
+    "caseId": "BL-0706",
+    "presentation": "A 32-year-old female with no previous co-morbidities presented with dyspnea & palpitations (NYHA III) from the last 6 months. She was advised valve replacement surgery previously but she didn't undergo. The patient presented now to our hospital in view of worsening dyspnea. On examination, pulse was 112 bpm, regular in rate and rhythm with increased force increased volume and normal tension, with collapsing character. Blood Pressure was 136/50 mmHg and Hill sign is positive with a difference of 60 mmHg. The patient was tachypneic at the time of examination.",
+    "images": [
+     {
+      "caseId": "BL-0706",
+      "position": 2
+     },
+     {
+      "caseId": "BL-0706",
+      "position": 1
+     }
+    ],
+    "sortOrder": 39
+   },
+   {
+    "code": "Q-BL-0707",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为主动脉夹层。主动脉腔内可见内膜片，将管腔分为真腔与假腔；累及升主动脉为 Stanford A 型，需评估破口位置及分支血管受累情况。",
+    "topicId": "CASE-0007",
+    "caseId": "BL-0707",
+    "presentation": "Patient information: this is a case of a 62-year-old male who was transferred to our ED, which was the closest stroke center to the initial ED he presented at. The report sent with the patient stated that he presented as conscious, and cooperative with left upper and lower extremity hemiplegia. He was phasic and did not have slurred speech. Patient is known to be hypertensive on bisoprolol 5 mg daily and hydrochlorothiazide/irbesartan 300/12.5 mg daily. He was diabetic on metformin 500 mg twice daily and dyslipidemic on simvastatin 10 mg daily. He also had coronary artery disease and had 2 stents placed within the last year and was on aspirin and Clopidorgrel daily. Of note, he also was overweight with a body mass index (BMI) of 31. His vitals recorded at 10:00 were blood pressure (BP) 126/64 mmHg, heart rate (HR) 60/min, saturation O2 SpO2 98% on room air, hemoglucotest (HGT) 170 mg/dL.",
+    "images": [
+     {
+      "caseId": "BL-0707",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0707",
+      "position": 2
+     }
+    ],
+    "sortOrder": 40
+   },
+   {
+    "code": "Q-BL-0708",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为主动脉夹层。主动脉腔内可见内膜片，将管腔分为真腔与假腔；累及升主动脉为 Stanford A 型，需评估破口位置及分支血管受累情况。",
+    "topicId": "CASE-0007",
+    "caseId": "BL-0708",
+    "presentation": "The prehospital emergency team was activated for a 68-year-old male presenting with intense sudden-onset dorso-lumbar pain in the last hour. Upon the emergency team's arrival, 20 minutes later, the patient was found lying on the ground, agitated, pale, sweaty, nauseated, and with marked flushing on the left hemiface and pallor on the right hemiface. Further physical examination revealed no adventitious sounds on auscultation and capillary refill time in the left upper limb <2 seconds; neurological examination showed Glasgow Coma Scale 14/15, dysarthria, left-sided facial droop, and left hemiplegia. Capillary refill time in the right upper limb was >3 seconds.",
+    "images": [
+     {
+      "caseId": "BL-0708",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0708",
+      "position": 2
+     }
+    ],
+    "sortOrder": 41
+   },
+   {
+    "code": "Q-BL-0801",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺炎"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为桡骨远端骨折。多见于跌倒时手掌撑地；伸直型（Colles 骨折）远折端向背侧及桡侧移位，侧位呈“餐叉样”畸形，可合并尺骨茎突骨折。",
+    "topicId": "CASE-0008",
+    "caseId": "BL-0801",
+    "presentation": "We report a case of an 80-year-old previously healthy Japanese female patient who was able to walk on her own. She fell down and was taken to our hospital.",
+    "images": [
+     {
+      "caseId": "BL-0801",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0801",
+      "position": 2
+     }
+    ],
+    "sortOrder": 42
+   },
+   {
+    "code": "Q-BL-0802",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺炎"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "主动脉夹层"
+     },
+     {
+      "key": "D",
+      "text": "桡骨远端骨折"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为桡骨远端骨折。多见于跌倒时手掌撑地；伸直型（Colles 骨折）远折端向背侧及桡侧移位，侧位呈“餐叉样”畸形，可合并尺骨茎突骨折。",
+    "topicId": "CASE-0008",
+    "caseId": "BL-0802",
+    "presentation": "This case involves a 23-year-old man with no notable medical history who fell from a height of around 12 m. The patient presented to the hospital in a normal upper limb trauma position with no discomfort to critical functions. Predominant symptoms at the emergency department were discomfort in the right wrist, hand, and ipsilateral elbow, as well as the entire upper limb functional impairment. Both the wrist and elbow seemed distorted on examination, with considerable edema and loss of bone landmarks. Passive mobilization was hampered by pain, but peripheral pulses were detectable.",
+    "images": [
+     {
+      "caseId": "BL-0802",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0802",
+      "position": 2
+     }
+    ],
+    "sortOrder": 43
+   },
+   {
+    "code": "Q-BL-0803",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "B",
+      "text": "肺炎"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "脑膜瘤"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为桡骨远端骨折。多见于跌倒时手掌撑地；伸直型（Colles 骨折）远折端向背侧及桡侧移位，侧位呈“餐叉样”畸形，可合并尺骨茎突骨折。",
+    "topicId": "CASE-0008",
+    "caseId": "BL-0803",
+    "presentation": "A 30-year old male presented to the Emergency Department after jumping over a small wall and falling onto his dominant right hand.",
+    "images": [
+     {
+      "caseId": "BL-0803",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0803",
+      "position": 2
+     }
+    ],
+    "sortOrder": 44
+   },
+   {
+    "code": "Q-BL-0804",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺炎"
+     },
+     {
+      "key": "B",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "急性脑梗死"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为桡骨远端骨折。多见于跌倒时手掌撑地；伸直型（Colles 骨折）远折端向背侧及桡侧移位，侧位呈“餐叉样”畸形，可合并尺骨茎突骨折。",
+    "topicId": "CASE-0008",
+    "caseId": "BL-0804",
+    "presentation": "A 51-year-old male ambidextrous patient presented to our ED after a fall from his mountain bike, going around 30 miles an hour downhill. After he fell off his bicycle, he landed heavily on a tree stump with his wrist. He suffers from mild asthma and is a non-smoker. He runs his own business as a locksmith, and the use of both hands for fine tasks is crucial in his line of work.",
+    "images": [
+     {
+      "caseId": "BL-0804",
+      "position": 3
+     },
+     {
+      "caseId": "BL-0804",
+      "position": 1
+     }
+    ],
+    "sortOrder": 45
+   },
+   {
+    "code": "Q-BL-0806",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺炎"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "D",
+      "text": "肝细胞癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为桡骨远端骨折。多见于跌倒时手掌撑地；伸直型（Colles 骨折）远折端向背侧及桡侧移位，侧位呈“餐叉样”畸形，可合并尺骨茎突骨折。",
+    "topicId": "CASE-0008",
+    "caseId": "BL-0806",
+    "presentation": "A previously healthy 4-year-old girl presented to the emergency department with acute left forearm pain following trauma sustained 12 h earlier. On the evening before presentation, she jumped from a cabinet approximately 2 m in height and landed on a carpeted floor. She primarily struck her left elbow and wrist, experiencing immediate severe pain while retaining the ability to move her hand freely. No other injuries were sustained, and there were no signs of trauma to other body regions. Due to logistical constraints, the family could not seek immediate medical evaluation. About 3 h post-injury, the patient was assessed at a nearby primary care center. Since radiological imaging was unavailable, her family returned home. Over the next several hours, the pain progressively worsened.",
+    "images": [
+     {
+      "caseId": "BL-0806",
+      "position": 1
+     }
+    ],
+    "sortOrder": 46
+   },
+   {
+    "code": "Q-BL-0807",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺炎"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "桡骨远端骨折"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为桡骨远端骨折。多见于跌倒时手掌撑地；伸直型（Colles 骨折）远折端向背侧及桡侧移位，侧位呈“餐叉样”畸形，可合并尺骨茎突骨折。",
+    "topicId": "CASE-0008",
+    "caseId": "BL-0807",
+    "presentation": "A 14 year old boy presented with the complaints of pain, progressive deformity and difficulty in writing using his right hand of 1 year duration. The deformity occurred following a fall from 10 feet height when he sustained an injury of his right forearm. He was initially managed by an osteopath with cleaning, dressing and splint immobilization. No radiographic documentation was carried out at that time. The pain subsided and splint was taken out after 6 weeks. His parents noticed a deformity of the forearm at this time, but did not pursue any further treatment. As the deformity gradually worsened, the child was taken to medical center 4 months after the injury where he was evaluated with radiographs and treated with distal ulnar shortening to correct the forearm deformity [Figure 1]. After 6 weeks of immobilization the child resumed regular activities.",
+    "images": [
+     {
+      "caseId": "BL-0807",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0807",
+      "position": 2
+     }
+    ],
+    "sortOrder": 47
+   },
+   {
+    "code": "Q-BL-0901",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "B",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "C",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "D",
+      "text": "桡骨远端骨折"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为膝关节前交叉韧带损伤。韧带连续性中断、信号弥漫性增高、形态模糊；常见股骨外侧髁与胫骨平台后外侧对吻性骨挫伤，可合并半月板损伤及关节积液。",
+    "topicId": "CASE-0009",
+    "caseId": "BL-0901",
+    "presentation": "An 18-year-old competitive skier presented to an emergency room with an acute knee injury, showing severe left knee pain and a restricted range of motion (ROM) following a competitive game. On initial examination of the left knee, ROM was limited to 5-40 degrees, and the Lachman test result was positive, while the pivot-shift test could not be performed due to pain. An anteroposterior radiograph revealed a Segond fracture (Figure 1A). The computed tomography (CT) scan of the knee showed a 7.7x18.4 mm size slightly displaced avulsion fracture fragment in the proximal portion of the lateral tibial condyle (Figure 1B).",
+    "images": [
+     {
+      "caseId": "BL-0901",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0901",
+      "position": 2
+     }
+    ],
+    "sortOrder": 48
+   },
+   {
+    "code": "Q-BL-0902",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "D",
+      "text": "桡骨远端骨折"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为膝关节前交叉韧带损伤。韧带连续性中断、信号弥漫性增高、形态模糊；常见股骨外侧髁与胫骨平台后外侧对吻性骨挫伤，可合并半月板损伤及关节积液。",
+    "topicId": "CASE-0009",
+    "caseId": "BL-0902",
+    "presentation": "A 38-year-old male presented to the emergency room unable to bear weight on his right knee after a fall while practicing recreational sport, specifically kitesurfing. Physical examination revealed a painful and swollen knee, with joint effusion and medial ecchymosis. He had a valgus laxity at both 0 and 30 degrees, a negative anterior drawer test, a positive posterior drawer test, and doubtful Lachman test. Anteroposterior and lateral X-rays of the knee were performed in the emergency room, showing an avulsion fracture on the medial femoral condyle ( Fig. 1 ). This finding, combined with the clinical presentation, pointed toward an avulsion of the MCL of the knee. The patient was discharged to our outpatients' clinics with protected weight-bearing using a brace and crutches.",
+    "images": [
+     {
+      "caseId": "BL-0902",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0902",
+      "position": 2
+     }
+    ],
+    "sortOrder": 49
+   },
+   {
+    "code": "Q-BL-0903",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "桡骨远端骨折"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为膝关节前交叉韧带损伤。韧带连续性中断、信号弥漫性增高、形态模糊；常见股骨外侧髁与胫骨平台后外侧对吻性骨挫伤，可合并半月板损伤及关节积液。",
+    "topicId": "CASE-0009",
+    "caseId": "BL-0903",
+    "presentation": "The patient is a 40-year-old female patient. The patient complained of pain in the left knee for 1 year and applied to the outpatient clinic with complaints of buckling and giving out sensation in the knee for the past 3 months. In the orthopedic examination of the patient, McMurray was found positive in the lateral of the left knee. In addition, the Lachman test was detected as grade 1, and the anterior drawer test was grade 2. Direct radiography was performed on the patient, and an MRI was requested while the patient was lying in a supine position with full knee extension.",
+    "images": [
+     {
+      "caseId": "BL-0903",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0903",
+      "position": 2
+     }
+    ],
+    "sortOrder": 50
+   },
+   {
+    "code": "Q-BL-0904",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "C",
+      "text": "桡骨远端骨折"
+     },
+     {
+      "key": "D",
+      "text": "膝关节前交叉韧带损伤"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为膝关节前交叉韧带损伤。韧带连续性中断、信号弥漫性增高、形态模糊；常见股骨外侧髁与胫骨平台后外侧对吻性骨挫伤，可合并半月板损伤及关节积液。",
+    "topicId": "CASE-0009",
+    "caseId": "BL-0904",
+    "presentation": "A 47-year-old athletic female patient (165cm; 63kg) was referred to our trauma department by ambulance after she fell twisting her left knee while downhill skiing at high speed. Clinical examination revealed a moderate effusion of the left knee with a positive Lachman, Drawer, and pivot shift test.",
+    "images": [
+     {
+      "caseId": "BL-0904",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0904",
+      "position": 4
+     }
+    ],
+    "sortOrder": 51
+   },
+   {
+    "code": "Q-BL-0905",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "B",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "C",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "D",
+      "text": "桡骨远端骨折"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为膝关节前交叉韧带损伤。韧带连续性中断、信号弥漫性增高、形态模糊；常见股骨外侧髁与胫骨平台后外侧对吻性骨挫伤，可合并半月板损伤及关节积液。",
+    "topicId": "CASE-0009",
+    "caseId": "BL-0905",
+    "presentation": "A seven-year-old girl had a trauma with twisting her left knee. She had pain, swelling and instability. The patient used crutches. The knee had an extension deficit of 15 with flexion up to 70 . Knee examination revealed a grade two Lachman and anterior drawer test with a soft endpoint. No valgus- or varus-instability was examined. Initial anteroposterior and lateral radiographs were inconspicuous.",
+    "images": [
+     {
+      "caseId": "BL-0905",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0905",
+      "position": 2
+     }
+    ],
+    "sortOrder": 52
+   },
+   {
+    "code": "Q-BL-0906",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "D",
+      "text": "桡骨远端骨折"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为膝关节前交叉韧带损伤。韧带连续性中断、信号弥漫性增高、形态模糊；常见股骨外侧髁与胫骨平台后外侧对吻性骨挫伤，可合并半月板损伤及关节积液。",
+    "topicId": "CASE-0009",
+    "caseId": "BL-0906",
+    "presentation": "A 60-year-old female with a history of diabetes mellitus and hypertension presented to the Orthopedic Clinic at King Khalid National Guard Hospital, Jeddah, Saudi Arabia, complaining of bilateral knee pain, primarily affecting the right knee, for the past 20 years. She had only been on pain medication and there was no surgical intervention. She described the pain as constant and nonradiating that got aggravated by activities and relieved by rest. The patient had a history of knee trauma, while her systemic review was unremarkable, except for a positive first-degree family history of breast cancer. On examination, she walked without assistance and showed a full range of motion without the signs of effusion.",
+    "images": [
+     {
+      "caseId": "BL-0906",
+      "position": 1
+     },
+     {
+      "caseId": "BL-0906",
+      "position": 2
+     }
+    ],
+    "sortOrder": 53
+   },
+   {
+    "code": "Q-BL-0907",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "急性脑梗死"
+     },
+     {
+      "key": "B",
+      "text": "脑膜瘤"
+     },
+     {
+      "key": "C",
+      "text": "膝关节前交叉韧带损伤"
+     },
+     {
+      "key": "D",
+      "text": "桡骨远端骨折"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为膝关节前交叉韧带损伤。韧带连续性中断、信号弥漫性增高、形态模糊；常见股骨外侧髁与胫骨平台后外侧对吻性骨挫伤，可合并半月板损伤及关节积液。",
+    "topicId": "CASE-0009",
+    "caseId": "BL-0907",
+    "presentation": "A 36-year-old female jumped from a four-foot high deck landing flatly on both feet. She felt a pop in the right knee and experienced extreme pain and inability to bear weight on the limb. She sought emergency medical attention where radiographs revealed a joint effusion, and a wavy appearance to the tendon [Figure 1]. There was no patellar elevation, fracture or malalignment.",
+    "images": [
+     {
+      "caseId": "BL-0907",
+      "position": 3
+     },
+     {
+      "caseId": "BL-0907",
+      "position": 1
+     }
+    ],
+    "sortOrder": 54
+   },
+   {
+    "code": "Q-BL-1003",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺结核"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "肾细胞癌"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为肾细胞癌。肾实质肿块，透明细胞癌多为富血供，皮质期明显不均匀强化、实质期廓清，内可见坏死囊变区；需评估肾静脉及下腔静脉癌栓。",
+    "topicId": "CASE-0010",
+    "caseId": "BL-1003",
+    "presentation": "The patient is an 84-year-old lady presenting arterial hypertension, atrial fibrillation, mitral valve insufficiency, hyperlipidemia, and earlier gastrointestinal bleeding under anticoagulation.",
+    "images": [
+     {
+      "caseId": "BL-1003",
+      "position": 1
+     },
+     {
+      "caseId": "BL-1003",
+      "position": 2
+     }
+    ],
+    "sortOrder": 55
+   },
+   {
+    "code": "Q-BL-1005",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "肺结核"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肝细胞癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为肾细胞癌。肾实质肿块，透明细胞癌多为富血供，皮质期明显不均匀强化、实质期廓清，内可见坏死囊变区；需评估肾静脉及下腔静脉癌栓。",
+    "topicId": "CASE-0010",
+    "caseId": "BL-1005",
+    "presentation": "A 55-year-old woman presented with severe right hypochondrium pain, with weight loss and alteration of her general condition, lasting for 6 months. She showed no urological signs, especially no hematuria, no pain, and no flank mass. She had no past history in particular. Neither physical examination nor laboratory examination revealed any significant findings. Abdominal ultrasonography showed a 2.6 cm diameter intraluminal polypoid hyperechoic mass in the gallbladder. Color Doppler ultrasonography examination demonstrated vessels in the mid-portion of the mass.",
+    "images": [
+     {
+      "caseId": "BL-1005",
+      "position": 1
+     },
+     {
+      "caseId": "BL-1005",
+      "position": 2
+     }
+    ],
+    "sortOrder": 56
+   },
+   {
+    "code": "Q-BL-1006",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺结核"
+     },
+     {
+      "key": "B",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "肝细胞癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为肾细胞癌。肾实质肿块，透明细胞癌多为富血供，皮质期明显不均匀强化、实质期廓清，内可见坏死囊变区；需评估肾静脉及下腔静脉癌栓。",
+    "topicId": "CASE-0010",
+    "caseId": "BL-1006",
+    "presentation": "A 50-year-old female patient presented with hematuria, massive weight loss (45 kg), asthenia and right lumbar pain 7 months prior to the consult. Previous blood work-up revealed anemia and previous CT and ultrasound revealed a solid injury of 10 cm on the right kidney and a mass in the right flank (Fig. 1).",
+    "images": [
+     {
+      "caseId": "BL-1006",
+      "position": 1
+     },
+     {
+      "caseId": "BL-1006",
+      "position": 2
+     }
+    ],
+    "sortOrder": 57
+   },
+   {
+    "code": "Q-BL-1007",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺结核"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "肝细胞癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为肾细胞癌。肾实质肿块，透明细胞癌多为富血供，皮质期明显不均匀强化、实质期廓清，内可见坏死囊变区；需评估肾静脉及下腔静脉癌栓。",
+    "topicId": "CASE-0010",
+    "caseId": "BL-1007",
+    "presentation": "A 56-year-old man presented with vague abdominal pain, fullness in the right iliac fossa, and gross as well as microscopic hematuria for 20 days. His past medical history revealed he had undergone an uneventful renal transplantation 13 years back in 2001, received from his brother at the age of 42 years for end-stage renal disease induced by analgesic nephropathy. The post-transplantation course was uneventful. The patient maintained stable renal allograft function with serum creatinine around 1 mg/dL and had no rejection episodes. Initially, every six months and later every year periodic ultrasonography and doppler imaging were conducted that had been unremarkable during these 13 years. On evaluation with ultrasound, a heterogeneous vascular mass sized 9.0x7.3x6.8 cm was seen involving the upper pole of the renal allograft (Fig 1). Doppler study of the graft vessels showed no abnormality.",
+    "images": [
+     {
+      "caseId": "BL-1007",
+      "position": 1
+     },
+     {
+      "caseId": "BL-1007",
+      "position": 2
+     }
+    ],
+    "sortOrder": 58
+   },
+   {
+    "code": "Q-BL-1101",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "肺结核"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "乳腺癌"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为乳腺癌。肿瘤细胞呈巢状、条索状或腺管样浸润性生长，细胞异型性明显，核分裂象易见，间质纤维组织增生。",
+    "topicId": "CASE-0011",
+    "caseId": "BL-1101",
+    "presentation": "A 73-year-old female patient visited the Skin Outpatient Department (OPD) with chief complaints of multiple localized erythematous tender nodules present over the right arm for five months and discharge from the lesions for four days. Other significant history included a lump in the right breast for the last three years, which has now become ulcerative, and aspiration of an abscess from the left lobe of the liver two years ago. The associated comorbidities in this patient were diabetes mellitus (DM), hypertension (HTN), hyperuricemia, dilated cardiomyopathy (DCMP), and cardiac dysfunction. For these comorbidities, she was on carvedilol, furosemide, spironolactone, losartan, and allopurinol. On local examination, multiple erythematous and hemorrhagic papulonodular lesions were present over the extensor aspect of the right arm, extending to include an area of 8 x 6 cm (Figure 1).",
+    "images": [
+     {
+      "caseId": "BL-1101",
+      "position": 2
+     },
+     {
+      "caseId": "BL-1101",
+      "position": 3
+     }
+    ],
+    "sortOrder": 59
+   },
+   {
+    "code": "Q-BL-1102",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "乳腺癌"
+     },
+     {
+      "key": "B",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "肺结核"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为乳腺癌。肿瘤细胞呈巢状、条索状或腺管样浸润性生长，细胞异型性明显，核分裂象易见，间质纤维组织增生。",
+    "topicId": "CASE-0011",
+    "caseId": "BL-1102",
+    "presentation": "Our 62-year-old female patient noticed an asymptomatic mass in her right breast ten years ago, but did not undergo any medical evaluation.",
+    "images": [
+     {
+      "caseId": "BL-1102",
+      "position": 1
+     },
+     {
+      "caseId": "BL-1102",
+      "position": 2
+     }
+    ],
+    "sortOrder": 60
+   },
+   {
+    "code": "Q-BL-1104",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "乳腺癌"
+     },
+     {
+      "key": "C",
+      "text": "肺结核"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为乳腺癌。肿瘤细胞呈巢状、条索状或腺管样浸润性生长，细胞异型性明显，核分裂象易见，间质纤维组织增生。",
+    "topicId": "CASE-0011",
+    "caseId": "BL-1104",
+    "presentation": "A 47-year-old female presented with a lump in her left breast in December 1998. Her family history was unremarkable and her Ca 15-3 level was normal.",
+    "images": [
+     {
+      "caseId": "BL-1104",
+      "position": 1
+     },
+     {
+      "caseId": "BL-1104",
+      "position": 2
+     }
+    ],
+    "sortOrder": 61
+   },
+   {
+    "code": "Q-BL-1105",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "肺结核"
+     },
+     {
+      "key": "C",
+      "text": "乳腺癌"
+     },
+     {
+      "key": "D",
+      "text": "周围型肺癌"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为乳腺癌。肿瘤细胞呈巢状、条索状或腺管样浸润性生长，细胞异型性明显，核分裂象易见，间质纤维组织增生。",
+    "topicId": "CASE-0011",
+    "caseId": "BL-1105",
+    "presentation": "A 66-year-old woman presented with cutaneous lesions surrounding her right nipple. Upon physical examination, multiple non-palpable erythematous patches were observed. These were irregularly shaped and distributed in an annular pattern around the nipple of the right breast (Figure 1). The patient did not report any itching or burning sensations. One year prior to her dermatology consultation, the patient noticed a subcutaneous mass on her right breast.",
+    "images": [
+     {
+      "caseId": "BL-1105",
+      "position": 1
+     },
+     {
+      "caseId": "BL-1105",
+      "position": 2
+     }
+    ],
+    "sortOrder": 62
+   },
+   {
+    "code": "Q-BL-1107",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肾细胞癌"
+     },
+     {
+      "key": "B",
+      "text": "肺结核"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "乳腺癌"
+     }
+    ],
+    "answer": [
+     "D"
+    ],
+    "explanation": "本例为乳腺癌。肿瘤细胞呈巢状、条索状或腺管样浸润性生长，细胞异型性明显，核分裂象易见，间质纤维组织增生。",
+    "topicId": "CASE-0011",
+    "caseId": "BL-1107",
+    "presentation": "A 50 year old lady presented with the history of a lump in the left breast for one year duration. The lump was painless and slowly increasing in size.",
+    "images": [
+     {
+      "caseId": "BL-1107",
+      "position": 1
+     },
+     {
+      "caseId": "BL-1107",
+      "position": 2
+     }
+    ],
+    "sortOrder": 63
+   },
+   {
+    "code": "Q-BL-1201",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "肺结核"
+     },
+     {
+      "key": "B",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "主动脉夹层"
+     }
+    ],
+    "answer": [
+     "A"
+    ],
+    "explanation": "本例为肺结核。好发于上叶尖后段及下叶背段，常见斑片、结节、空洞及“树芽征”，渗出、增殖与钙化病灶可同时存在。",
+    "topicId": "CASE-0012",
+    "caseId": "BL-1201",
+    "presentation": "A 57-year-old man presented with a history of shortness of breath and dry cough for 2 weeks in duration. His respiratory symptoms were of sudden onset, gradually progressive, and not associated with chest pain or palpitations. In addition, his shortness of breath was not associated with any diurnal variation. There was no history of hemoptysis, pyrexia, or weight changes.",
+    "images": [
+     {
+      "caseId": "BL-1201",
+      "position": 2
+     },
+     {
+      "caseId": "BL-1201",
+      "position": 1
+     }
+    ],
+    "sortOrder": 64
+   },
+   {
+    "code": "Q-BL-1203",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "肺结核"
+     },
+     {
+      "key": "C",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "D",
+      "text": "主动脉夹层"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "本例为肺结核。好发于上叶尖后段及下叶背段，常见斑片、结节、空洞及“树芽征”，渗出、增殖与钙化病灶可同时存在。",
+    "topicId": "CASE-0012",
+    "caseId": "BL-1203",
+    "presentation": "The patient, a 55-year-old male, presented with head and neck pain, fever, and left limb weakness persisting for 5 days, accompanied by a peak temperature of 39.4 C. Subsequently, he developed progressive difficulties in rolling over and lower back pain.",
+    "images": [
+     {
+      "caseId": "BL-1203",
+      "position": 4
+     },
+     {
+      "caseId": "BL-1203",
+      "position": 1
+     }
+    ],
+    "sortOrder": 65
+   },
+   {
+    "code": "Q-BL-1204",
+    "type": "single",
+    "stem": "阅读以下病例节选（英文原文）并观察影像，最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "B",
+      "text": "肝细胞癌"
+     },
+     {
+      "key": "C",
+      "text": "肺结核"
+     },
+     {
+      "key": "D",
+      "text": "主动脉夹层"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "本例为肺结核。好发于上叶尖后段及下叶背段，常见斑片、结节、空洞及“树芽征”，渗出、增殖与钙化病灶可同时存在。",
+    "topicId": "CASE-0012",
+    "caseId": "BL-1204",
+    "presentation": "On January 8, 2025, a 56-year-old man presented at an external hospital with bilateral masses in his neck, having first noticed these swellings a week prior, with the right side being more prominent. The patient reported no additional symptoms such as cough, sputum production, or fever.",
+    "images": [
+     {
+      "caseId": "BL-1204",
+      "position": 3
+     },
+     {
+      "caseId": "BL-1204",
+      "position": 1
+     }
+    ],
+    "sortOrder": 66
+   }
+  ]
+ },
+ {
+  "id": "chest",
+  "name": "胸部影像诊断",
+  "shortName": "胸部影像",
+  "description": "肺结节、肺炎、肺结核、纵隔病变等",
+  "kind": "chapter",
+  "sessionSize": null,
+  "sortOrder": 1,
+  "questions": [
+   {
+    "code": "Q-C-001",
+    "type": "single",
+    "stem": "男，63 岁，长期吸烟。CT 示右肺上叶 2.8cm 结节，边缘分叶、短毛刺，伴胸膜凹陷。最可能的诊断是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "结核球"
+     },
+     {
+      "key": "B",
+      "text": "错构瘤"
+     },
+     {
+      "key": "C",
+      "text": "周围型肺癌"
+     },
+     {
+      "key": "D",
+      "text": "炎性假瘤"
+     },
+     {
+      "key": "E",
+      "text": "肺隔离症"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "分叶征、毛刺征、胸膜凹陷征是周围型肺癌的典型征象，结合高龄与长期吸烟史，首先考虑周围型肺癌。",
+    "topicId": "CASE-0001",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 0
+   },
+   {
+    "code": "Q-C-002",
+    "type": "multiple",
+    "stem": "以下哪些征象支持继发性肺结核的诊断？",
+    "options": [
+     {
+      "key": "A",
+      "text": "病灶好发于上叶尖后段"
+     },
+     {
+      "key": "B",
+      "text": "树芽征"
+     },
+     {
+      "key": "C",
+      "text": "渗出、增殖、钙化病灶共存"
+     },
+     {
+      "key": "D",
+      "text": "病灶仅位于下叶基底段"
+     }
+    ],
+    "answer": [
+     "A",
+     "B",
+     "C"
+    ],
+    "explanation": "继发性肺结核好发于上叶尖后段及下叶背段，常见多形性病灶共存，树芽征提示支气管播散。",
+    "topicId": "CASE-0012",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 1
+   },
+   {
+    "code": "Q-C-003",
+    "type": "judge",
+    "stem": "支气管充气征只见于大叶性肺炎，可作为其特异性诊断依据。",
+    "options": [
+     {
+      "key": "T",
+      "text": "正确"
+     },
+     {
+      "key": "F",
+      "text": "错误"
+     }
+    ],
+    "answer": [
+     "F"
+    ],
+    "explanation": "支气管充气征见于多种肺实变性病变（如肺炎、浸润性黏液腺癌、淋巴瘤等），并不特异。",
+    "topicId": "CASE-0002",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 2
+   }
+  ]
+ },
+ {
+  "id": "abdomen",
+  "name": "腹部影像诊断",
+  "shortName": "腹部影像",
+  "description": "肝胆胰脾、胃肠道、急腹症等",
+  "kind": "chapter",
+  "sessionSize": null,
+  "sortOrder": 2,
+  "questions": [
+   {
+    "code": "Q-A-001",
+    "type": "single",
+    "stem": "乙肝肝硬化患者，增强 CT 示肝内肿块动脉期明显强化、门脉期廓清。该强化方式通常描述为：",
+    "options": [
+     {
+      "key": "A",
+      "text": "慢进慢出"
+     },
+     {
+      "key": "B",
+      "text": "快进快出"
+     },
+     {
+      "key": "C",
+      "text": "早出晚归"
+     },
+     {
+      "key": "D",
+      "text": "环形强化"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "肝细胞癌主要由肝动脉供血，典型表现为动脉期明显强化、门脉期/延迟期廓清，即“快进快出”。",
+    "topicId": "CASE-0003",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 0
+   },
+   {
+    "code": "Q-A-002",
+    "type": "single",
+    "stem": "超声诊断急性阑尾炎时，提示阳性的阑尾外径一般大于：",
+    "options": [
+     {
+      "key": "A",
+      "text": "3mm"
+     },
+     {
+      "key": "B",
+      "text": "4mm"
+     },
+     {
+      "key": "C",
+      "text": "6mm"
+     },
+     {
+      "key": "D",
+      "text": "12mm"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "阑尾外径 >6mm 且加压不可压缩，是急性阑尾炎常用的超声诊断标准。",
+    "topicId": "CASE-0004",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 1
+   },
+   {
+    "code": "Q-A-003",
+    "type": "judge",
+    "stem": "阑尾腔内粪石是阑尾穿孔的高危因素之一。",
+    "options": [
+     {
+      "key": "T",
+      "text": "正确"
+     },
+     {
+      "key": "F",
+      "text": "错误"
+     }
+    ],
+    "answer": [
+     "T"
+    ],
+    "explanation": "粪石可导致阑尾腔梗阻、压力升高，增加坏疽和穿孔风险。",
+    "topicId": null,
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 2
+   }
+  ]
+ },
+ {
+  "id": "neuro",
+  "name": "神经影像诊断",
+  "shortName": "神经影像",
+  "description": "脑血管病、颅内肿瘤、脱髓鞘病变等",
+  "kind": "chapter",
+  "sessionSize": null,
+  "sortOrder": 3,
+  "questions": [
+   {
+    "code": "Q-N-001",
+    "type": "single",
+    "stem": "急性脑梗死在 MRI 上最早出现异常的序列通常是：",
+    "options": [
+     {
+      "key": "A",
+      "text": "T1WI"
+     },
+     {
+      "key": "B",
+      "text": "T2WI"
+     },
+     {
+      "key": "C",
+      "text": "DWI"
+     },
+     {
+      "key": "D",
+      "text": "SWI"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "细胞毒性水肿导致水分子扩散受限，DWI 在发病数分钟至数小时内即可呈高信号，ADC 值降低。",
+    "topicId": "CASE-0005",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 0
+   },
+   {
+    "code": "Q-N-002",
+    "type": "multiple",
+    "stem": "提示颅内病变位于脑外的征象包括：",
+    "options": [
+     {
+      "key": "A",
+      "text": "宽基底附着于硬脑膜"
+     },
+     {
+      "key": "B",
+      "text": "白质塌陷征"
+     },
+     {
+      "key": "C",
+      "text": "病灶与脑组织间存在脑脊液间隙"
+     },
+     {
+      "key": "D",
+      "text": "病灶周围白质指状水肿且位于脑实质内"
+     }
+    ],
+    "answer": [
+     "A",
+     "B",
+     "C"
+    ],
+    "explanation": "宽基底、白质塌陷征、脑脊液裂隙征均为脑外肿瘤的定位征象；D 项提示脑内病变。",
+    "topicId": "CASE-0006",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 1
+   },
+   {
+    "code": "Q-N-003",
+    "type": "judge",
+    "stem": "“脑膜尾征”是脑膜瘤的特异性征象，出现即可确诊。",
+    "options": [
+     {
+      "key": "T",
+      "text": "正确"
+     },
+     {
+      "key": "F",
+      "text": "错误"
+     }
+    ],
+    "answer": [
+     "F"
+    ],
+    "explanation": "脑膜尾征常见于脑膜瘤，但也可见于转移瘤、淋巴瘤等，不具特异性。",
+    "topicId": null,
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 2
+   }
+  ]
+ },
+ {
+  "id": "msk",
+  "name": "骨骼肌肉影像",
+  "shortName": "骨骼肌肉",
+  "description": "骨折、关节损伤、骨肿瘤等",
+  "kind": "chapter",
+  "sessionSize": null,
+  "sortOrder": 4,
+  "questions": [
+   {
+    "code": "Q-M-001",
+    "type": "single",
+    "stem": "老年女性跌倒手掌撑地，X 线示桡骨远端骨折，远折端向背侧移位，呈“餐叉样”畸形。诊断为：",
+    "options": [
+     {
+      "key": "A",
+      "text": "Smith 骨折"
+     },
+     {
+      "key": "B",
+      "text": "Colles 骨折"
+     },
+     {
+      "key": "C",
+      "text": "Barton 骨折"
+     },
+     {
+      "key": "D",
+      "text": "Monteggia 骨折"
+     }
+    ],
+    "answer": [
+     "B"
+    ],
+    "explanation": "Colles 骨折为桡骨远端伸直型骨折，远折端向背侧、桡侧移位，侧位呈餐叉样畸形。",
+    "topicId": "CASE-0008",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 0
+   },
+   {
+    "code": "Q-M-002",
+    "type": "single",
+    "stem": "膝关节 MRI 中，股骨外侧髁与胫骨平台后外侧的“对吻性骨挫伤”最常提示：",
+    "options": [
+     {
+      "key": "A",
+      "text": "后交叉韧带断裂"
+     },
+     {
+      "key": "B",
+      "text": "内侧副韧带损伤"
+     },
+     {
+      "key": "C",
+      "text": "前交叉韧带断裂"
+     },
+     {
+      "key": "D",
+      "text": "髌骨脱位"
+     }
+    ],
+    "answer": [
+     "C"
+    ],
+    "explanation": "对吻性骨挫伤是前交叉韧带断裂的重要间接征象，由轴移损伤机制所致。",
+    "topicId": "CASE-0009",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 1
+   }
+  ]
+ },
+ {
+  "id": "pathology",
+  "name": "病理诊断基础",
+  "shortName": "病理基础",
+  "description": "肿瘤病理、组织学分级、免疫组化",
+  "kind": "chapter",
+  "sessionSize": null,
+  "sortOrder": 5,
+  "questions": [
+   {
+    "code": "Q-P-001",
+    "type": "multiple",
+    "stem": "乳腺浸润性癌 Nottingham 组织学分级的评估指标包括：",
+    "options": [
+     {
+      "key": "A",
+      "text": "腺管形成比例"
+     },
+     {
+      "key": "B",
+      "text": "核多形性"
+     },
+     {
+      "key": "C",
+      "text": "核分裂象计数"
+     },
+     {
+      "key": "D",
+      "text": "HER2 表达状态"
+     }
+    ],
+    "answer": [
+     "A",
+     "B",
+     "C"
+    ],
+    "explanation": "Nottingham 分级由腺管形成、核多形性与核分裂计数三项评分相加；HER2 为分子分型指标。",
+    "topicId": "CASE-0011",
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 0
+   },
+   {
+    "code": "Q-P-002",
+    "type": "judge",
+    "stem": "乳腺癌术后标本常规需补充 ER、PR、HER2 及 Ki-67 免疫组化检测。",
+    "options": [
+     {
+      "key": "T",
+      "text": "正确"
+     },
+     {
+      "key": "F",
+      "text": "错误"
+     }
+    ],
+    "answer": [
+     "T"
+    ],
+    "explanation": "上述指标用于分子分型并指导内分泌及靶向治疗，是常规检测项目。",
+    "topicId": null,
+    "caseId": null,
+    "presentation": null,
+    "images": [],
+    "sortOrder": 1
+   }
+  ]
+ }
+]

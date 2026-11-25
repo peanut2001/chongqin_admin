@@ -1,5 +1,4 @@
 import { useAuthStore } from '@/stores/auth-store'
-import { useAvatarStore } from '@/stores/avatar-store'
 import { roleDefaultAvatars } from '@/lib/permissions'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
@@ -16,10 +15,9 @@ type UserAvatarProps = {
  */
 export function UserAvatar({ className, fallbackClassName }: UserAvatarProps) {
   const user = useAuthStore((s) => s.auth.user)
-  const uploaded = useAvatarStore((s) =>
-    user ? s.avatars[user.id] : undefined
-  )
-  const src = uploaded ?? (user ? roleDefaultAvatars[user.role] : undefined)
+  // 头像地址来自后端（/api/media/avatars/<id>），未上传时用角色默认头像
+  const src =
+    user?.avatarUrl ?? (user ? roleDefaultAvatars[user.role] : undefined)
   const initial = (user?.name || '?').charAt(0).toUpperCase()
 
   return (

@@ -1,67 +1,35 @@
 import { useRef } from 'react'
-import { ImageUp, RotateCcw } from 'lucide-react'
+import { ImageUp, Loader2, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
-import { useAvatarStore } from '@/stores/avatar-store'
+import { apiErrorTitle } from '@/lib/api/client'
+import { useDeleteAvatar, useUploadAvatar } from '@/lib/api/me'
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/user-avatar'
 
-const MAX_SIZE = 1024 * 1024 // 1MB
-const ACCEPT_TYPES = [
-  'image/svg+xml',
-  'image/gif',
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-]
-const ACCEPT_EXTENSIONS = /\.(svg|gif|png|jpe?g|webp)$/i
+const MAX_SIZE = 1024 * 1024 // 1MB，与后端限制一致
 
-function readAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
-}
-
+/**
+ * 头像上传：文件发送到后端保存。后端按文件内容判断类型（不看扩展名），
+ * 这里的大小检查只是为了更快给出提示。
+ */
 export function AvatarUpload() {
   const inputRef = useRef<HTMLInputElement>(null)
-  const userId = useAuthStore((s) => s.auth.user?.id)
-  const hasAvatar = useAvatarStore((s) => !!(userId && s.avatars[userId]))
-  const setAvatar = useAvatarStore((s) => s.setAvatar)
-  const removeAvatar = useAvatarStore((s) => s.removeAvatar)
+  const hasAvatar = useAuthStore((s) => !!s.auth.user?.avatarUrl)
+  const upload = useUploadAvatar()
+  const remove = useDeleteAvatar()
+  const busy = upload.isPending || remove.isPending
 
-  const handleFile = async (file: File | undefined) => {
-    if (!file || !userId) return
-
-    // 部分系统不会给 .svg 文件填写 MIME 类型，所以同时按扩展名判断
-    if (
-      !ACCEPT_TYPES.includes(file.type) &&
-      !ACCEPT_EXTENSIONS.test(file.name)
-    ) {
-      toast.error('仅支持 SVG、GIF、PNG、JPG、WebP 格式的图片。')
-      return
-    }
+  const handleFile = (file: File | undefined) => {
+    if (!file) return
     if (file.size > MAX_SIZE) {
       toast.error('图片不能超过 1MB。')
       return
     }
-
-    let dataUrl = await readAsDataUrl(file)
-    // 没有 MIME 类型的 SVG 会被读成 application/octet-stream，<img> 无法显示，这里修正
-    if (
-      /\.svg$/i.test(file.name) &&
-      !dataUrl.startsWith('data:image/svg+xml')
-    ) {
-      dataUrl = dataUrl.replace(/^data:[^;]*;/, 'data:image/svg+xml;')
-    }
-
-    if (setAvatar(userId, dataUrl)) {
-      toast.success('头像已更新')
-    } else {
-      toast.error('浏览器存储空间不足，请换一张更小的图片。')
-    }
+    upload.mutate(file, {
+      onSuccess: () => toast.success('头像已更新'),
+      onError: (err) => toast.error(apiErrorTitle(err, '头像上传失败。')),
+    })
   }
 
   return (
@@ -73,19 +41,27 @@ export function AvatarUpload() {
             type='button'
             variant='outline'
             size='sm'
+            disabled={busy}
             onClick={() => inputRef.current?.click()}
           >
-            <ImageUp /> 上传头像
+            {upload.isPending ? (
+              <Loader2 className='animate-spin' />
+            ) : (
+              <ImageUp />
+            )}
+            上传头像
           </Button>
           {hasAvatar && (
             <Button
               type='button'
               variant='ghost'
               size='sm'
-              onClick={() => {
-                if (userId) removeAvatar(userId)
-                toast.success('已恢复默认头像')
-              }}
+              disabled={busy}
+              onClick={() =>
+                remove.mutate(undefined, {
+                  onSuccess: () => toast.success('已恢复默认头像'),
+                })
+              }
             >
               <RotateCcw /> 恢复默认
             </Button>
@@ -100,7 +76,7 @@ export function AvatarUpload() {
           accept='.svg,image/svg+xml,image/gif,image/png,image/jpeg,image/webp'
           className='hidden'
           onChange={(e) => {
-            void handleFile(e.target.files?.[0])
+            handleFile(e.target.files?.[0])
             // 清空，保证再次选择同一个文件也能触发
             e.target.value = ''
           }}

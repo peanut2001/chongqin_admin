@@ -1,13 +1,11 @@
 import {
   // Construction,
   LayoutDashboard,
-  Monitor,
   // Bug,
   // ListTodo,
   // FileX,
   // HelpCircle,
   // Lock,
-  Bell,
   // Package,
   Palette,
   // ServerOff,
@@ -24,7 +22,6 @@ import {
   ScanEye,
   ChartNoAxesCombined,
 } from 'lucide-react'
-// import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 
 // 菜单的角色可见性由 src/lib/permissions.ts 的路由规则统一控制
@@ -67,24 +64,6 @@ export const sidebarData: SidebarData = {
           url: '/users',
           icon: Users,
         },
-        // {
-        //   title: 'Clerk 安全认证',
-        //   icon: ClerkLogo,
-        //   items: [
-        //     {
-        //       title: '登录',
-        //       url: '/clerk/sign-in',
-        //     },
-        //     {
-        //       title: '注册',
-        //       url: '/clerk/sign-up',
-        //     },
-        //     {
-        //       title: '用户管理',
-        //       url: '/clerk/user-management',
-        //     },
-        //   ],
-        // },
       ],
     },
     {
@@ -122,9 +101,7 @@ export const sidebarData: SidebarData = {
     //       items: [
     //         { title: '登录', url: '/sign-in' },
     //         { title: '登录（双栏）', url: '/sign-in-2' },
-    //         { title: '注册', url: '/sign-up' },
     //         { title: '忘记密码', url: '/forgot-password' },
-    //         { title: '验证码', url: '/otp' },
     //       ],
     //     },
     //     {
@@ -169,16 +146,6 @@ export const sidebarData: SidebarData = {
               title: '外观',
               url: '/settings/appearance',
               icon: Palette,
-            },
-            {
-              title: '通知',
-              url: '/settings/notifications',
-              icon: Bell,
-            },
-            {
-              title: '显示',
-              url: '/settings/display',
-              icon: Monitor,
             },
           ],
         },

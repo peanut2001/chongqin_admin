@@ -6,6 +6,7 @@ import {
   Sparkles,
   TriangleAlert,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -39,79 +40,118 @@ import { Main } from '@/components/layout/main'
 import { MedicalImagePlaceholder } from '@/components/medical-image-placeholder'
 import { SimpleProgress } from '@/components/simple-progress'
 import {
-  aiModalities,
-  aiRecords,
-  aiSamples,
-  mockResultFor,
-  type AiRecord,
+  useAiReadings,
+  useAiSamples,
+  useCreateReading,
+  useSetAgreement,
+} from './api'
+import {
+  agreements,
+  type Agreement,
+  type AiReading as Reading,
   type AiResult,
 } from './data/samples'
 
-const agreementClass: Record<AiRecord['agreement'], string> = {
+const MAX_UPLOAD_BYTES = 8 * 1024 * 1024
+const ACCEPT = 'image/png,image/jpeg,image/webp,image/gif'
+const PAGE_SIZE = 10
+
+const agreementClass: Record<Agreement, string> = {
   一致: 'text-emerald-600',
   部分一致: 'text-amber-600',
   不一致: 'text-rose-600',
 }
 
-export function AiReading() {
-  const [sampleId, setSampleId] = useState<string | null>(aiSamples[0].id)
-  const [uploadUrl, setUploadUrl] = useState<string | null>(null)
-  const [modality, setModality] = useState(aiModalities[0])
-  const [opinion, setOpinion] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<AiResult | null>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
-  const timerRef = useRef<number | undefined>(undefined)
+const dateFmt = new Intl.DateTimeFormat('zh-CN', {
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+})
 
-  const sample = aiSamples.find((s) => s.id === sampleId)
+export function AiReading() {
+  const { data: meta } = useAiSamples()
+  const samples = meta?.samples ?? []
+  const modalities = meta?.modalities ?? []
+
+  // undefined：尚未选择，默认第一个示例；null：已切换为上传图片
+  const [pickedSampleId, setPickedSampleId] = useState<string | null>()
+  const [file, setFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [uploadModality, setUploadModality] = useState<string>()
+  const [opinion, setOpinion] = useState('')
+  const [reading, setReading] = useState<Reading | null>(null)
+  const [page, setPage] = useState(1)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const records = useAiReadings(page, PAGE_SIZE)
+  const create = useCreateReading()
+  const agree = useSetAgreement()
+
+  const sampleId =
+    pickedSampleId === undefined ? samples[0]?.id : pickedSampleId
+  const sample = samples.find((s) => s.id === sampleId)
+  const modality = sample?.modality ?? uploadModality ?? modalities[0] ?? ''
 
   // 释放上传图片的 object URL
   useEffect(() => {
     return () => {
-      if (uploadUrl) URL.revokeObjectURL(uploadUrl)
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
     }
-  }, [uploadUrl])
-
-  useEffect(() => () => window.clearTimeout(timerRef.current), [])
-
-  const reset = () => {
-    window.clearTimeout(timerRef.current)
-    setLoading(false)
-    setResult(null)
-  }
+  }, [previewUrl])
 
   const pickSample = (id: string) => {
-    reset()
-    setUploadUrl(null)
-    setSampleId(id)
-    const s = aiSamples.find((x) => x.id === id)
-    if (s) setModality(s.modality)
+    setReading(null)
+    setFile(null)
+    setPreviewUrl(null)
+    setPickedSampleId(id)
   }
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const f = e.target.files?.[0]
     e.target.value = ''
-    if (!file) return
-    reset()
-    setSampleId(null)
-    setUploadUrl(URL.createObjectURL(file))
+    if (!f) return
+    if (!ACCEPT.split(',').includes(f.type)) {
+      toast.error('仅支持 PNG、JPEG、WebP、GIF 图片。')
+      return
+    }
+    if (f.size > MAX_UPLOAD_BYTES) {
+      toast.error('图片不能超过 8MB。')
+      return
+    }
+    setReading(null)
+    setPickedSampleId(null)
+    setFile(f)
+    setPreviewUrl(URL.createObjectURL(f))
   }
 
-  const analyze = () => {
-    const next = sample ? sample.result : mockResultFor(modality)
-    setLoading(true)
-    setResult(null)
-    // 模拟 AI 推理耗时
-    timerRef.current = window.setTimeout(
-      () => {
-        setResult(next)
-        setLoading(false)
+  const opinionReady = opinion.trim().length >= 2
+  const hasImage = !!sample || !!file
+
+  const analyze = () =>
+    create.mutate(
+      {
+        sampleId: sample?.id,
+        file: sample ? undefined : (file ?? undefined),
+        modality,
+        opinion: opinion.trim(),
       },
-      Math.min(next.elapsedMs, 1500)
+      { onSuccess: setReading }
+    )
+
+  const setAgreement = (agreement: Agreement) => {
+    if (!reading) return
+    agree.mutate(
+      { id: reading.id, agreement },
+      { onSuccess: (r) => setReading(r) }
     )
   }
 
-  const hasImage = !!sample || !!uploadUrl
+  const result = reading?.result ?? null
+  const totalPages = Math.max(
+    1,
+    Math.ceil((records.data?.total ?? 0) / PAGE_SIZE)
+  )
 
   return (
     <>
@@ -129,7 +169,8 @@ export function AiReading() {
         <Alert>
           <TriangleAlert />
           <AlertDescription>
-            当前为演示版本，判读结果为模拟数据，仅用于教学流程展示，不可用于临床诊断。
+            当前尚未接入真实 AI
+            模型，判读结果为演示数据，仅用于教学流程展示，不可用于临床诊断。你的判读意见与自评会被保存，用于学情统计。
           </AlertDescription>
         </Alert>
 
@@ -142,7 +183,7 @@ export function AiReading() {
             </CardHeader>
             <CardContent className='space-y-4'>
               <div className='flex flex-wrap gap-2'>
-                {aiSamples.map((s) => (
+                {samples.map((s) => (
                   <Button
                     key={s.id}
                     size='sm'
@@ -154,7 +195,7 @@ export function AiReading() {
                 ))}
                 <Button
                   size='sm'
-                  variant={uploadUrl ? 'default' : 'outline'}
+                  variant={file ? 'default' : 'outline'}
                   onClick={() => fileRef.current?.click()}
                 >
                   <ImagePlus />
@@ -163,14 +204,14 @@ export function AiReading() {
                 <input
                   ref={fileRef}
                   type='file'
-                  accept='image/*'
+                  accept={ACCEPT}
                   className='hidden'
                   onChange={onUpload}
                 />
               </div>
 
               <ImageWithBoxes
-                url={uploadUrl}
+                url={sample ? sample.imageUrl : previewUrl}
                 label={sample?.name ?? modality}
                 result={result}
               />
@@ -180,14 +221,14 @@ export function AiReading() {
                   <Label>检查类型</Label>
                   <Select
                     value={modality}
-                    onValueChange={setModality}
+                    onValueChange={setUploadModality}
                     disabled={!!sample}
                   >
                     <SelectTrigger className='w-full'>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {aiModalities.map((m) => (
+                      {modalities.map((m) => (
                         <SelectItem key={m} value={m}>
                           {m}
                         </SelectItem>
@@ -198,15 +239,15 @@ export function AiReading() {
                 <div className='flex items-end'>
                   <Button
                     className='w-full'
-                    disabled={!hasImage || loading}
+                    disabled={!hasImage || !opinionReady || create.isPending}
                     onClick={analyze}
                   >
-                    {loading ? (
+                    {create.isPending ? (
                       <LoaderCircle className='animate-spin' />
                     ) : (
                       <ScanEye />
                     )}
-                    {loading ? '判读中…' : '开始 AI 判读'}
+                    {create.isPending ? '判读中…' : '开始 AI 判读'}
                   </Button>
                 </div>
               </div>
@@ -216,10 +257,16 @@ export function AiReading() {
                 <Textarea
                   id='opinion'
                   rows={3}
+                  maxLength={2000}
                   placeholder='请先独立描述影像所见与初步诊断，再查看 AI 结果进行对照…'
                   value={opinion}
                   onChange={(e) => setOpinion(e.target.value)}
                 />
+                {!opinionReady && (
+                  <p className='text-xs text-muted-foreground'>
+                    填写判读意见后才能查看 AI 结果。
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -230,28 +277,37 @@ export function AiReading() {
               <CardTitle className='flex items-center gap-2'>
                 <Sparkles className='size-5 text-primary' />
                 AI 判读结果
+                {reading?.isDemo && (
+                  <Badge
+                    variant='outline'
+                    className='border-amber-500 text-amber-600'
+                  >
+                    演示结果
+                  </Badge>
+                )}
               </CardTitle>
               <CardDescription>
-                {result
-                  ? `推理耗时 ${(result.elapsedMs / 1000).toFixed(2)} 秒`
-                  : '点击「开始 AI 判读」查看结果'}
+                {reading
+                  ? (reading.disclaimer ??
+                    `推理耗时 ${(reading.result.elapsedMs / 1000).toFixed(2)} 秒`)
+                  : '填写判读意见后，点击「开始 AI 判读」查看结果'}
               </CardDescription>
             </CardHeader>
             <CardContent className='space-y-5'>
-              {loading && (
+              {create.isPending && (
                 <div className='flex h-40 items-center justify-center text-muted-foreground'>
                   <LoaderCircle className='me-2 size-5 animate-spin' />
-                  模型分析中…
+                  分析中…
                 </div>
               )}
 
-              {!loading && !result && (
+              {!create.isPending && !result && (
                 <div className='flex h-40 items-center justify-center text-sm text-muted-foreground'>
                   暂无结果
                 </div>
               )}
 
-              {result && (
+              {!create.isPending && reading && result && (
                 <>
                   <div className='space-y-3'>
                     <h3 className='text-sm font-semibold'>异常发现</h3>
@@ -301,8 +357,29 @@ export function AiReading() {
                   <div className='rounded-md border bg-muted/40 p-3'>
                     <h3 className='mb-1 text-sm font-semibold'>我的判读意见</h3>
                     <p className='text-sm whitespace-pre-wrap text-muted-foreground'>
-                      {opinion.trim() || '（未填写）'}
+                      {reading.opinion}
                     </p>
+                  </div>
+
+                  <div className='space-y-2'>
+                    <h3 className='text-sm font-semibold'>
+                      对照 AI 结果，你的判读与其一致程度？
+                    </h3>
+                    <div className='flex flex-wrap gap-2'>
+                      {agreements.map((a) => (
+                        <Button
+                          key={a}
+                          size='sm'
+                          variant={
+                            reading.agreement === a ? 'default' : 'outline'
+                          }
+                          disabled={agree.isPending}
+                          onClick={() => setAgreement(a)}
+                        >
+                          {a}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}
@@ -314,14 +391,13 @@ export function AiReading() {
           <CardHeader>
             <CardTitle>最近判读记录</CardTitle>
             <CardDescription>
-              学生判读意见与 AI 结果的一致性对比
+              学生判读意见与 AI 结果的一致性（学生自评）
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className='space-y-3'>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>编号</TableHead>
                   <TableHead>学生</TableHead>
                   <TableHead>影像</TableHead>
                   <TableHead>AI 提示</TableHead>
@@ -330,24 +406,74 @@ export function AiReading() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {aiRecords.map((r) => (
+                {(records.data?.items ?? []).map((r) => (
                   <TableRow key={r.id}>
-                    <TableCell className='text-muted-foreground'>
-                      {r.id}
+                    <TableCell className='font-medium'>
+                      {r.student ?? '—'}
                     </TableCell>
-                    <TableCell className='font-medium'>{r.student}</TableCell>
                     <TableCell>{r.sample}</TableCell>
-                    <TableCell>{r.aiImpression}</TableCell>
-                    <TableCell className={agreementClass[r.agreement]}>
-                      {r.agreement}
+                    <TableCell className='max-w-xs'>
+                      <span
+                        className='line-clamp-1'
+                        title={r.result.impression}
+                      >
+                        {r.isDemo && (
+                          <Badge variant='outline' className='me-1'>
+                            演示
+                          </Badge>
+                        )}
+                        {r.result.impression}
+                      </span>
+                    </TableCell>
+                    <TableCell
+                      className={
+                        r.agreement
+                          ? agreementClass[r.agreement]
+                          : 'text-muted-foreground'
+                      }
+                    >
+                      {r.agreement ?? '未自评'}
                     </TableCell>
                     <TableCell className='text-muted-foreground'>
-                      {r.createdAt}
+                      {dateFmt.format(new Date(r.createdAt))}
                     </TableCell>
                   </TableRow>
                 ))}
+                {records.data?.items.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className='h-20 text-center text-muted-foreground'
+                    >
+                      还没有判读记录。
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
+            {totalPages > 1 && (
+              <div className='flex items-center justify-end gap-2 text-sm text-muted-foreground'>
+                <span>
+                  第 {page} 页，共 {totalPages} 页
+                </span>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  上一页
+                </Button>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  下一页
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </Main>
@@ -385,11 +511,7 @@ function ImageWithBoxes({
     return (
       <div className='flex justify-center overflow-hidden rounded-md bg-black'>
         <div className='relative'>
-          <img
-            src={url}
-            alt='上传的影像'
-            className='block max-h-[420px] w-auto'
-          />
+          <img src={url} alt={label} className='block max-h-[420px] w-auto' />
           <div className='pointer-events-none absolute inset-0'>{boxes}</div>
         </div>
       </div>

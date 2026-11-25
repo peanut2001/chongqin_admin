@@ -21,51 +21,69 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DefaultHeader } from '@/components/layout/default-header'
 import { Main } from '@/components/layout/main'
 import { SimpleProgress } from '@/components/simple-progress'
-import { cases, caseSystems } from '@/features/cases/data/cases'
 import {
-  semester,
-  studentStats,
-  weeklyActivity,
-} from '@/features/learning-stats/data/stats'
-import { questionSets } from '@/features/question-bank/data/questions'
+  type Dashboard as DashboardData,
+  useDashboard,
+} from '@/features/learning-stats/api'
 import { Analytics } from './components/analytics'
 import { Overview } from './components/overview'
 import { RecentActivities } from './components/recent-activities'
 
-const totalQuestions = questionSets.reduce((s, q) => s + q.total, 0)
-const totalAiReads = weeklyActivity.reduce((s, w) => s + w.aiReads, 0)
-const lastWeek = weeklyActivity[weeklyActivity.length - 1]
-const prevWeek = weeklyActivity[weeklyActivity.length - 2]
-const semesterPercent = Math.round(
-  (semester.currentWeek / semester.totalWeeks) * 100
-)
+function signed(n: number) {
+  return n >= 0 ? `+${n}` : `${n}`
+}
 
-const kpis = [
-  {
-    title: '教学病例',
-    value: `${cases.length} 例`,
-    hint: `覆盖 ${caseSystems.length} 大系统`,
-    icon: FolderHeart,
-  },
-  {
-    title: '题库题量',
-    value: totalQuestions.toLocaleString(),
-    hint: `${questionSets.length} 个章节`,
-    icon: ClipboardList,
-  },
-  {
-    title: 'AI 判读次数',
-    value: totalAiReads.toLocaleString(),
-    hint: `本周 ${lastWeek.aiReads} 次，较上周 +${lastWeek.aiReads - prevWeek.aiReads}`,
-    icon: ScanEye,
-  },
-  {
-    title: '在学研究生',
-    value: `${studentStats.length} 人`,
-    hint: `本周平均正确率 ${lastWeek.accuracy}%`,
-    icon: GraduationCap,
-  },
-]
+function buildKpis(d: DashboardData) {
+  const weeks = d.weeklyActivity
+  const thisWeek = weeks[weeks.length - 1] as (typeof weeks)[number] | undefined
+  const lastWeek = weeks[weeks.length - 2] as (typeof weeks)[number] | undefined
+  const personal = d.scope === 'personal'
+  const aiHint = thisWeek
+    ? `本周 ${thisWeek.aiReads} 次` +
+      (lastWeek
+        ? `，较上周 ${signed(thisWeek.aiReads - lastWeek.aiReads)}`
+        : '')
+    : '学期尚未开始'
+  return [
+    {
+      title: '教学病例',
+      value: `${d.caseCount} 例`,
+      hint: `覆盖 ${d.systemCount} 大系统`,
+      icon: FolderHeart,
+    },
+    {
+      title: '题库题量',
+      value: d.questionCount.toLocaleString(),
+      hint: `${d.questionSetCount} 个练习集`,
+      icon: ClipboardList,
+    },
+    {
+      title: personal ? '我的 AI 判读' : 'AI 判读次数',
+      value: d.kpis.totalAiReads.toLocaleString(),
+      hint: aiHint,
+      icon: ScanEye,
+    },
+    personal
+      ? {
+          title: '我的练习',
+          value: `${d.kpis.totalPractice.toLocaleString()} 题`,
+          hint:
+            d.kpis.avgAccuracy !== null
+              ? `总体正确率 ${d.kpis.avgAccuracy}%`
+              : '还没有作答记录',
+          icon: GraduationCap,
+        }
+      : {
+          title: '在学研究生',
+          value: `${d.studentCount} 人`,
+          hint:
+            thisWeek?.accuracy != null
+              ? `本周平均正确率 ${thisWeek.accuracy}%`
+              : '本周暂无作答',
+          icon: GraduationCap,
+        },
+  ]
+}
 
 const allModules = [
   {
@@ -100,6 +118,12 @@ export function Dashboard() {
   const modules = allModules.filter((m) => canAccess(role, m.url))
   // 学生看不到「教学分析」和其他同学的「最近学习动态」
   const showClassData = canViewClassData(role)
+  const { data, isError } = useDashboard()
+  const semester = data?.semester
+  const semesterPercent = semester
+    ? Math.round((semester.currentWeek / semester.totalWeeks) * 100)
+    : 0
+  const kpis = data ? buildKpis(data) : []
 
   return (
     <>
@@ -110,7 +134,11 @@ export function Dashboard() {
           <div>
             <h1 className='text-2xl font-bold tracking-tight'>仪表盘</h1>
             <p className='text-muted-foreground'>
-              {semester.course} · {semester.name}
+              {semester
+                ? `${semester.course} · ${semester.name}`
+                : isError
+                  ? '数据加载失败'
+                  : '加载中…'}
             </p>
           </div>
         </div>
@@ -157,15 +185,17 @@ export function Dashboard() {
                     课程运行情况
                   </CardTitle>
                   <CardDescription>
-                    {semester.startDate} 至 {semester.endDate}
+                    {semester
+                      ? `${semester.startDate} 至 ${semester.endDate}`
+                      : '—'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className='space-y-4'>
                   <div className='space-y-1'>
                     <div className='flex justify-between text-sm'>
                       <span>
-                        教学周 第 {semester.currentWeek} / {semester.totalWeeks}{' '}
-                        周
+                        教学周 第 {semester?.currentWeek ?? '—'} /{' '}
+                        {semester?.totalWeeks ?? '—'} 周
                       </span>
                       <span className='text-muted-foreground'>
                         {semesterPercent}%
@@ -218,13 +248,15 @@ export function Dashboard() {
                 }
               >
                 <CardHeader>
-                  <CardTitle>学习活跃度</CardTitle>
+                  <CardTitle>
+                    {showClassData ? '学习活跃度' : '我的学习活跃度'}
+                  </CardTitle>
                   <CardDescription>
-                    各教学周病例浏览、题库练习与 AI 判读次数
+                    各教学周病例浏览次数、练习题数与 AI 判读次数
                   </CardDescription>
                 </CardHeader>
                 <CardContent className='ps-2'>
-                  <Overview />
+                  <Overview data={data?.weeklyActivity ?? []} />
                 </CardContent>
               </Card>
               {showClassData && (
@@ -234,16 +266,16 @@ export function Dashboard() {
                     <CardDescription>研究生最新学习记录</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <RecentActivities />
+                    <RecentActivities items={data?.recentActivities ?? []} />
                   </CardContent>
                 </Card>
               )}
             </div>
           </TabsContent>
 
-          {showClassData && (
+          {showClassData && data && (
             <TabsContent value='analytics' className='space-y-4'>
-              <Analytics />
+              <Analytics data={data} />
             </TabsContent>
           )}
         </Tabs>

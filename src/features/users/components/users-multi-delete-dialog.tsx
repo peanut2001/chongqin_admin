@@ -4,13 +4,13 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
-import { useAuthStore } from '@/stores/auth-store'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { useBulkUsers } from '../api'
+import { reportBulkResult } from '../bulk-result'
 import { type User } from '../data/schema'
-import { useUsersStore } from '../data/users-store'
 
 type UserMultiDeleteDialogProps<TData> = {
   open: boolean
@@ -26,8 +26,7 @@ export function UsersMultiDeleteDialog<TData>({
   table,
 }: UserMultiDeleteDialogProps<TData>) {
   const [value, setValue] = useState('')
-  const removeUsers = useUsersStore((s) => s.removeUsers)
-  const currentUserId = useAuthStore((s) => s.auth.user?.id)
+  const bulk = useBulkUsers()
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
@@ -37,20 +36,19 @@ export function UsersMultiDeleteDialog<TData>({
       return
     }
 
-    onOpenChange(false)
-
-    // 不允许删除当前登录的自己
-    const ids = selectedRows
-      .map((row) => (row.original as User).id)
-      .filter((id) => id !== currentUserId)
-    if (ids.length < selectedRows.length) {
-      toast.warning('已跳过当前登录账号，不能删除自己。')
-    }
-
-    removeUsers(ids)
-    setValue('')
-    table.resetRowSelection()
-    toast.success(`已删除 ${ids.length} 个用户`)
+    // 自己与最后一个管理员会被后端跳过，并在结果提示中说明
+    const ids = selectedRows.map((row) => (row.original as User).id)
+    bulk.mutate(
+      { action: 'delete', ids },
+      {
+        onSuccess: (result) => {
+          onOpenChange(false)
+          setValue('')
+          table.resetRowSelection()
+          reportBulkResult(result, '删除')
+        },
+      }
+    )
   }
 
   return (
@@ -59,6 +57,7 @@ export function UsersMultiDeleteDialog<TData>({
       onOpenChange={onOpenChange}
       form='users-multi-delete-form'
       disabled={value.trim() !== CONFIRM_WORD}
+      isLoading={bulk.isPending}
       title={
         <span className='text-destructive'>
           <AlertTriangle
@@ -80,7 +79,7 @@ export function UsersMultiDeleteDialog<TData>({
           <p className='mb-2'>
             确定要删除所选用户吗？
             <br />
-            此操作无法撤销。
+            用户的练习、浏览、判读记录会一并删除，学情统计也会随之变化。如只是暂停使用，建议改为「停用」。
           </p>
 
           <Label className='my-4 flex flex-col items-start gap-1.5'>

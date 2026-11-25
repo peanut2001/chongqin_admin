@@ -1,5 +1,5 @@
 import { Outlet } from '@tanstack/react-router'
-import { Monitor, Bell, Palette, Wrench, UserCog } from 'lucide-react'
+import { Palette, Wrench, UserCog } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -25,16 +25,6 @@ const sidebarNavItems = [
     href: '/settings/appearance',
     icon: <Palette size={18} />,
   },
-  {
-    title: '通知',
-    href: '/settings/notifications',
-    icon: <Bell size={18} />,
-  },
-  {
-    title: '显示',
-    href: '/settings/display',
-    icon: <Monitor size={18} />,
-  },
 ]
 
 export function Settings() {
@@ -54,7 +44,7 @@ export function Settings() {
             设置
           </h1>
           <p className='text-muted-foreground'>
-            管理你的账户设置并设定邮件偏好。
+            管理个人资料、登录密码与界面外观。
           </p>
         </div>
         <Separator className='my-4 lg:my-6' />
