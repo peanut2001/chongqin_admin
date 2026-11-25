@@ -1,15 +1,17 @@
 import { clearCookies } from '@/test-utils/cookies'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { type AuthUser } from './auth-store'
 
 async function importAuthStore() {
   const { useAuthStore } = await import('./auth-store')
   return useAuthStore
 }
 
-const sampleUser = {
-  accountNo: 'ACC-1',
+const sampleUser: AuthUser = {
+  id: 'u-1',
+  name: 'Sample User',
   email: 'user@example.com',
-  role: ['user'],
+  role: 'teacher',
   exp: 1_700_000_000,
 }
 
@@ -55,6 +57,16 @@ describe('useAuthStore', () => {
     useAuthStore.getState().auth.setUser({ ...sampleUser })
 
     expect(useAuthStore.getState().auth.user).toEqual(sampleUser)
+  })
+
+  it('persists the signed-in user so a new store instance reads it back', async () => {
+    const useAuthStore = await importAuthStore()
+    useAuthStore.getState().auth.setUser({ ...sampleUser })
+
+    vi.resetModules()
+    const useAuthStoreAfterReload = await importAuthStore()
+
+    expect(useAuthStoreAfterReload.getState().auth.user).toEqual(sampleUser)
   })
 
   it('reset clears user and access token and drops persistence', async () => {

@@ -1,12 +1,15 @@
 import { create } from 'zustand'
 import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
+import { type Role } from '@/lib/permissions'
 
 const ACCESS_TOKEN = 'thisisjustarandomstring'
+const AUTH_USER = 'auth_user'
 
-interface AuthUser {
-  accountNo: string
+export interface AuthUser {
+  id: string
+  name: string
   email: string
-  role: string[]
+  role: Role
   exp: number
 }
 
@@ -21,14 +24,31 @@ interface AuthState {
   }
 }
 
+function readCookieJson<T>(name: string): T | null {
+  const raw = getCookie(name)
+  if (!raw) return null
+  try {
+    return JSON.parse(decodeURIComponent(raw)) as T
+  } catch {
+    return null
+  }
+}
+
 export const useAuthStore = create<AuthState>()((set) => {
-  const cookieState = getCookie(ACCESS_TOKEN)
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
+  const initToken = readCookieJson<string>(ACCESS_TOKEN) ?? ''
+  const initUser = readCookieJson<AuthUser>(AUTH_USER)
   return {
     auth: {
-      user: null,
+      user: initUser,
       setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
+        set((state) => {
+          if (user) {
+            setCookie(AUTH_USER, encodeURIComponent(JSON.stringify(user)))
+          } else {
+            removeCookie(AUTH_USER)
+          }
+          return { ...state, auth: { ...state.auth, user } }
+        }),
       accessToken: initToken,
       setAccessToken: (accessToken) =>
         set((state) => {
@@ -43,6 +63,7 @@ export const useAuthStore = create<AuthState>()((set) => {
       reset: () =>
         set((state) => {
           removeCookie(ACCESS_TOKEN)
+          removeCookie(AUTH_USER)
           return {
             ...state,
             auth: { ...state.auth, user: null, accessToken: '' },

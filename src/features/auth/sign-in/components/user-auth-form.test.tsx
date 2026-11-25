@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
 import { type Locator, userEvent } from 'vitest/browser'
@@ -85,17 +86,17 @@ describe('UserAuthForm', () => {
     })
 
     it('authenticates and navigates to default route on success', async () => {
-      await userEvent.fill(emailInput, 'a@b.com')
-      await userEvent.fill(passwordInput, '1234567')
+      await userEvent.fill(emailInput, 'admin@demo.com')
+      await userEvent.fill(passwordInput, 'demo1234')
 
       await userEvent.click(signInButton)
 
       await vi.waitFor(() => expect(setUserMock).toHaveBeenCalledOnce())
       expect(setUserMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          email: 'a@b.com',
-          accountNo: expect.any(String),
-          role: expect.any(Array),
+          id: 'demo-admin',
+          email: 'admin@demo.com',
+          role: 'admin',
           exp: expect.any(Number),
         })
       )
@@ -106,6 +107,29 @@ describe('UserAuthForm', () => {
         expect(navigate).toHaveBeenCalledWith({ to: '/', replace: true })
       )
     })
+
+    it('does not sign in with a wrong password', async () => {
+      const promiseSpy = vi.spyOn(toast, 'promise')
+      await userEvent.fill(emailInput, 'admin@demo.com')
+      await userEvent.fill(passwordInput, 'wrong-password')
+
+      await userEvent.click(signInButton)
+
+      await vi.waitFor(() => expect(promiseSpy).toHaveBeenCalledOnce())
+      await expect(promiseSpy.mock.calls[0][0]).rejects.toThrow(
+        '邮箱或密码错误。'
+      )
+      expect(setUserMock).not.toHaveBeenCalled()
+      expect(navigate).not.toHaveBeenCalled()
+      promiseSpy.mockRestore()
+    })
+
+    it('fills the demo account when a role button is clicked', async () => {
+      await userEvent.click(screen.getByRole('button', { name: '教师' }))
+
+      await expect.element(emailInput).toHaveValue('teacher@demo.com')
+      await expect.element(passwordInput).toHaveValue('demo1234')
+    })
   })
 
   it('navigates to redirectTo when provided', async () => {
@@ -115,10 +139,13 @@ describe('UserAuthForm', () => {
       <UserAuthForm redirectTo='/settings' />
     )
 
-    await userEvent.fill(getByRole('textbox', { name: /邮箱/i }), 'a@b.com')
-    await userEvent.fill(getByLabelText('密码'), '1234567')
+    await userEvent.fill(
+      getByRole('textbox', { name: /邮箱/i }),
+      'student@demo.com'
+    )
+    await userEvent.fill(getByLabelText('密码'), 'demo1234')
 
-    await userEvent.click(getByRole('button', { name: /登录/i }))
+    await userEvent.click(getByRole('button', { name: /^登录$/i }))
 
     await vi.waitFor(() => expect(setUserMock).toHaveBeenCalledOnce())
     expect(setAccessTokenMock).toHaveBeenCalledOnce()
@@ -128,6 +155,25 @@ describe('UserAuthForm', () => {
         to: '/settings',
         replace: true,
       })
+    )
+  })
+
+  it('falls back to the dashboard when the role cannot access redirectTo', async () => {
+    vi.clearAllMocks()
+
+    const { getByRole, getByLabelText } = await render(
+      <UserAuthForm redirectTo='/users' />
+    )
+
+    await userEvent.fill(
+      getByRole('textbox', { name: /邮箱/i }),
+      'student@demo.com'
+    )
+    await userEvent.fill(getByLabelText('密码'), 'demo1234')
+    await userEvent.click(getByRole('button', { name: /^登录$/i }))
+
+    await vi.waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith({ to: '/', replace: true })
     )
   })
 })

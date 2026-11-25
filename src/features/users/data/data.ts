@@ -1,4 +1,5 @@
-import { Shield, UserCheck, Users, CreditCard } from 'lucide-react'
+import { Shield, Presentation, GraduationCap } from 'lucide-react'
+import { roleLabels } from '@/lib/permissions'
 import { type UserStatus } from './schema'
 
 export const callTypes = new Map<UserStatus, string>([
@@ -19,24 +20,7 @@ export const statuses = [
 ] as const
 
 export const roles = [
-  {
-    label: '超级管理员',
-    value: 'superadmin',
-    icon: Shield,
-  },
-  {
-    label: '管理员',
-    value: 'admin',
-    icon: UserCheck,
-  },
-  {
-    label: '经理',
-    value: 'manager',
-    icon: Users,
-  },
-  {
-    label: '收银员',
-    value: 'cashier',
-    icon: CreditCard,
-  },
+  { label: roleLabels.admin, value: 'admin', icon: Shield },
+  { label: roleLabels.teacher, value: 'teacher', icon: Presentation },
+  { label: roleLabels.student, value: 'student', icon: GraduationCap },
 ] as const

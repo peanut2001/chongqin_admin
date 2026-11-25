@@ -3,15 +3,32 @@ import { createTableMock } from '@/test-utils/tanstack-table'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
+import { type User } from '../data/schema'
+import { useUsersStore } from '../data/users-store'
 import { UsersMultiDeleteDialog } from './users-multi-delete-dialog'
 
-vi.mock('@/lib/utils', async (orig) => ({
-  ...(await orig()),
-  sleep: vi.fn(() => Promise.resolve()),
-}))
+const makeUser = (id: string): User => ({
+  id,
+  firstName: 'Test',
+  lastName: id,
+  username: id,
+  email: `${id}@test.com`,
+  phoneNumber: '',
+  status: 'active',
+  role: 'student',
+  createdAt: new Date('2026-01-01'),
+  updatedAt: new Date('2026-01-01'),
+})
 
 describe('UsersMultiDeleteDialog', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // createTableMock 选中的两行 id 为 row-1、row-2
+    useUsersStore.setState({
+      users: ['row-1', 'row-2', 'row-3'].map(makeUser),
+      passwords: {},
+    })
+  })
 
   it('renders the dialog with the correct title, description, input and buttons', async () => {
     const { table } = createTableMock()
@@ -108,7 +125,7 @@ describe('UsersMultiDeleteDialog', () => {
     await expect.element(confirmDeleteInput).toHaveValue('')
   })
 
-  it('shows the submitted data when deleted successfully', async () => {
+  it('removes the selected users from the store when deleted successfully', async () => {
     const { table, resetRowSelection } = createTableMock()
     const onOpenChange = vi.fn()
     const { getByRole } = await render(
@@ -131,6 +148,7 @@ describe('UsersMultiDeleteDialog', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
 
     await vi.waitFor(() => expect(resetRowSelection).toHaveBeenCalledOnce())
+    expect(useUsersStore.getState().users.map((u) => u.id)).toEqual(['row-3'])
   })
 
   it('deletes successfully when press Enter key on the confirm delete input', async () => {

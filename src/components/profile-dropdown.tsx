@@ -1,6 +1,8 @@
 import { Link } from '@tanstack/react-router'
+import { BadgeCheck, Bell, LogOut, UserCog } from 'lucide-react'
+import { useAuthStore } from '@/stores/auth-store'
+import { roleLabels } from '@/lib/permissions'
 import useDialogState from '@/hooks/use-dialog-state'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -9,31 +11,36 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
+import { UserAvatar } from '@/components/user-avatar'
 
 export function ProfileDropdown() {
   const [open, setOpen] = useDialogState()
+  const authUser = useAuthStore((s) => s.auth.user)
 
   return (
     <>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
-            <Avatar className='h-8 w-8'>
-              <AvatarImage src='/avatars/01.png' alt='@shadcn' />
-              <AvatarFallback>SN</AvatarFallback>
-            </Avatar>
+            <UserAvatar className='h-8 w-8' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-56' align='end' forceMount>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col gap-1.5'>
-              <p className='text-sm leading-none font-medium'>satnaing</p>
+              <p className='text-sm leading-none font-medium'>
+                {authUser?.name ?? '未登录'}
+                {authUser && (
+                  <span className='ms-1 text-xs text-muted-foreground'>
+                    {roleLabels[authUser.role]}
+                  </span>
+                )}
+              </p>
               <p className='text-xs leading-none text-muted-foreground'>
-                satnaingdev@gmail.com
+                {authUser?.email}
               </p>
             </div>
           </DropdownMenuLabel>
@@ -41,30 +48,27 @@ export function ProfileDropdown() {
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <Link to='/settings'>
+                <UserCog />
                 个人资料
-                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to='/settings'>
-                账单
-                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+              <Link to='/settings/account'>
+                <BadgeCheck />
+                账户
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to='/settings'>
-                设置
-                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+              <Link to='/settings/notifications'>
+                <Bell />
+                通知
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>新建团队</DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant='destructive' onClick={() => setOpen(true)}>
+            <LogOut />
             退出登录
-            <DropdownMenuShortcut className='text-current'>
-              ⇧⌘Q
-            </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

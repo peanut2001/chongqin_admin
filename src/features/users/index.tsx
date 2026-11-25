@@ -9,13 +9,14 @@ import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
 import { UsersProvider } from './components/users-provider'
 import { UsersTable } from './components/users-table'
-import { users } from './data/users'
+import { useUsersStore } from './data/users-store'
 
 const route = getRouteApi('/_authenticated/users/')
 
 export function Users() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
+  const users = useUsersStore((s) => s.users)
 
   return (
     <UsersProvider>
@@ -30,7 +31,9 @@ export function Users() {
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>用户列表</h2>
-            <p className='text-muted-foreground'>在此管理用户及其角色。</p>
+            <p className='text-muted-foreground'>
+              管理平台账号、角色与启用状态。
+            </p>
           </div>
           <UsersPrimaryButtons />
         </div>

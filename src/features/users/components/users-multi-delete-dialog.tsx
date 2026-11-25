@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
-import { sleep } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth-store'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { type User } from '../data/schema'
+import { useUsersStore } from '../data/users-store'
 
 type UserMultiDeleteDialogProps<TData> = {
   open: boolean
@@ -24,6 +26,8 @@ export function UsersMultiDeleteDialog<TData>({
   table,
 }: UserMultiDeleteDialogProps<TData>) {
   const [value, setValue] = useState('')
+  const removeUsers = useUsersStore((s) => s.removeUsers)
+  const currentUserId = useAuthStore((s) => s.auth.user?.id)
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
@@ -35,15 +39,18 @@ export function UsersMultiDeleteDialog<TData>({
 
     onOpenChange(false)
 
-    toast.promise(sleep(2000), {
-      loading: '正在删除用户…',
-      success: () => {
-        setValue('')
-        table.resetRowSelection()
-        return `已删除 ${selectedRows.length} 个用户`
-      },
-      error: '删除用户时出错',
-    })
+    // 不允许删除当前登录的自己
+    const ids = selectedRows
+      .map((row) => (row.original as User).id)
+      .filter((id) => id !== currentUserId)
+    if (ids.length < selectedRows.length) {
+      toast.warning('已跳过当前登录账号，不能删除自己。')
+    }
+
+    removeUsers(ids)
+    setValue('')
+    table.resetRowSelection()
+    toast.success(`已删除 ${ids.length} 个用户`)
   }
 
   return (

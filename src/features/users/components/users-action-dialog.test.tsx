@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
 import { type UserEvent, userEvent } from 'vitest/browser'
-import { showSubmittedData } from '@/lib/show-submitted-data'
 import { type User } from '../data/schema'
+import { useUsersStore } from '../data/users-store'
 import { UsersActionDialog } from './users-action-dialog'
 
 const VALIDATION_MESSAGES = {
@@ -27,15 +27,19 @@ const MOCK_USER: User = {
   email: 'alex@smith.com',
   phoneNumber: '+19999999999',
   status: 'active',
-  role: 'superadmin',
+  role: 'admin',
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-02-02'),
 }
 
-vi.mock('@/lib/show-submitted-data', () => ({ showSubmittedData: vi.fn() }))
+const findUser = (id: string) =>
+  useUsersStore.getState().users.find((u) => u.id === id)
 
 describe('UsersActionDialog', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    useUsersStore.setState({ users: [MOCK_USER], passwords: {} })
+  })
 
   describe('add user', () => {
     it('renders title and description', async () => {
@@ -150,8 +154,9 @@ describe('UsersActionDialog', () => {
         .not.toBeInTheDocument()
     })
 
-    it('shows the submitted data when the form is submitted successfully', async () => {
+    it('adds the user to the store when the form is submitted successfully', async () => {
       const onOpenChange = vi.fn()
+      useUsersStore.setState({ users: [], passwords: {} })
 
       const screen = await render(
         <UsersActionDialog open onOpenChange={onOpenChange} />
@@ -167,18 +172,37 @@ describe('UsersActionDialog', () => {
       expect(onOpenChange).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
 
-      expect(showSubmittedData).toHaveBeenCalledOnce()
-      expect(showSubmittedData).toHaveBeenCalledWith({
+      const { users, passwords } = useUsersStore.getState()
+      expect(users).toHaveLength(1)
+      expect(users[0]).toMatchObject({
         firstName: MOCK_USER.firstName,
         lastName: MOCK_USER.lastName,
         username: MOCK_USER.username,
         email: MOCK_USER.email,
         role: MOCK_USER.role,
         phoneNumber: MOCK_USER.phoneNumber,
-        password: 'S3cur3P@ssw0rd',
-        confirmPassword: 'S3cur3P@ssw0rd',
-        isEdit: false,
+        status: 'active',
       })
+      expect(passwords[users[0].id]).toBe('S3cur3P@ssw0rd')
+    })
+
+    it('rejects an email that is already used by another user', async () => {
+      const onOpenChange = vi.fn()
+      const screen = await render(
+        <UsersActionDialog open onOpenChange={onOpenChange} />
+      )
+
+      await fillRequiredProfileFields(userEvent, screen, {
+        email: MOCK_USER.email,
+      })
+      await fillPasswords(userEvent, screen, 'S3cur3P@ssw0rd', 'S3cur3P@ssw0rd')
+      await userEvent.click(screen.getByRole('button', { name: /保存更改/i }))
+
+      await expect
+        .element(screen.getByText('该邮箱已被其他用户使用。'))
+        .toBeInTheDocument()
+      expect(onOpenChange).not.toHaveBeenCalled()
+      expect(useUsersStore.getState().users).toHaveLength(1)
     })
   })
 
@@ -214,18 +238,12 @@ describe('UsersActionDialog', () => {
       expect(onOpenChange).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
 
-      expect(showSubmittedData).toHaveBeenCalledOnce()
-      expect(showSubmittedData).toHaveBeenCalledWith({
+      expect(findUser(MOCK_USER.id)).toMatchObject({
         firstName: MOCK_USER.firstName,
-        lastName: MOCK_USER.lastName,
-        username: MOCK_USER.username,
         email: MOCK_USER.email,
-        phoneNumber: MOCK_USER.phoneNumber,
         role: MOCK_USER.role,
-        password: '',
-        confirmPassword: '',
-        isEdit: true,
       })
+      expect(useUsersStore.getState().passwords[MOCK_USER.id]).toBeUndefined()
     })
 
     it('requires confirm password when password is changed', async () => {
@@ -249,7 +267,7 @@ describe('UsersActionDialog', () => {
         .toBeInTheDocument()
     })
 
-    it('shows the submitted data when the form is submitted successfully', async () => {
+    it('updates the user in the store when the form is submitted successfully', async () => {
       const onOpenChange = vi.fn()
       const screen = await render(
         <UsersActionDialog
@@ -279,18 +297,14 @@ describe('UsersActionDialog', () => {
       expect(onOpenChange).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
 
-      expect(showSubmittedData).toHaveBeenCalledOnce()
-      expect(showSubmittedData).toHaveBeenCalledWith({
+      expect(findUser(MOCK_USER.id)).toMatchObject({
         firstName: EDIT_SUCCESS_FIRST_NAME,
         lastName: MOCK_USER.lastName,
         username: MOCK_USER.username,
-        email: MOCK_USER.email,
-        phoneNumber: MOCK_USER.phoneNumber,
-        role: MOCK_USER.role,
-        password: EDIT_SUCCESS_PASSWORD,
-        confirmPassword: EDIT_SUCCESS_PASSWORD,
-        isEdit: true,
       })
+      expect(useUsersStore.getState().passwords[MOCK_USER.id]).toBe(
+        EDIT_SUCCESS_PASSWORD
+      )
     })
   })
 })
@@ -324,7 +338,7 @@ async function fillRequiredProfileFields(
   const roleSelect = screen.getByRole('combobox', { name: /角色/i })
   await user.click(roleSelect)
   await user.click(
-    screen.getByRole('option', { name: overrides?.roleOption ?? '超级管理员' })
+    screen.getByRole('option', { name: overrides?.roleOption ?? '管理员' })
   )
 }
 

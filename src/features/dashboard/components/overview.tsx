@@ -1,62 +1,21 @@
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import {
+  Bar,
+  BarChart,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
+import { weeklyActivity } from '@/features/learning-stats/data/stats'
 
-const data = [
-  {
-    name: '1月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '2月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '3月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '4月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '5月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '6月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '7月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '8月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '9月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '10月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '11月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: '12月',
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-]
-
+/** 各教学周学习活跃度（堆叠柱状图） */
 export function Overview() {
   return (
     <ResponsiveContainer width='100%' height={350}>
-      <BarChart data={data}>
+      <BarChart data={weeklyActivity}>
         <XAxis
-          dataKey='name'
+          dataKey='week'
           stroke='#888888'
           fontSize={12}
           tickLine={false}
@@ -68,13 +27,35 @@ export function Overview() {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+        />
+        <Tooltip
+          contentStyle={{
+            background: 'var(--popover)',
+            border: '1px solid var(--border)',
+            borderRadius: 8,
+            fontSize: 12,
+          }}
+          labelStyle={{ color: 'var(--popover-foreground)' }}
+        />
+        <Legend wrapperStyle={{ fontSize: 12 }} />
+        <Bar
+          dataKey='caseViews'
+          name='病例浏览'
+          stackId='a'
+          fill='var(--chart-1)'
         />
         <Bar
-          dataKey='total'
-          fill='currentColor'
+          dataKey='practice'
+          name='题库练习'
+          stackId='a'
+          fill='var(--chart-2)'
+        />
+        <Bar
+          dataKey='aiReads'
+          name='AI 判读'
+          stackId='a'
+          fill='var(--chart-3)'
           radius={[4, 4, 0, 0]}
-          className='fill-primary'
         />
       </BarChart>
     </ResponsiveContainer>

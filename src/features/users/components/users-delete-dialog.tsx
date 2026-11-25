@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
-import { showSubmittedData } from '@/lib/show-submitted-data'
+import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { roles } from '../data/data'
 import { type User } from '../data/schema'
+import { useUsersStore } from '../data/users-store'
 
 type UserDeleteDialogProps = {
   open: boolean
@@ -22,12 +23,14 @@ export function UsersDeleteDialog({
   currentRow,
 }: UserDeleteDialogProps) {
   const [value, setValue] = useState('')
+  const removeUsers = useUsersStore((s) => s.removeUsers)
 
   const handleDelete = () => {
     if (value.trim() !== currentRow.username) return
 
     onOpenChange(false)
-    showSubmittedData(currentRow, '以下用户已被删除：')
+    removeUsers([currentRow.id])
+    toast.success(`已删除用户 ${currentRow.username}`)
   }
 
   return (
@@ -61,7 +64,7 @@ export function UsersDeleteDialog({
             此操作将从系统中永久移除角色为{' '}
             <span className='font-bold'>
               {roles.find(({ value }) => value === currentRow.role)?.label ??
-                currentRow.role.toUpperCase()}
+                currentRow.role}
             </span>{' '}
             的该用户，且无法撤销。
           </p>

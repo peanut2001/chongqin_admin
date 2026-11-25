@@ -1,6 +1,8 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { type Row } from '@tanstack/react-table'
-import { Trash2, UserPen } from 'lucide-react'
+import { Ban, CircleCheck, Trash2, UserPen } from 'lucide-react'
+import { toast } from 'sonner'
+import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { type User } from '../data/schema'
+import { useUsersStore } from '../data/users-store'
 import { useUsers } from './users-provider'
 
 type DataTableRowActionsProps = {
@@ -19,6 +22,18 @@ type DataTableRowActionsProps = {
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { setOpen, setCurrentRow } = useUsers()
+  const setStatus = useUsersStore((s) => s.setStatus)
+  const currentUserId = useAuthStore((s) => s.auth.user?.id)
+  const user = row.original
+  // 当前登录的自己：不能停用、不能删除
+  const isSelf = user.id === currentUserId
+  const isActive = user.status === 'active'
+
+  const toggleStatus = () => {
+    setStatus([user.id], isActive ? 'suspended' : 'active')
+    toast.success(`已${isActive ? '停用' : '启用'}用户 ${user.username}`)
+  }
+
   return (
     <>
       <DropdownMenu modal={false}>
@@ -34,7 +49,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         <DropdownMenuContent align='end' className='w-40'>
           <DropdownMenuItem
             onClick={() => {
-              setCurrentRow(row.original)
+              setCurrentRow(user)
               setOpen('edit')
             }}
           >
@@ -43,10 +58,17 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               <UserPen size={16} />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
+          <DropdownMenuItem disabled={isSelf} onClick={toggleStatus}>
+            {isActive ? '停用' : '启用'}
+            <DropdownMenuShortcut>
+              {isActive ? <Ban size={16} /> : <CircleCheck size={16} />}
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
+            disabled={isSelf}
             onClick={() => {
-              setCurrentRow(row.original)
+              setCurrentRow(user)
               setOpen('delete')
             }}
             className='text-red-500!'

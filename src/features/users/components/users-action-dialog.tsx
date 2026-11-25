@@ -3,7 +3,9 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { showSubmittedData } from '@/lib/show-submitted-data'
+import { toast } from 'sonner'
+import { useAuthStore } from '@/stores/auth-store'
+import { type Role } from '@/lib/permissions'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -26,6 +28,7 @@ import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { roles } from '../data/data'
 import { type User } from '../data/schema'
+import { emailExists, useUsersStore } from '../data/users-store'
 
 const formSchema = z
   .object({
@@ -105,6 +108,12 @@ export function UsersActionDialog({
   onOpenChange,
 }: UserActionDialogProps) {
   const isEdit = !!currentRow
+  const { auth } = useAuthStore()
+  const addUser = useUsersStore((s) => s.addUser)
+  const updateUser = useUsersStore((s) => s.updateUser)
+  // 管理员不能修改自己的角色，避免把自己降级后失去管理权限
+  const isSelf = isEdit && currentRow.id === auth.user?.id
+
   const form = useForm<UserForm>({
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
@@ -128,8 +137,48 @@ export function UsersActionDialog({
   })
 
   const onSubmit = (values: UserForm) => {
+    if (emailExists(values.email, currentRow?.id)) {
+      form.setError('email', { message: '该邮箱已被其他用户使用。' })
+      return
+    }
+
+    const fields = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      username: values.username,
+      email: values.email,
+      phoneNumber: values.phoneNumber,
+      role: values.role as Role,
+    }
+    const password = values.password || undefined
+
+    if (isEdit) {
+      updateUser(currentRow.id, fields, password)
+      // 编辑的是自己时，同步右上角/侧边栏显示的登录信息
+      if (isSelf && auth.user) {
+        auth.setUser({
+          ...auth.user,
+          name: `${fields.firstName} ${fields.lastName}`,
+          email: fields.email,
+        })
+      }
+      toast.success(`已更新用户 ${fields.username}`)
+    } else {
+      const now = new Date()
+      addUser(
+        {
+          id: crypto.randomUUID(),
+          ...fields,
+          status: 'active',
+          createdAt: now,
+          updatedAt: now,
+        },
+        password
+      )
+      toast.success(`已添加用户 ${fields.username}`)
+    }
+
     form.reset()
-    showSubmittedData(values)
     onOpenChange(false)
   }
 
@@ -260,11 +309,17 @@ export function UsersActionDialog({
                       onValueChange={field.onChange}
                       placeholder='选择角色'
                       className='col-span-4'
+                      disabled={isSelf}
                       items={roles.map(({ label, value }) => ({
                         label,
                         value,
                       }))}
                     />
+                    {isSelf && (
+                      <p className='col-span-4 col-start-3 text-xs text-muted-foreground'>
+                        不能修改自己的角色。
+                      </p>
+                    )}
                     <FormMessage className='col-span-4 col-start-3' />
                   </FormItem>
                 )}

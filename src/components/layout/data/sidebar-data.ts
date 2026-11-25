@@ -1,51 +1,39 @@
 import {
-  Construction,
+  // Construction,
   LayoutDashboard,
   Monitor,
-  Bug,
-  ListTodo,
-  FileX,
-  HelpCircle,
-  Lock,
+  // Bug,
+  // ListTodo,
+  // FileX,
+  // HelpCircle,
+  // Lock,
   Bell,
-  Package,
+  // Package,
   Palette,
-  ServerOff,
+  // ServerOff,
   Settings,
   Wrench,
   UserCog,
-  UserX,
+  // UserX,
   Users,
-  MessagesSquare,
-  ShieldCheck,
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
+  // MessagesSquare,
+  // ShieldCheck,
+  GraduationCap,
+  FolderHeart,
+  ClipboardList,
+  ScanEye,
+  ChartNoAxesCombined,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
+// import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 
+// 菜单的角色可见性由 src/lib/permissions.ts 的路由规则统一控制
 export const sidebarData: SidebarData = {
-  user: {
-    name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   teams: [
     {
-      name: 'Shadcn Admin',
-      logo: Command,
-      plan: 'Vite + ShadcnUI',
-    },
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: '企业版',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: '初创版',
+      name: '智慧课程平台',
+      logo: GraduationCap,
+      plan: '研究生教学',
     },
   ],
   navGroups: [
@@ -57,109 +45,109 @@ export const sidebarData: SidebarData = {
           url: '/',
           icon: LayoutDashboard,
         },
-        {
-          title: '任务',
-          url: '/tasks',
-          icon: ListTodo,
-        },
-        {
-          title: '应用',
-          url: '/apps',
-          icon: Package,
-        },
-        {
-          title: '聊天',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare,
-        },
+        // ===== 模板示例功能，暂时隐藏 =====
+        // {
+        //   title: '任务',
+        //   url: '/tasks',
+        //   icon: ListTodo,
+        // },
+        // {
+        //   title: '应用',
+        //   url: '/apps',
+        //   icon: Package,
+        // },
+        // {
+        //   title: '聊天',
+        //   url: '/chats',
+        //   badge: '3',
+        //   icon: MessagesSquare,
+        // },
         {
           title: '用户',
           url: '/users',
           icon: Users,
         },
-        {
-          title: 'Clerk 安全认证',
-          icon: ClerkLogo,
-          items: [
-            {
-              title: '登录',
-              url: '/clerk/sign-in',
-            },
-            {
-              title: '注册',
-              url: '/clerk/sign-up',
-            },
-            {
-              title: '用户管理',
-              url: '/clerk/user-management',
-            },
-          ],
-        },
+        // {
+        //   title: 'Clerk 安全认证',
+        //   icon: ClerkLogo,
+        //   items: [
+        //     {
+        //       title: '登录',
+        //       url: '/clerk/sign-in',
+        //     },
+        //     {
+        //       title: '注册',
+        //       url: '/clerk/sign-up',
+        //     },
+        //     {
+        //       title: '用户管理',
+        //       url: '/clerk/user-management',
+        //     },
+        //   ],
+        // },
       ],
     },
     {
-      title: '页面',
+      title: '智慧课程',
       items: [
         {
-          title: '认证',
-          icon: ShieldCheck,
-          items: [
-            {
-              title: '登录',
-              url: '/sign-in',
-            },
-            {
-              title: '登录（双栏）',
-              url: '/sign-in-2',
-            },
-            {
-              title: '注册',
-              url: '/sign-up',
-            },
-            {
-              title: '忘记密码',
-              url: '/forgot-password',
-            },
-            {
-              title: '验证码',
-              url: '/otp',
-            },
-          ],
+          title: '病例库浏览',
+          url: '/cases',
+          icon: FolderHeart,
         },
         {
-          title: '错误',
-          icon: Bug,
-          items: [
-            {
-              title: '未授权',
-              url: '/errors/unauthorized',
-              icon: Lock,
-            },
-            {
-              title: '禁止访问',
-              url: '/errors/forbidden',
-              icon: UserX,
-            },
-            {
-              title: '页面未找到',
-              url: '/errors/not-found',
-              icon: FileX,
-            },
-            {
-              title: '服务器内部错误',
-              url: '/errors/internal-server-error',
-              icon: ServerOff,
-            },
-            {
-              title: '维护中',
-              url: '/errors/maintenance-error',
-              icon: Construction,
-            },
-          ],
+          title: '题库练习',
+          url: '/question-bank',
+          icon: ClipboardList,
+        },
+        {
+          title: 'AI 图像判读',
+          url: '/ai-reading',
+          icon: ScanEye,
+        },
+        {
+          title: '学情统计',
+          url: '/learning-stats',
+          icon: ChartNoAxesCombined,
         },
       ],
     },
+    // ===== 模板示例页面，暂时隐藏 =====
+    // {
+    //   title: '页面',
+    //   items: [
+    //     {
+    //       title: '认证',
+    //       icon: ShieldCheck,
+    //       items: [
+    //         { title: '登录', url: '/sign-in' },
+    //         { title: '登录（双栏）', url: '/sign-in-2' },
+    //         { title: '注册', url: '/sign-up' },
+    //         { title: '忘记密码', url: '/forgot-password' },
+    //         { title: '验证码', url: '/otp' },
+    //       ],
+    //     },
+    //     {
+    //       title: '错误',
+    //       icon: Bug,
+    //       items: [
+    //         { title: '未授权', url: '/errors/unauthorized', icon: Lock },
+    //         { title: '禁止访问', url: '/errors/forbidden', icon: UserX },
+    //         { title: '页面未找到', url: '/errors/not-found', icon: FileX },
+    //         {
+    //           title: '服务器内部错误',
+    //           url: '/errors/internal-server-error',
+    //           icon: ServerOff,
+    //         },
+    //         {
+    //           title: '维护中',
+    //           url: '/errors/maintenance-error',
+    //           icon: Construction,
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
     {
       title: '其他',
       items: [
@@ -194,11 +182,11 @@ export const sidebarData: SidebarData = {
             },
           ],
         },
-        {
-          title: '帮助中心',
-          url: '/help-center',
-          icon: HelpCircle,
-        },
+        // {
+        //   title: '帮助中心',
+        //   url: '/help-center',
+        //   icon: HelpCircle,
+        // },
       ],
     },
   ],

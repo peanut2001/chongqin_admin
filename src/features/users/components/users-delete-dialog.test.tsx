@@ -2,11 +2,9 @@ import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
-import { showSubmittedData } from '@/lib/show-submitted-data'
 import { type User } from '../data/schema'
+import { useUsersStore } from '../data/users-store'
 import { UsersDeleteDialog } from './users-delete-dialog'
-
-vi.mock('@/lib/show-submitted-data', () => ({ showSubmittedData: vi.fn() }))
 
 const MOCK_USER: User = {
   id: 'user-delete-test',
@@ -16,13 +14,19 @@ const MOCK_USER: User = {
   email: 'johndoe@shadcn-admin.com',
   phoneNumber: '+959123456789',
   status: 'active',
-  role: 'manager',
+  role: 'teacher',
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-02-02'),
 }
 
+const isInStore = () =>
+  useUsersStore.getState().users.some((u) => u.id === MOCK_USER.id)
+
 describe('UsersDeleteDialog', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    useUsersStore.setState({ users: [MOCK_USER], passwords: {} })
+  })
 
   it('renders the dialog with the correct title, description, input and buttons', async () => {
     const { getByText, getByRole } = await render(
@@ -115,7 +119,7 @@ describe('UsersDeleteDialog', () => {
     await expect.element(usernameInput).toHaveValue('')
   })
 
-  it('shows the submitted data when deleted successfully', async () => {
+  it('removes the user from the store when deleted successfully', async () => {
     const onOpenChange = vi.fn()
     const { getByRole } = await render(
       <UsersDeleteDialog
@@ -138,12 +142,7 @@ describe('UsersDeleteDialog', () => {
 
     expect(onOpenChange).toHaveBeenCalledOnce()
     expect(onOpenChange).toHaveBeenCalledWith(false)
-
-    expect(showSubmittedData).toHaveBeenCalledOnce()
-    expect(showSubmittedData).toHaveBeenCalledWith(
-      MOCK_USER,
-      '以下用户已被删除：'
-    )
+    expect(isInStore()).toBe(false)
   })
 
   it('deletes successfully when press Enter key on the username input', async () => {
@@ -168,11 +167,6 @@ describe('UsersDeleteDialog', () => {
 
     expect(onOpenChange).toHaveBeenCalledOnce()
     expect(onOpenChange).toHaveBeenCalledWith(false)
-
-    expect(showSubmittedData).toHaveBeenCalledOnce()
-    expect(showSubmittedData).toHaveBeenCalledWith(
-      MOCK_USER,
-      '以下用户已被删除：'
-    )
+    expect(isInStore()).toBe(false)
   })
 })

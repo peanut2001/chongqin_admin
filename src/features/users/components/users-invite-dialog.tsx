@@ -2,7 +2,8 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { MailPlus, Send } from 'lucide-react'
-import { showSubmittedData } from '@/lib/show-submitted-data'
+import { toast } from 'sonner'
+import { type Role } from '@/lib/permissions'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -25,6 +26,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { roles } from '../data/data'
+import { emailExists, useUsersStore } from '../data/users-store'
 
 const formSchema = z.object({
   email: z.email({
@@ -50,9 +52,32 @@ export function UsersInviteDialog({
     defaultValues: { email: '', role: '', desc: '' },
   })
 
+  const addUser = useUsersStore((s) => s.addUser)
+
   const onSubmit = (values: UserInviteForm) => {
+    if (emailExists(values.email)) {
+      form.setError('email', { message: '该邮箱已存在。' })
+      return
+    }
+
+    // 被邀请的用户状态为「已邀请」，管理员激活后才能登录
+    const username = values.email.split('@')[0]
+    const now = new Date()
+    addUser({
+      id: crypto.randomUUID(),
+      firstName: username,
+      lastName: '',
+      username,
+      email: values.email,
+      phoneNumber: '',
+      status: 'invited',
+      role: values.role as Role,
+      createdAt: now,
+      updatedAt: now,
+    })
+    toast.success(`已向 ${values.email} 发送邀请`)
+
     form.reset()
-    showSubmittedData(values)
     onOpenChange(false)
   }
 
