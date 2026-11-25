@@ -23,9 +23,11 @@ import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authen
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedSemestersIndexRouteImport } from './routes/_authenticated/semesters/index'
 import { Route as AuthenticatedQuestionBankIndexRouteImport } from './routes/_authenticated/question-bank/index'
 import { Route as AuthenticatedLearningStatsIndexRouteImport } from './routes/_authenticated/learning-stats/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedClassesIndexRouteImport } from './routes/_authenticated/classes/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCasesIndexRouteImport } from './routes/_authenticated/cases/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
@@ -105,6 +107,12 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedSemestersIndexRoute =
+  AuthenticatedSemestersIndexRouteImport.update({
+    id: '/semesters/',
+    path: '/semesters/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedQuestionBankIndexRoute =
   AuthenticatedQuestionBankIndexRouteImport.update({
     id: '/question-bank/',
@@ -121,6 +129,12 @@ const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
     path: '/help-center/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedClassesIndexRoute =
+  AuthenticatedClassesIndexRouteImport.update({
+    id: '/classes/',
+    path: '/classes/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
@@ -181,9 +195,11 @@ export interface FileRoutesByFullPath {
   '/apps/': typeof AuthenticatedAppsIndexRoute
   '/cases/': typeof AuthenticatedCasesIndexRoute
   '/chats/': typeof AuthenticatedChatsIndexRoute
+  '/classes/': typeof AuthenticatedClassesIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/learning-stats/': typeof AuthenticatedLearningStatsIndexRoute
   '/question-bank/': typeof AuthenticatedQuestionBankIndexRoute
+  '/semesters/': typeof AuthenticatedSemestersIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks/': typeof AuthenticatedTasksIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
@@ -205,9 +221,11 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/cases': typeof AuthenticatedCasesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/classes': typeof AuthenticatedClassesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/learning-stats': typeof AuthenticatedLearningStatsIndexRoute
   '/question-bank': typeof AuthenticatedQuestionBankIndexRoute
+  '/semesters': typeof AuthenticatedSemestersIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
@@ -232,9 +250,11 @@ export interface FileRoutesById {
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/cases/': typeof AuthenticatedCasesIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/classes/': typeof AuthenticatedClassesIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/learning-stats/': typeof AuthenticatedLearningStatsIndexRoute
   '/_authenticated/question-bank/': typeof AuthenticatedQuestionBankIndexRoute
+  '/_authenticated/semesters/': typeof AuthenticatedSemestersIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
@@ -259,9 +279,11 @@ export interface FileRouteTypes {
     | '/apps/'
     | '/cases/'
     | '/chats/'
+    | '/classes/'
     | '/help-center/'
     | '/learning-stats/'
     | '/question-bank/'
+    | '/semesters/'
     | '/settings/'
     | '/tasks/'
     | '/users/'
@@ -283,9 +305,11 @@ export interface FileRouteTypes {
     | '/apps'
     | '/cases'
     | '/chats'
+    | '/classes'
     | '/help-center'
     | '/learning-stats'
     | '/question-bank'
+    | '/semesters'
     | '/settings'
     | '/tasks'
     | '/users'
@@ -309,9 +333,11 @@ export interface FileRouteTypes {
     | '/_authenticated/apps/'
     | '/_authenticated/cases/'
     | '/_authenticated/chats/'
+    | '/_authenticated/classes/'
     | '/_authenticated/help-center/'
     | '/_authenticated/learning-stats/'
     | '/_authenticated/question-bank/'
+    | '/_authenticated/semesters/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
@@ -429,6 +455,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/semesters/': {
+      id: '/_authenticated/semesters/'
+      path: '/semesters'
+      fullPath: '/semesters/'
+      preLoaderRoute: typeof AuthenticatedSemestersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/question-bank/': {
       id: '/_authenticated/question-bank/'
       path: '/question-bank'
@@ -448,6 +481,13 @@ declare module '@tanstack/react-router' {
       path: '/help-center'
       fullPath: '/help-center/'
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/classes/': {
+      id: '/_authenticated/classes/'
+      path: '/classes'
+      fullPath: '/classes/'
+      preLoaderRoute: typeof AuthenticatedClassesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chats/': {
@@ -528,9 +568,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedCasesIndexRoute: typeof AuthenticatedCasesIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedClassesIndexRoute: typeof AuthenticatedClassesIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedLearningStatsIndexRoute: typeof AuthenticatedLearningStatsIndexRoute
   AuthenticatedQuestionBankIndexRoute: typeof AuthenticatedQuestionBankIndexRoute
+  AuthenticatedSemestersIndexRoute: typeof AuthenticatedSemestersIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
 }
@@ -543,9 +585,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedCasesIndexRoute: AuthenticatedCasesIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedClassesIndexRoute: AuthenticatedClassesIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedLearningStatsIndexRoute: AuthenticatedLearningStatsIndexRoute,
   AuthenticatedQuestionBankIndexRoute: AuthenticatedQuestionBankIndexRoute,
+  AuthenticatedSemestersIndexRoute: AuthenticatedSemestersIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
 }

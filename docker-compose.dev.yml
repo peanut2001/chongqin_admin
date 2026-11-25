@@ -37,6 +37,8 @@ services:
       - UPLOAD_DIR=/data/uploads
       - CONTENT_DIR=/app/content
       - APP_TZ=Asia/Shanghai
+      # 开发环境允许演示账号登录（正式环境不要设置，默认关闭）
+      - ALLOW_DEMO_LOGIN=true
     depends_on:
       db:
         condition: service_healthy

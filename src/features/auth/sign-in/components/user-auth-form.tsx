@@ -22,7 +22,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 
-/** 演示账号（由后端 flask seed accounts 创建） */
+/**
+ * 演示账号（由后端 flask seed accounts 创建）。
+ * 只在开发环境显示，正式构建默认隐藏；演示环境可设置 VITE_SHOW_DEMO_ACCOUNTS=true 显示。
+ * 注意：这只是界面开关，真正的限制在后端 ALLOW_DEMO_LOGIN（默认关闭时演示账号无法登录）。
+ */
+const showDemoAccounts =
+  import.meta.env.DEV || import.meta.env.VITE_SHOW_DEMO_ACCOUNTS === 'true'
 const DEMO_PASSWORD = 'demo1234'
 const demoAccounts: { role: Role; email: string }[] = [
   { role: 'admin', email: 'admin@demo.com' },
@@ -131,30 +137,34 @@ export function UserAuthForm({
           登录
         </Button>
 
-        <div className='relative my-2'>
-          <div className='absolute inset-0 flex items-center'>
-            <span className='w-full border-t' />
-          </div>
-          <div className='relative flex justify-center text-xs'>
-            <span className='bg-background px-2 text-muted-foreground'>
-              演示账号（密码 {DEMO_PASSWORD}）
-            </span>
-          </div>
-        </div>
+        {showDemoAccounts && (
+          <>
+            <div className='relative my-2'>
+              <div className='absolute inset-0 flex items-center'>
+                <span className='w-full border-t' />
+              </div>
+              <div className='relative flex justify-center text-xs'>
+                <span className='bg-background px-2 text-muted-foreground'>
+                  演示账号（密码 {DEMO_PASSWORD}）
+                </span>
+              </div>
+            </div>
 
-        <div className='grid grid-cols-3 gap-2'>
-          {demoAccounts.map((account) => (
-            <Button
-              key={account.email}
-              variant='outline'
-              type='button'
-              disabled={isLoading}
-              onClick={() => fillDemo(account.email)}
-            >
-              {roleLabels[account.role]}
-            </Button>
-          ))}
-        </div>
+            <div className='grid grid-cols-3 gap-2'>
+              {demoAccounts.map((account) => (
+                <Button
+                  key={account.email}
+                  variant='outline'
+                  type='button'
+                  disabled={isLoading}
+                  onClick={() => fillDemo(account.email)}
+                >
+                  {roleLabels[account.role]}
+                </Button>
+              ))}
+            </div>
+          </>
+        )}
       </form>
     </Form>
   )

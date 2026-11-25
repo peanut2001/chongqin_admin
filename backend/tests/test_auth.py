@@ -99,3 +99,27 @@ def test_login_is_throttled_after_repeated_failures(app, client, make_user):
 def test_refresh_without_cookie_is_unauthorized(client):
     resp = client.post("/api/auth/refresh")
     assert resp.status_code == 401
+
+
+def test_demo_accounts_blocked_when_demo_login_disabled(app, client, make_user, auth_headers):
+    """正式环境（ALLOW_DEMO_LOGIN 关闭）：演示账号密码公开在源码里，必须无法登录。"""
+    make_user("demo@test.com", is_demo=True)
+    make_user("real@test.com")
+    demo_headers = auth_headers("demo@test.com")  # 测试配置默认允许，先拿到一个已登录的会话
+
+    app.config["ALLOW_DEMO_LOGIN"] = False
+    try:
+        resp = login(client, "demo@test.com")
+        assert resp.status_code == 403 and resp.get_json()["code"] == "demo_disabled"
+        # 密码错误时仍是普通的 401，不暴露账号是否为演示账号
+        assert login(client, "demo@test.com", "wrong-pass1").get_json()["code"] == "invalid_credentials"
+
+        # 已登录的演示账号立即失效：普通接口与刷新都被拒绝
+        me_resp = client.get("/api/me", headers=demo_headers)
+        assert me_resp.status_code == 401 and me_resp.get_json()["code"] == "demo_disabled"
+        assert client.post("/api/auth/refresh").status_code == 401
+
+        # 真实账号不受影响
+        assert login(client, "real@test.com").status_code == 200
+    finally:
+        app.config["ALLOW_DEMO_LOGIN"] = True

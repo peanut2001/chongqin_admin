@@ -9,6 +9,7 @@ import {
   ChartNoAxesCombined,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
+import { apiErrorTitle } from '@/lib/api/client'
 import { canAccess, canViewClassData } from '@/lib/permissions'
 import {
   Card,
@@ -118,7 +119,7 @@ export function Dashboard() {
   const modules = allModules.filter((m) => canAccess(role, m.url))
   // 学生看不到「教学分析」和其他同学的「最近学习动态」
   const showClassData = canViewClassData(role)
-  const { data, isError } = useDashboard()
+  const { data, isError, error } = useDashboard()
   const semester = data?.semester
   const semesterPercent = semester
     ? Math.round((semester.currentWeek / semester.totalWeeks) * 100)
@@ -137,7 +138,7 @@ export function Dashboard() {
               {semester
                 ? `${semester.course} · ${semester.name}`
                 : isError
-                  ? '数据加载失败'
+                  ? apiErrorTitle(error, '数据加载失败')
                   : '加载中…'}
             </p>
           </div>

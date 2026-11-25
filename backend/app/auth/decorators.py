@@ -2,6 +2,7 @@
 
 from functools import wraps
 
+from flask import current_app
 from flask_jwt_extended import current_user, get_jwt, verify_jwt_in_request
 
 from app.errors import ApiError, forbidden
@@ -12,6 +13,11 @@ STATUS_MESSAGES = {
     "invited": "该账号尚未接受邀请，请联系管理员。",
     "suspended": "该账号已被停用，请联系管理员。",
 }
+DEMO_DISABLED_MESSAGE = "演示账号在当前环境中不可用，请使用管理员开通的账号登录。"
+
+
+def demo_login_blocked(user: User) -> bool:
+    return user.is_demo and not current_app.config["ALLOW_DEMO_LOGIN"]
 
 
 def check_user_usable(user: User | None, token_version: int | None) -> User:
@@ -22,6 +28,9 @@ def check_user_usable(user: User | None, token_version: int | None) -> User:
         raise ApiError(
             401, "account_disabled", STATUS_MESSAGES.get(user.status, "账号不可用。")
         )
+    # 关闭演示登录后，已登录的演示账号也立即失效
+    if demo_login_blocked(user):
+        raise ApiError(401, "demo_disabled", DEMO_DISABLED_MESSAGE)
     if token_version != user.token_version:
         raise ApiError(401, "token_revoked", "登录状态已失效，请重新登录。")
     return user

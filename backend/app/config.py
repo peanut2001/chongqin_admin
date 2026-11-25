@@ -50,6 +50,10 @@ class Config:
 
     APP_TZ = _env("APP_TZ", "Asia/Shanghai")
 
+    # 是否允许演示账号（flask seed 创建、is_demo=true，密码公开在源码中）登录。
+    # 默认关闭：正式环境即使忘了清理演示数据，演示账号也无法登录；开发环境由 docker-compose 打开。
+    ALLOW_DEMO_LOGIN = _env("ALLOW_DEMO_LOGIN", "false").lower() == "true"
+
     # 登录限流：同一邮箱或 IP 在窗口期内失败次数上限
     LOGIN_FAIL_LIMIT = 10
     LOGIN_FAIL_WINDOW_MINUTES = 15
@@ -77,6 +81,8 @@ class TestConfig(Config):
         "postgresql+psycopg://chongqin:chongqin@localhost:5432/chongqin_test",
     )
     LOGIN_FAIL_LIMIT = 5
+    # 部分测试使用 flask seed 创建的演示账号
+    ALLOW_DEMO_LOGIN = True
 
 
 class ProdConfig(Config):

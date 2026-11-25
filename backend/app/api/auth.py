@@ -19,7 +19,7 @@ from flask_jwt_extended import (
 from pydantic import Field
 from sqlalchemy import delete, func, select
 
-from app.auth.decorators import STATUS_MESSAGES, check_user_usable
+from app.auth.decorators import DEMO_DISABLED_MESSAGE, STATUS_MESSAGES, check_user_usable, demo_login_blocked
 from app.errors import ApiError
 from app.extensions import db
 from app.models import RevokedToken, User
@@ -67,6 +67,8 @@ def login():
 
     if user.status != "active":
         raise ApiError(403, f"account_{user.status}", STATUS_MESSAGES[user.status])
+    if demo_login_blocked(user):
+        raise ApiError(403, "demo_disabled", DEMO_DISABLED_MESSAGE)
 
     user.last_login_at = now_utc()
     audit.log("auth.login", actor_id=user.id, target_type="user", target_id=str(user.id))

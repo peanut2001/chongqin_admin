@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { apiErrorTitle } from '@/lib/api/client'
 import { useMeta } from '@/lib/api/meta'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -99,7 +100,9 @@ export function LearningStats() {
         </div>
 
         {overview.isError && (
-          <p className='text-sm text-destructive'>统计数据加载失败。</p>
+          <p className='text-sm text-destructive'>
+            {apiErrorTitle(overview.error, '统计数据加载失败。')}
+          </p>
         )}
 
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>

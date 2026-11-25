@@ -18,6 +18,7 @@ from app.models.identity import ROLES, STATUSES
 from app.schemas import CamelModel, parse_body
 from app.serializers import user_full
 from app.services import users as svc
+from app.services.passwords import password_problem
 
 bp = Blueprint("users", __name__)
 
@@ -38,12 +39,9 @@ SORTABLE = {
 def _password_rule(value: str | None) -> str | None:
     if value is None or value == "":
         return None
-    if len(value) < 8:
-        raise ValueError("密码长度至少为 8 个字符。")
-    if not re.search(r"[a-z]", value):
-        raise ValueError("密码必须包含至少一个小写字母。")
-    if not re.search(r"\d", value):
-        raise ValueError("密码必须包含至少一个数字。")
+    problem = password_problem(value)
+    if problem:
+        raise ValueError(problem)
     return value
 
 

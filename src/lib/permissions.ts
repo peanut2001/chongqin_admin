@@ -26,6 +26,8 @@ export const roleDefaultAvatars: Record<Role, string> = {
  */
 const routeRules: { prefix: string; roles: Role[] }[] = [
   { prefix: '/users', roles: ['admin'] },
+  { prefix: '/classes', roles: ['admin'] },
+  { prefix: '/semesters', roles: ['admin'] },
   { prefix: '/learning-stats', roles: ['admin', 'teacher'] },
   // 模板自带的示例页面，暂不对任何角色开放（菜单中也已隐藏）
   { prefix: '/tasks', roles: [] },
