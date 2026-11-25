@@ -24,7 +24,7 @@ def test_import_is_idempotent_and_ids_are_stable(app, content):
         second_ids = sorted(str(i) for i in db.session.scalars(select(CaseImage.id)))
     assert again == content
     assert first_ids == second_ids
-    assert content["cases"] == 91 and content["questions"] == 80
+    assert content["cases"] == 389 and content["questions"] == 287
 
 
 def test_import_rejects_case_without_license(app, tmp_path):
@@ -43,7 +43,7 @@ def test_case_list_and_detail(client, make_user, auth_headers, content):
     make_user("s@test.com")
     h = auth_headers("s@test.com")
     cases = client.get("/api/cases", headers=h).get_json()
-    assert len(cases) == 91
+    assert len(cases) == 389
     assert "fullText" not in cases[0]
     assert cases[0]["source"]["license"]
     image_url = cases[0]["images"][0]["url"]
@@ -56,7 +56,7 @@ def test_case_list_and_detail(client, make_user, auth_headers, content):
     assert img.status_code == 200
     assert "immutable" in img.headers["Cache-Control"]
 
-    assert len(client.get("/api/topics", headers=h).get_json()) == 12
+    assert len(client.get("/api/topics", headers=h).get_json()) == 42
     assert client.get("/api/cases").status_code == 401
 
 

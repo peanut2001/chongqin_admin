@@ -13,6 +13,9 @@ export type CaseSystem =
   | '循环系统'
   | '骨骼肌肉'
   | '泌尿生殖'
+  | '妇产科'
+  | '内分泌系统'
+  | '浅表器官'
 
 export type CaseModality = 'X 线' | 'CT' | 'MRI' | '超声' | '病理切片'
 
@@ -74,19 +77,22 @@ export type CaseRecord = {
 export type MedicalCase = CaseRecord & { topic: DiseaseTopic }
 
 export const caseSystems: CaseSystem[] = [
-  '呼吸系统',
   '消化系统',
-  '神经系统',
+  '泌尿生殖',
+  '妇产科',
+  '内分泌系统',
+  '浅表器官',
   '循环系统',
   '骨骼肌肉',
-  '泌尿生殖',
+  '呼吸系统',
+  '神经系统',
 ]
 
 export const caseModalities: CaseModality[] = [
+  '超声',
   'X 线',
   'CT',
   'MRI',
-  '超声',
   '病理切片',
 ]
 
@@ -110,6 +116,7 @@ export const imageTypeLabels: Record<string, string> = {
   pathology: '病理',
   endoscopy: '内镜',
   medical_photograph: '临床照片',
+  ophthalmic_imaging: '眼科影像',
 }
 
 /** 「男，55 岁」 */

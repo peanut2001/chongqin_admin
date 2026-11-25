@@ -31,10 +31,11 @@ def _start(client, h, set_id):
     return resp.get_json()
 
 
-def test_session_payload_does_not_leak_answers(client, make_user, auth_headers, content):
+@pytest.mark.parametrize("set_id", ["case-diagnosis", "us-case-diagnosis"])
+def test_session_payload_does_not_leak_answers(client, make_user, auth_headers, content, set_id):
     make_user("s@test.com")
     h = auth_headers("s@test.com")
-    session = _start(client, h, "case-diagnosis")
+    session = _start(client, h, set_id)
     assert len(session["questions"]) == 10  # 病例题每次随机 10 道
     for path, key, value in _walk(session):
         assert key not in FORBIDDEN_KEYS, f"{path}.{key} 泄露了答案相关信息"
@@ -130,5 +131,6 @@ def test_finish_counts_unanswered_as_wrong_and_lists_records(client, make_user, 
 
     sets = {s["id"]: s for s in client.get("/api/question-sets", headers=h).get_json()}
     assert sets["case-diagnosis"]["total"] == 67
+    assert sets["us-case-diagnosis"]["total"] == 207
     assert sets["chest"]["my"] == {"answered": 1, "accuracy": 100.0}
     assert sets["chest"]["avgAccuracy"] is None  # 作答太少不展示正确率
