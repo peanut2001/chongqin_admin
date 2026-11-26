@@ -1,9 +1,9 @@
 # 生产部署
 
-应用打包成一个镜像 `ghcr.io/peanut2001/chongqin_admin`（前端页面 + 后端接口），由 GitHub Actions 自动构建：
+应用打包成一个镜像 `ghcr.io/peanut2001/chongqin_admin`（前端页面 + 后端接口），由 GitHub Actions 构建。日常推送 `main` 不打包，只在发版时构建：
 
-- 推送到 `main`：发布 `latest` 和提交短哈希（如 `716ef12`）两个标签；
-- 推送 `v*` 标签（如 `v1.0.0`）：额外发布版本号标签（`1.0.0`）；
+- 推送 `v*` 标签（如 `git tag v1.0.0 && git push origin v1.0.0`）：发布版本号（`1.0.0`）、提交短哈希（如 `716ef12`）和 `latest` 三个标签；
+- 在 GitHub 的 Actions 页面手动运行「Docker image」（选 `main`）：发布提交短哈希和 `latest`；
 - 同时提供 amd64 和 arm64 架构。
 
 服务器上运行两个容器：
@@ -110,7 +110,7 @@ dc pull
 dc up -d
 ```
 
-数据库迁移在 app 容器启动时自动执行。要固定某个版本，把 `.env.prod` 的 `APP_VERSION` 改为提交短哈希或版本号。
+先发版（推送 `v*` 标签或手动运行构建），等 Actions 跑完再在服务器上 `pull`。数据库迁移在 app 容器启动时自动执行。要固定某个版本，把 `.env.prod` 的 `APP_VERSION` 改为版本号或提交短哈希。
 
 ## 演示结束后
 

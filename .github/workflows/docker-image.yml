@@ -1,11 +1,11 @@
 name: Docker image
 
-# 推送到 main：发布 latest 与提交短哈希（如 716ef12）两个标签；
-# 推送 v* 标签（如 v1.0.0）：额外发布版本号标签（1.0.0）。
+# 日常推送 main 不打包，只在发版时构建：
+# - 推送 v* 标签（如 v1.0.0）：发布版本号（1.0.0）、提交短哈希（如 716ef12）与 latest 三个标签；
+# - 在 Actions 页面手动运行（选 main）：发布提交短哈希与 latest。
 # amd64 / arm64 分别在原生机器上构建，再合并成一个多架构镜像。
 on:
   push:
-    branches: [main]
     tags: ['v*']
   workflow_dispatch:
 
@@ -35,7 +35,7 @@ jobs:
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=重庆医科大学附属第二医院 · 智慧课程平台（前端 + 后端，数据库使用 PostgreSQL 16）
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' }}
             type=sha,prefix=
             type=semver,pattern={{version}}
 
