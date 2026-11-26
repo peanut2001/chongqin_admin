@@ -41,7 +41,7 @@ export function NavUser() {
                 className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
               >
                 <UserAvatar
-                  className='h-8 w-8 rounded-lg'
+                  className='size-8 shrink-0 rounded-lg group-data-[collapsible=icon]:size-10'
                   fallbackClassName='rounded-lg'
                 />
                 <div className='grid flex-1 text-start text-sm leading-tight'>

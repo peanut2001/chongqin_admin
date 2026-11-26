@@ -33,6 +33,7 @@ import { Route as AuthenticatedCasesIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as AuthenticatedAiReadingIndexRouteImport } from './routes/_authenticated/ai-reading/index'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
+import { Route as AuthenticatedSettingsAiModelRouteImport } from './routes/_authenticated/settings/ai-model'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 
@@ -164,6 +165,12 @@ const AuthenticatedSettingsAppearanceRoute =
     path: '/appearance',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedSettingsAiModelRoute =
+  AuthenticatedSettingsAiModelRouteImport.update({
+    id: '/ai-model',
+    path: '/ai-model',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
 const AuthenticatedSettingsAccountRoute =
   AuthenticatedSettingsAccountRouteImport.update({
     id: '/account',
@@ -190,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503Route
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/ai-model': typeof AuthenticatedSettingsAiModelRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/ai-reading/': typeof AuthenticatedAiReadingIndexRoute
   '/apps/': typeof AuthenticatedAppsIndexRoute
@@ -216,6 +224,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/ai-model': typeof AuthenticatedSettingsAiModelRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/ai-reading': typeof AuthenticatedAiReadingIndexRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
@@ -245,6 +254,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/_authenticated/settings/ai-model': typeof AuthenticatedSettingsAiModelRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/ai-reading/': typeof AuthenticatedAiReadingIndexRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/errors/$error'
     | '/settings/account'
+    | '/settings/ai-model'
     | '/settings/appearance'
     | '/ai-reading/'
     | '/apps/'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/'
     | '/errors/$error'
     | '/settings/account'
+    | '/settings/ai-model'
     | '/settings/appearance'
     | '/ai-reading'
     | '/apps'
@@ -328,6 +340,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
+    | '/_authenticated/settings/ai-model'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/ai-reading/'
     | '/_authenticated/apps/'
@@ -525,6 +538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAppearanceRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/settings/ai-model': {
+      id: '/_authenticated/settings/ai-model'
+      path: '/ai-model'
+      fullPath: '/settings/ai-model'
+      preLoaderRoute: typeof AuthenticatedSettingsAiModelRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
     '/_authenticated/settings/account': {
       id: '/_authenticated/settings/account'
       path: '/account'
@@ -544,6 +564,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+  AuthenticatedSettingsAiModelRoute: typeof AuthenticatedSettingsAiModelRoute
   AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
@@ -551,6 +572,7 @@ interface AuthenticatedSettingsRouteRouteChildren {
 const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
   {
     AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+    AuthenticatedSettingsAiModelRoute: AuthenticatedSettingsAiModelRoute,
     AuthenticatedSettingsAppearanceRoute: AuthenticatedSettingsAppearanceRoute,
     AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   }

@@ -23,6 +23,7 @@ import {
   ClipboardList,
   ScanEye,
   ChartNoAxesCombined,
+  Bot,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -158,6 +159,11 @@ export const sidebarData: SidebarData = {
               title: '外观',
               url: '/settings/appearance',
               icon: Palette,
+            },
+            {
+              title: 'AI 模型',
+              url: '/settings/ai-model',
+              icon: Bot,
             },
           ],
         },

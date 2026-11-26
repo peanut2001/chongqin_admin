@@ -1,17 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api/client'
-import { type Agreement, type AiReading, type AiSample } from './data/samples'
+import {
+  type Agreement,
+  type AiEngine,
+  type AiReading,
+  type AiSample,
+} from './data/samples'
 
 export function useAiSamples() {
   return useQuery({
     queryKey: ['ai-samples'],
     queryFn: async () =>
       (
-        await api.get<{ modalities: string[]; samples: AiSample[] }>(
-          '/ai/samples'
-        )
+        await api.get<{
+          engine: AiEngine
+          modalities: string[]
+          samples: AiSample[]
+        }>('/ai/samples')
       ).data,
-    staleTime: Infinity,
+    // 管理员可能随时启用 / 停用模型，进入页面时重新获取
+    staleTime: 0,
   })
 }
 

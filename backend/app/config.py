@@ -42,6 +42,14 @@ class Config:
     MEDIA_SIGNING_KEY = _env("MEDIA_SIGNING_KEY", "dev-only-media-signing-key")
     SIGNED_URL_MAX_AGE = 3600
 
+    # 加密数据库中保存的 AI 模型 API Key；更换后已保存的 Key 无法解密，需在设置页重新填写
+    MODEL_KEY_SECRET = _env("MODEL_KEY_SECRET", "dev-only-model-key-secret")
+    # 调用 AI 模型的超时（秒）与重试次数；判读是同步请求，不宜过长
+    # AI 判读对外显示的模型名称（判读页、判读记录统一显示此名称，不暴露实际调用的模型）
+    AI_MODEL_DISPLAY_NAME = _env("AI_MODEL_DISPLAY_NAME", "DolphonUltrasound72BV1.9")
+    AI_MODEL_TIMEOUT = 90
+    AI_MODEL_MAX_RETRIES = 1
+
     UPLOAD_DIR = Path(_env("UPLOAD_DIR", str(BASE_DIR / "uploads")))
     CONTENT_DIR = Path(_env("CONTENT_DIR", str(BASE_DIR / "content")))
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024

@@ -34,6 +34,8 @@ services:
       - TEST_DATABASE_URL=postgresql+psycopg://chongqin:chongqin@db:5432/chongqin_test
       - JWT_SECRET_KEY=dev-only-jwt-secret-please-change-in-production-0123456789
       - MEDIA_SIGNING_KEY=dev-only-media-signing-key
+      # 加密数据库中的 AI 模型 API Key（正式环境务必改为随机长字符串，且之后不要再改）
+      - MODEL_KEY_SECRET=dev-only-model-key-secret
       - UPLOAD_DIR=/data/uploads
       - CONTENT_DIR=/app/content
       - APP_TZ=Asia/Shanghai

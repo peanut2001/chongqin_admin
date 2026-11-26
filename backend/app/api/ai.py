@@ -1,5 +1,6 @@
-"""AI 图像判读：示例图片 / 上传图片 + 学生判读意见 → 演示结果，并保存判读记录。"""
+"""AI 图像判读：示例图片 / 上传图片 + 学生判读意见 → 模型判读结果（未启用模型时为演示结果），并保存判读记录。"""
 
+from pathlib import Path
 from typing import Literal
 
 from flask import Blueprint, current_app, request
@@ -13,7 +14,7 @@ from app.errors import ApiError, not_found, validation_error_fields
 from app.extensions import db
 from app.models import AiReading, AiSample, AppSetting
 from app.schemas import CamelModel, parse_body
-from app.services import ai_demo, media
+from app.services import ai_demo, ai_model, media
 from app.services.signing import upload_url
 from app.services.timeutil import iso, now_utc
 from app.services.users import parse_uuid
@@ -35,6 +36,7 @@ def _image_url(r: AiReading) -> str | None:
 
 
 def reading_dict(r: AiReading) -> dict:
+    is_demo = r.result_source == ai_demo.RESULT_SOURCE
     return {
         "id": str(r.id),
         "student": r.user.display_name if r.user else None,
@@ -43,9 +45,11 @@ def reading_dict(r: AiReading) -> dict:
         "modality": r.modality,
         "opinion": r.student_opinion,
         "result": r.result,
-        "resultSource": r.result_source,
-        "isDemo": r.result_source == ai_demo.RESULT_SOURCE,
-        "disclaimer": ai_demo.DISCLAIMER if r.result_source == ai_demo.RESULT_SOURCE else None,
+        # 实际调用的模型只保存在数据库（result_source / model_version），对外统一显示名称
+        "resultSource": "demo" if is_demo else "model",
+        "modelName": None if is_demo else current_app.config["AI_MODEL_DISPLAY_NAME"],
+        "isDemo": is_demo,
+        "disclaimer": ai_demo.DISCLAIMER if is_demo else None,
         "agreement": r.agreement,
         "imageUrl": _image_url(r),
         "createdAt": iso(r.created_at),
@@ -56,7 +60,14 @@ def reading_dict(r: AiReading) -> dict:
 @auth_required()
 def samples():
     rows = db.session.scalars(select(AiSample).order_by(AiSample.sort_order)).all()
+    cfg = ai_model.active_config()
     return {
+        # 当前判读引擎：已启用模型时为 model（只给出模型名称），否则为演示结果
+        "engine": (
+            {"mode": "model", "model": current_app.config["AI_MODEL_DISPLAY_NAME"]}
+            if cfg
+            else {"mode": "demo", "model": None}
+        ),
         "modalities": _modalities(),
         "samples": [
             {
@@ -68,6 +79,18 @@ def samples():
             for s in rows
         ],
     }
+
+
+def _image_bytes(sample: AiSample | None, upload) -> tuple[bytes, str]:
+    """读取待判读图像的原始字节与类型（示例影像来自病例图片，上传图片来自上传目录）。"""
+    if upload is not None:
+        path = Path(current_app.config["UPLOAD_DIR"]) / upload.storage_key
+        return path.read_bytes(), upload.content_type
+    image = sample.case_image if sample else None
+    if image is None:
+        raise ApiError(422, "no_image", "该示例没有可供判读的图像，请选择其他示例或上传图片。")
+    data = (Path(current_app.config["CONTENT_DIR"]) / "case-images" / image.storage_key).read_bytes()
+    return data, media.sniff(data) or "image/webp"
 
 
 class ReadingForm(BaseModel):
@@ -112,14 +135,30 @@ def create_reading():
         )
         db.session.flush()
 
+    cfg = ai_model.active_config()
+    if cfg is None:
+        result = ai_demo.analyze(modality, sample)
+        result_source, model_version = ai_demo.RESULT_SOURCE, None
+    else:
+        # 模型调用失败时报错且不保存记录（已写入磁盘的上传文件一并删除）
+        try:
+            image, content_type = _image_bytes(sample, upload)
+            result = ai_model.analyze(cfg, image, content_type, modality, show_detail=user.role == "admin")
+        except Exception:
+            if upload is not None:
+                (Path(current_app.config["UPLOAD_DIR"]) / upload.storage_key).unlink(missing_ok=True)
+            raise
+        result_source, model_version = f"model:{cfg['model']}", cfg["model"]
+
     reading = AiReading(
         user_id=user.id,
         sample_id=sample.id if sample else None,
         upload_id=upload.id if upload else None,
         modality=modality,
         student_opinion=form.opinion,
-        result=ai_demo.analyze(modality, sample),
-        result_source=ai_demo.RESULT_SOURCE,
+        result=result,
+        result_source=result_source,
+        model_version=model_version,
         created_at=now_utc(),
     )
     db.session.add(reading)
