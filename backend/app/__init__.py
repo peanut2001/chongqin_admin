@@ -9,7 +9,10 @@ from app.extensions import db, jwt, migrate
 
 def create_app(config_name: str | None = None) -> Flask:
     app = Flask(__name__)
-    app.config.from_object(CONFIGS[config_name or os.environ.get("APP_CONFIG", "dev")])
+    config = CONFIGS[config_name or os.environ.get("APP_CONFIG", "dev")]
+    # 生产环境缺少密钥或仍使用开发默认值时直接启动失败，而不是悄悄用公开的默认值
+    config.validate()
+    app.config.from_object(config)
     app.json.ensure_ascii = False
     app.json.sort_keys = False
 

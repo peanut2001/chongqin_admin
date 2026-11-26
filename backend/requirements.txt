@@ -9,4 +9,5 @@ Pillow~=11.3
 anthropic~=2.14
 openai~=3.59
 cryptography~=50.0
+gunicorn~=27.0
 pytest~=8.3

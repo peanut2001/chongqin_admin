@@ -13,6 +13,10 @@ dist-ssr
 *.local
 
 .env
+# 生产部署：密钥、证书、数据库备份
+.env.prod
+deploy/certs/
+*.dump
 
 # Editor directories and files
 .vscode/*

@@ -75,6 +75,10 @@ class Config:
 
     JSON_SORT_KEYS = False
 
+    @classmethod
+    def validate(cls) -> None:
+        """启动时检查配置；开发 / 测试环境不检查。"""
+
 
 class DevConfig(Config):
     DEBUG = True
@@ -95,6 +99,21 @@ class TestConfig(Config):
 
 class ProdConfig(Config):
     JWT_COOKIE_SECURE = True
+
+    # 这些值有开发默认值（公开在源码中），正式环境必须显式设置为随机长字符串
+    SECRETS = ("JWT_SECRET_KEY", "MEDIA_SIGNING_KEY", "MODEL_KEY_SECRET")
+
+    @classmethod
+    def validate(cls) -> None:
+        problems = [] if os.environ.get("DATABASE_URL") else ["DATABASE_URL 未设置"]
+        for name in cls.SECRETS:
+            value = os.environ.get(name, "")
+            if not value:
+                problems.append(f"{name} 未设置")
+            elif value.startswith("dev-only") or len(value) < 32:
+                problems.append(f"{name} 不能使用开发默认值，且至少 32 个字符")
+        if problems:
+            raise RuntimeError("生产配置有误：" + "；".join(problems) + "。可用 openssl rand -hex 32 生成。")
 
 
 CONFIGS = {"dev": DevConfig, "test": TestConfig, "prod": ProdConfig}

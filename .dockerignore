@@ -3,3 +3,11 @@ dist
 coverage
 .git
 *.log
+# 前端镜像不需要后端代码、病例图片、数据库脚本
+backend
+db
+# 密钥与证书不能进入镜像
+.env
+.env.*
+deploy/certs
+*.dump
