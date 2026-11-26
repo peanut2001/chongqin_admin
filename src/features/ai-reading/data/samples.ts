@@ -13,7 +13,9 @@ export type AiFinding = {
 }
 
 /** 当前判读引擎 */
-export type AiEngine = { mode: 'model'; model: string } | { mode: 'demo'; model: null }
+export type AiEngine =
+  | { mode: 'model'; model: string }
+  | { mode: 'demo'; model: null }
 
 export type AiResult = {
   findings: AiFinding[]

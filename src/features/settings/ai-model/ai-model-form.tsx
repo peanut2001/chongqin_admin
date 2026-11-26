@@ -194,7 +194,8 @@ export function AiModelForm() {
                 </RadioGroup>
               </FormControl>
               <FormDescription>
-                不确定时选 OpenAI 格式，多数中转服务都支持。使用自定义服务地址时，
+                不确定时选 OpenAI
+                格式，多数中转服务都支持。使用自定义服务地址时，
                 若所选格式被服务拒绝，判读会自动改用另一种格式并保存。
               </FormDescription>
               <FormMessage />

@@ -20,10 +20,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
+      # 固定 pnpm 10：与生成 pnpm-lock.yaml 的版本、Dockerfile 一致（不固定会装到最新大版本）
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: corepack enable && corepack prepare pnpm@10 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
