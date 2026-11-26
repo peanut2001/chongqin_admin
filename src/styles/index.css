@@ -85,3 +85,88 @@
     height: 0;
   }
 }
+
+/* 自动向上滚动的轮播列表：内容复制一份，滚到一半无缝衔接；悬停暂停 */
+@keyframes marquee-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee-up var(--marquee-duration, 30s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+/* AI 判读：分析中扫描光束上下往返 */
+@keyframes ai-scan {
+  from {
+    top: 0%;
+  }
+  to {
+    top: 100%;
+  }
+}
+.ai-scan-beam {
+  animation: ai-scan 2.2s ease-in-out infinite alternate;
+}
+.ai-scan-grid {
+  background-image:
+    linear-gradient(to right, rgb(34 211 238 / 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(34 211 238 / 0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* AI 判读：病灶框入场 + 光晕呼吸 */
+@keyframes ai-box-in {
+  from {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes ai-box-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 8px 0 rgb(244 63 94 / 0.2),
+      inset 0 0 12px 0 rgb(244 63 94 / 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 18px 2px rgb(244 63 94 / 0.4),
+      inset 0 0 20px 2px rgb(244 63 94 / 0.3);
+  }
+}
+.ai-box {
+  animation: ai-box-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.ai-box-glow {
+  animation: ai-box-glow 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-scan-beam {
+    animation: none;
+    top: 50%;
+  }
+  .ai-box,
+  .ai-box-glow {
+    animation: none;
+  }
+  .marquee {
+    overflow-y: auto;
+  }
+  .marquee-track {
+    animation: none;
+  }
+  .marquee-dup {
+    display: none;
+  }
+}

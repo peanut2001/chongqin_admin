@@ -94,6 +94,105 @@ export function useStudentStats(classId?: number) {
   })
 }
 
+/* ===================== 单个学生详情与 AI 学情分析 ===================== */
+
+/** 人均指标（正确率按题数加权） */
+export type PerCapita = {
+  studyHours: number
+  practiceCount: number
+  accuracy: number | null
+  caseViews: number
+  aiReads: number
+}
+
+export type StudentDetail = {
+  student: StudentStat
+  currentWeek: number
+  attentionHoursThreshold: number
+  attentionAccuracy: number
+  /** 对比基准：「班级平均」或（未分班时）「全体平均」 */
+  peerLabel: string
+  peer: PerCapita
+  weeklyActivity: WeeklyActivity[]
+  /** mastery 为 null 表示该生还没练习这一章 */
+  chapterMastery: (Omit<ChapterMastery, 'mastery'> & {
+    mastery: number | null
+    peerMastery: number
+  })[]
+  moduleUsage: ModuleUsage[]
+  aiAgreement: Record<'一致' | '部分一致' | '不一致' | '未自评', number>
+}
+
+type AdviceMeta = {
+  /** 未启用 AI 模型时为规则生成的演示结果 */
+  isDemo: boolean
+  modelName: string | null
+  disclaimer: string
+  generatedAt: string
+}
+
+export type GroupAdvice = AdviceMeta & {
+  summary: string
+  issues: { title: string; detail: string }[]
+  focusStudents: {
+    userId: string
+    studentNo: string
+    name: string
+    reason: string
+  }[]
+  suggestions: string[]
+}
+
+export type StudentAdvice = AdviceMeta & {
+  summary: string
+  strengths: string[]
+  weaknesses: string[]
+  suggestions: string[]
+  /** 写给学生本人的学习建议 */
+  message: string
+}
+
+export function useStudentDetail(userId: string | null) {
+  return useQuery({
+    queryKey: ['stats', 'student', userId],
+    queryFn: async () =>
+      (await api.get<StudentDetail>(`/stats/students/${userId}`)).data,
+    enabled: userId !== null,
+  })
+}
+
+// AI 分析耗时且计费：同一范围 10 分钟内复用结果，失败不自动重试
+const ADVICE_CACHE = 10 * 60 * 1000
+
+export function useGroupAdvice(userIds: string[], enabled: boolean) {
+  const ids = [...userIds].sort()
+  return useQuery({
+    queryKey: ['stats', 'ai-advice', 'group', ids.join(',')],
+    queryFn: async () =>
+      (await api.post<GroupAdvice>('/stats/ai-advice', { userIds: ids })).data,
+    enabled: enabled && ids.length > 0,
+    staleTime: ADVICE_CACHE,
+    gcTime: ADVICE_CACHE,
+    retry: false,
+    refetchOnWindowFocus: false,
+  })
+}
+
+/** 不自动请求：由「生成分析」按钮调用 refetch()；已生成过的结果直接从缓存显示 */
+export function useStudentAdvice(userId: string | null) {
+  return useQuery({
+    queryKey: ['stats', 'ai-advice', 'student', userId],
+    queryFn: async () =>
+      (await api.post<StudentAdvice>(`/stats/students/${userId}/ai-advice`))
+        .data,
+    enabled: false,
+    staleTime: ADVICE_CACHE,
+    gcTime: ADVICE_CACHE,
+    retry: false,
+    refetchOnWindowFocus: false,
+  })
+}
+
 export type MyStats = Omit<StatsOverview, 'kpis' | 'recentActivities'> & {
   kpis: Kpis
 }

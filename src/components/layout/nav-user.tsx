@@ -38,10 +38,10 @@ export function NavUser() {
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size='lg'
-                className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+                className='h-14 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
               >
                 <UserAvatar
-                  className='size-8 shrink-0 rounded-lg group-data-[collapsible=icon]:size-10'
+                  className='size-10 shrink-0 rounded-lg'
                   fallbackClassName='rounded-lg'
                 />
                 <div className='grid flex-1 text-start text-sm leading-tight'>

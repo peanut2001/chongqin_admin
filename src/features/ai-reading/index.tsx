@@ -131,6 +131,7 @@ export function AiReading() {
 
   const opinionReady = opinion.trim().length >= 2
   const hasImage = !!sample || !!file
+  const canAnalyze = hasImage && opinionReady && !create.isPending
 
   const analyze = () =>
     create.mutate(
@@ -266,7 +267,9 @@ export function AiReading() {
             <FittedImage
               url={sample ? sample.imageUrl : previewUrl}
               label={sample?.name ?? modality}
-              result={result}
+              // 分析中隐藏旧标注，结果返回后标注重新入场
+              result={create.isPending ? null : result}
+              scanning={create.isPending}
             />
           </Card>
 
@@ -285,6 +288,17 @@ export function AiReading() {
                 placeholder='请先独立描述影像所见与初步诊断…'
                 value={opinion}
                 onChange={(e) => setOpinion(e.target.value)}
+                // Enter 发起判读，Shift+Enter 换行；输入法选词时的回车不触发
+                onKeyDown={(e) => {
+                  if (
+                    e.key !== 'Enter' ||
+                    e.shiftKey ||
+                    e.nativeEvent.isComposing
+                  )
+                    return
+                  e.preventDefault()
+                  if (canAnalyze) analyze()
+                }}
               />
               <div className='flex items-center justify-between gap-2'>
                 <span className='text-xs text-muted-foreground'>
@@ -292,10 +306,7 @@ export function AiReading() {
                     ? '判读意见与自评会保存，用于学情统计'
                     : '填写后才能查看 AI 结果'}
                 </span>
-                <Button
-                  disabled={!hasImage || !opinionReady || create.isPending}
-                  onClick={analyze}
-                >
+                <Button disabled={!canAnalyze} onClick={analyze}>
                   {create.isPending ? (
                     <LoaderCircle className='animate-spin' />
                   ) : (
@@ -598,10 +609,12 @@ function FittedImage({
   url,
   label,
   result,
+  scanning,
 }: {
   url: string | null
   label: string
   result: AiResult | null
+  scanning: boolean
 }) {
   const areaRef = useRef<HTMLDivElement>(null)
   const [area, setArea] = useState<{ w: number; h: number } | null>(null)
@@ -632,21 +645,19 @@ function FittedImage({
   const boxes = result?.findings.map(
     (f, i) =>
       f.box && (
-        <div
+        <LesionBox
           key={`${i}-${f.label}`}
-          className='absolute rounded-sm border-2 border-rose-500 shadow-[0_0_0_1px_rgba(0,0,0,0.4)]'
-          style={{
-            left: `${f.box.x}%`,
-            top: `${f.box.y}%`,
-            width: `${f.box.w}%`,
-            height: `${f.box.h}%`,
-          }}
-        >
-          <span className='absolute -top-5 left-0 rounded-sm bg-rose-500 px-1 text-[10px] text-white'>
-            {i + 1}
-          </span>
-        </div>
+          index={i}
+          confidence={f.confidence}
+          box={f.box}
+        />
       )
+  )
+  const overlay = (
+    <>
+      {scanning && <ScanOverlay />}
+      <div className='pointer-events-none absolute inset-0'>{boxes}</div>
+    </>
   )
 
   return (
@@ -669,13 +680,112 @@ function FittedImage({
               })
             }
           />
-          <div className='pointer-events-none absolute inset-0'>{boxes}</div>
+          {overlay}
         </div>
       ) : (
         <MedicalImagePlaceholder label={label} className='size-full'>
-          {boxes}
+          {overlay}
         </MedicalImagePlaceholder>
       )}
+    </div>
+  )
+}
+
+/** 分析中：网格 + 上下往返的扫描光束 + 四角取景框 + 状态提示 */
+function ScanOverlay() {
+  return (
+    <div
+      className='pointer-events-none absolute inset-0 animate-in overflow-hidden duration-300 fade-in-0'
+      aria-hidden
+    >
+      <div className='ai-scan-grid absolute inset-0 bg-cyan-500/5' />
+      <div className='ai-scan-beam absolute inset-x-0 h-24 -translate-y-1/2 bg-[linear-gradient(to_bottom,transparent,rgb(34_211_238/0.22)_50%,transparent)]'>
+        <div className='absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-cyan-300 shadow-[0_0_12px_2px_rgb(34_211_238/0.8)]' />
+      </div>
+      <Corners className='inset-3 border-cyan-300/90' size='size-6' />
+      <div className='absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-cyan-300/40 bg-black/60 px-3 py-1 text-xs text-cyan-100 backdrop-blur-sm'>
+        <span className='relative flex size-2'>
+          <span className='absolute inline-flex size-full animate-ping rounded-full bg-cyan-300 opacity-75' />
+          <span className='relative inline-flex size-2 rounded-full bg-cyan-300' />
+        </span>
+        AI 正在分析影像…
+      </div>
+    </div>
+  )
+}
+
+/** 四角括号：定位到父元素 absolute 区域的四个角 */
+function Corners({ className, size }: { className?: string; size: string }) {
+  const base = cn('absolute', size)
+  return (
+    <div className={cn('absolute', className)}>
+      <span
+        className={cn(
+          base,
+          'top-0 left-0 rounded-tl-sm border-t-2 border-l-2 border-inherit'
+        )}
+      />
+      <span
+        className={cn(
+          base,
+          'top-0 right-0 rounded-tr-sm border-t-2 border-r-2 border-inherit'
+        )}
+      />
+      <span
+        className={cn(
+          base,
+          'bottom-0 left-0 rounded-bl-sm border-b-2 border-l-2 border-inherit'
+        )}
+      />
+      <span
+        className={cn(
+          base,
+          'right-0 bottom-0 rounded-br-sm border-r-2 border-b-2 border-inherit'
+        )}
+      />
+    </div>
+  )
+}
+
+/** 病灶标注：半透明填充 + 呼吸光晕 + 四角括号 + 标签（编号 · 置信度，完整描述见右侧列表） */
+function LesionBox({
+  index,
+  confidence,
+  box,
+}: {
+  index: number
+  confidence: number
+  box: { x: number; y: number; w: number; h: number }
+}) {
+  // 靠近顶部时标签放到框下方，避免被裁掉
+  const labelBelow = box.y < 8
+  return (
+    <div
+      className='ai-box absolute'
+      style={{
+        left: `${box.x}%`,
+        top: `${box.y}%`,
+        width: `${box.w}%`,
+        height: `${box.h}%`,
+        animationDelay: `${index * 150}ms`,
+      }}
+    >
+      <div className='ai-box-glow absolute inset-0 rounded-[3px] border border-rose-300/30 bg-rose-500/8' />
+      <Corners
+        className='-inset-0.5 border-rose-500 drop-shadow-[0_0_3px_rgb(244_63_94/0.9)]'
+        size='size-4'
+      />
+      <span
+        className={cn(
+          'absolute -left-0.5 flex items-center gap-1 rounded-sm bg-rose-500/90 py-0.5 ps-0.5 pe-1.5 text-[10px] leading-none whitespace-nowrap text-white shadow-md backdrop-blur-sm',
+          labelBelow ? 'top-full mt-1.5' : 'bottom-full mb-1.5'
+        )}
+      >
+        <span className='flex size-3.5 shrink-0 items-center justify-center rounded-[2px] bg-white text-[9px] font-semibold text-rose-600'>
+          {index + 1}
+        </span>
+        <span className='tabular-nums'>{(confidence * 100).toFixed(0)}%</span>
+      </span>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { type ImgHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
-import emblem from './images/hospital-emblem.png'
+import emblem from './images/hospital-logo.svg'
 
 export const APP_NAME = '重庆医科大学附属第二医院'
 export const APP_SHORT_NAME = '重医附二院'

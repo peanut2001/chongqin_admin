@@ -47,13 +47,13 @@ export function SignIn() {
 
   return (
     <div className='flex min-h-svh items-center justify-center bg-muted/40 p-4 sm:p-8'>
-      <div className='relative flex w-full max-w-5xl overflow-hidden rounded-2xl border bg-card shadow-sm lg:h-[min(640px,calc(100svh-4rem))] lg:bg-primary dark:lg:bg-muted'>
+      <div className='relative flex w-full max-w-[68rem] overflow-hidden rounded-2xl border bg-card shadow-sm lg:h-[min(680px,calc(100svh-4rem))] lg:bg-primary dark:lg:bg-muted'>
         {/* 右侧品牌区：主题主色 + 低透明度层叠三角 */}
         <div
           aria-hidden
           className='absolute inset-y-0 right-0 hidden w-[52%] items-center justify-center text-primary-foreground lg:flex dark:text-foreground'
         >
-          <div className='relative aspect-square w-[76%] max-w-[420px]'>
+          <div className='relative aspect-square w-[76%] max-w-[450px]'>
             <RoundedTriangle
               opacity={0.06}
               className='absolute inset-0 translate-x-[10%] -translate-y-[6%] rotate-[-14deg]'
@@ -70,17 +70,17 @@ export function SignIn() {
           {/* 院徽 + 平台名，斜切边右侧可视区内居中；院徽原为蓝色，用 mask 着色为文字色 */}
           <div className='absolute top-1/2 left-[57%] flex w-[70%] -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center'>
             <div
-              className='aspect-[432/320] w-44 bg-current'
+              className='aspect-[432/320] w-48 bg-current'
               style={maskStyle(hospitalEmblem)}
             />
-            <div className='mt-8 text-3xl font-bold tracking-[0.15em]'>
+            <div className='mt-8 text-4xl font-bold tracking-[0.15em]'>
               {APP_SUBTITLE}
             </div>
-            <div className='mt-2 text-[11px] tracking-[0.3em] uppercase opacity-60'>
+            <div className='mt-3 text-xs tracking-[0.3em] uppercase opacity-60'>
               Smart Medical Education Platform
             </div>
             <div className='my-4 h-px w-10 bg-current opacity-40' />
-            <div className='text-sm tracking-[0.2em] opacity-80'>
+            <div className='text-base tracking-[0.2em] opacity-80'>
               智慧教学 · 数字赋能
             </div>
           </div>
@@ -93,17 +93,19 @@ export function SignIn() {
         />
 
         {/* 登录表单 */}
-        <div className='relative z-10 flex w-full flex-col justify-center px-6 py-10 sm:px-12 lg:w-[44%] lg:px-14'>
-          <div className='mx-auto w-full max-w-sm'>
+        <div className='relative z-10 flex w-full flex-col justify-center px-6 py-10 sm:px-12 lg:w-[44%] lg:px-16'>
+          <div className='mx-auto w-full max-w-md'>
             {/* 横版院标（院徽 + 中英文院名）。原文件为白色，用 mask 着色以适配浅色面板 */}
             <div
               role='img'
               aria-label={APP_NAME}
-              className='aspect-[479/56] w-full max-w-[320px] bg-[#1f58a5] dark:bg-foreground'
+              className='aspect-[479/56] w-full max-w-[360px] bg-[#1f58a5] dark:bg-foreground'
               style={maskStyle(hospitalLogo)}
             />
-            <h1 className='mt-8 text-2xl font-bold tracking-tight'>欢迎登录</h1>
-            <p className='mt-1 mb-6 text-sm text-muted-foreground'>
+            <h1 className='mt-10 text-3xl font-bold tracking-tight'>
+              欢迎登录
+            </h1>
+            <p className='mt-2 mb-8 text-sm text-muted-foreground'>
               登录{APP_SUBTITLE}，开启您的学习之旅
             </p>
 

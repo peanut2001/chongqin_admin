@@ -13,14 +13,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { DefaultHeader } from '@/components/layout/default-header'
 import { Main } from '@/components/layout/main'
 import { useDashboard, useMyStats } from '@/features/learning-stats/api'
 import {
   AccuracyTrend,
-  ActivityMixPie,
-  ChapterMasteryList,
+  ActivityRings,
+  ChapterMasteryRadar,
   StudyTimeGauge,
 } from './components/dashboard-charts'
 import { RecentActivities } from './components/recent-activities'
@@ -116,12 +115,10 @@ export function Dashboard() {
               )}
             >
               <Panel title='章节掌握度' desc='按练习集统计的作答正确率'>
-                <ScrollArea className='h-72 pe-3'>
-                  <ChapterMasteryList data={chapterMastery ?? []} />
-                </ScrollArea>
+                <ChapterMasteryRadar data={chapterMastery ?? []} />
               </Panel>
               <Panel title='学习行为构成' desc='本学期各类学习次数占比'>
-                <ActivityMixPie kpis={data.kpis} />
+                <ActivityRings kpis={data.kpis} />
               </Panel>
               <Panel
                 title='正确率走势'
@@ -132,9 +129,11 @@ export function Dashboard() {
               </Panel>
               {showClassData && (
                 <Panel title='最近学习动态' desc='研究生最新学习记录'>
-                  <ScrollArea className='h-72 pe-3'>
-                    <RecentActivities items={data.recentActivities ?? []} />
-                  </ScrollArea>
+                  <RecentActivities
+                    items={data.recentActivities ?? []}
+                    autoScroll
+                    className='h-72'
+                  />
                 </Panel>
               )}
             </div>

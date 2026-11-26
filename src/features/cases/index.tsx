@@ -1,7 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
-import { Images, Search as SearchIcon } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Images,
+  Search as SearchIcon,
+} from 'lucide-react'
+import { getPageNumbers } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -27,6 +34,8 @@ import {
 } from './data/cases'
 
 const ALL = 'all'
+/** 每页病例数（4 列 × 3 行），只渲染当前页的封面图，避免一次请求过多图片 */
+const PAGE_SIZE = 12
 const route = getRouteApi('/_authenticated/cases/')
 
 export function Cases() {
@@ -35,6 +44,15 @@ export function Cases() {
   const [system, setSystem] = useState<string>(ALL)
   const [modality, setModality] = useState<string>(ALL)
   const [difficulty, setDifficulty] = useState<string>(ALL)
+  const [page, setPage] = useState(1)
+  const listRef = useRef<HTMLUListElement>(null)
+  // 筛选条件变化时回到第 1 页
+  const withReset =
+    <T,>(set: (v: T) => void) =>
+    (v: T) => {
+      set(v)
+      setPage(1)
+    }
   const { cases, topics, isLoading, isError } = useMedicalCases()
   // 当前打开的病例记在地址栏 ?case=，可直接分享/从题库跳转，浏览器后退即关闭
   const { case: openCaseId } = route.useSearch()
@@ -60,6 +78,17 @@ export function Cases() {
     )
   }, [cases, keyword, topicId, system, modality, difficulty])
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const pageCases = filtered.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  )
+  const goPage = (p: number) => {
+    setPage(p)
+    listRef.current?.scrollTo({ top: 0 })
+  }
+
   return (
     <>
       <DefaultHeader />
@@ -72,12 +101,12 @@ export function Cases() {
               placeholder='搜索病种 / 编号 / 标签 / 英文关键词…'
               className='h-9 w-64 ps-8'
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => withReset(setKeyword)(e.target.value)}
             />
           </div>
           <FilterSelect
             value={topicId}
-            onChange={setTopicId}
+            onChange={withReset(setTopicId)}
             placeholder='全部病种'
             options={topics.map((t) => ({
               value: t.id,
@@ -87,19 +116,19 @@ export function Cases() {
           />
           <FilterSelect
             value={system}
-            onChange={setSystem}
+            onChange={withReset(setSystem)}
             placeholder='全部系统'
             options={caseSystems}
           />
           <FilterSelect
             value={modality}
-            onChange={setModality}
+            onChange={withReset(setModality)}
             placeholder='全部检查'
             options={caseModalities}
           />
           <FilterSelect
             value={difficulty}
-            onChange={setDifficulty}
+            onChange={withReset(setDifficulty)}
             placeholder='全部难度'
             options={caseDifficulties}
           />
@@ -128,13 +157,25 @@ export function Cases() {
                 : '没有符合条件的病例'}
           </div>
         ) : (
-          <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pt-4 pb-16 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-            {filtered.map((c) => (
-              <li key={c.id}>
-                <CaseCard data={c} onOpen={() => setCurrent(c)} />
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul
+              ref={listRef}
+              className='no-scrollbar grid flex-1 content-start gap-4 overflow-auto py-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+            >
+              {pageCases.map((c) => (
+                <li key={c.id}>
+                  <CaseCard data={c} onOpen={() => setCurrent(c)} />
+                </li>
+              ))}
+            </ul>
+            {totalPages > 1 && (
+              <CasePagination
+                page={currentPage}
+                totalPages={totalPages}
+                onChange={goPage}
+              />
+            )}
+          </>
         )}
       </Main>
 
@@ -197,6 +238,64 @@ function CaseCard({
         </span>
       </div>
     </button>
+  )
+}
+
+function CasePagination({
+  page,
+  totalPages,
+  onChange,
+}: {
+  page: number
+  totalPages: number
+  onChange: (p: number) => void
+}) {
+  return (
+    <nav
+      aria-label='病例分页'
+      className='flex items-center justify-center gap-2 border-t pt-3'
+    >
+      <Button
+        variant='outline'
+        className='size-8 p-0'
+        onClick={() => onChange(page - 1)}
+        disabled={page <= 1}
+      >
+        <span className='sr-only'>上一页</span>
+        <ChevronLeft className='size-4' />
+      </Button>
+      {getPageNumbers(page, totalPages).map((n, i) =>
+        n === '...' ? (
+          <span
+            key={`dots-${i}`}
+            className='px-1 text-sm text-muted-foreground'
+          >
+            ...
+          </span>
+        ) : (
+          <Button
+            key={n}
+            variant={n === page ? 'default' : 'outline'}
+            className='h-8 min-w-8 px-2'
+            onClick={() => onChange(n as number)}
+          >
+            {n}
+          </Button>
+        )
+      )}
+      <Button
+        variant='outline'
+        className='size-8 p-0'
+        onClick={() => onChange(page + 1)}
+        disabled={page >= totalPages}
+      >
+        <span className='sr-only'>下一页</span>
+        <ChevronRight className='size-4' />
+      </Button>
+      <span className='ms-2 text-sm text-muted-foreground'>
+        第 {page} / {totalPages} 页
+      </span>
+    </nav>
   )
 }
 
