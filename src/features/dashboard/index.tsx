@@ -21,6 +21,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DefaultHeader } from '@/components/layout/default-header'
 import { Main } from '@/components/layout/main'
+import { NumberTicker } from '@/components/number-ticker'
 import { SimpleProgress } from '@/components/simple-progress'
 import {
   type Dashboard as DashboardData,
@@ -48,26 +49,30 @@ function buildKpis(d: DashboardData) {
   return [
     {
       title: '教学病例',
-      value: `${d.caseCount} 例`,
+      value: d.caseCount,
+      unit: '例',
       hint: `覆盖 ${d.systemCount} 大系统`,
       icon: FolderHeart,
     },
     {
       title: '题库题量',
-      value: d.questionCount.toLocaleString(),
+      value: d.questionCount,
+      unit: '题',
       hint: `${d.questionSetCount} 个练习集`,
       icon: ClipboardList,
     },
     {
       title: personal ? '我的 AI 判读' : 'AI 判读次数',
-      value: d.kpis.totalAiReads.toLocaleString(),
+      value: d.kpis.totalAiReads,
+      unit: '次',
       hint: aiHint,
       icon: ScanEye,
     },
     personal
       ? {
           title: '我的练习',
-          value: `${d.kpis.totalPractice.toLocaleString()} 题`,
+          value: d.kpis.totalPractice,
+          unit: '题',
           hint:
             d.kpis.avgAccuracy !== null
               ? `总体正确率 ${d.kpis.avgAccuracy}%`
@@ -76,7 +81,8 @@ function buildKpis(d: DashboardData) {
         }
       : {
           title: '在学研究生',
-          value: `${d.studentCount} 人`,
+          value: d.studentCount,
+          unit: '人',
           hint:
             thisWeek?.accuracy != null
               ? `本周平均正确率 ${thisWeek.accuracy}%`
@@ -161,16 +167,27 @@ export function Dashboard() {
           <TabsContent value='overview' className='space-y-4'>
             {/* ===== KPI ===== */}
             <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-              {kpis.map((k) => (
-                <Card key={k.title}>
+              {kpis.map((k, i) => (
+                <Card
+                  key={k.title}
+                  className='animate-in transition-shadow duration-500 fill-mode-both fade-in slide-in-from-bottom-2 hover:shadow-md'
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
                   <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                     <CardTitle className='text-sm font-medium'>
                       {k.title}
                     </CardTitle>
-                    <k.icon className='size-4 text-muted-foreground' />
+                    <div className='flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+                      <k.icon className='size-4' />
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className='text-2xl font-bold'>{k.value}</div>
+                    <div className='text-2xl font-bold'>
+                      <NumberTicker value={k.value} />
+                      <span className='ms-1 text-sm font-medium text-muted-foreground'>
+                        {k.unit}
+                      </span>
+                    </div>
                     <p className='text-xs text-muted-foreground'>{k.hint}</p>
                   </CardContent>
                 </Card>
@@ -256,7 +273,7 @@ export function Dashboard() {
                     各教学周病例浏览次数、练习题数与 AI 判读次数
                   </CardDescription>
                 </CardHeader>
-                <CardContent className='ps-2'>
+                <CardContent className='flex flex-1 ps-2'>
                   <Overview data={data?.weeklyActivity ?? []} />
                 </CardContent>
               </Card>
