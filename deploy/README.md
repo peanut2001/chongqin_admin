@@ -1,32 +1,36 @@
 # 生产部署
 
-服务器只需要安装 Docker（含 compose 插件）。一共三个容器：
+应用打包成一个镜像 `ghcr.io/peanut2001/chongqin_admin`（前端页面 + 后端接口），由 GitHub Actions 自动构建：
 
-| 容器 | 作用 | 对外端口 |
+- 推送到 `main`：发布 `latest` 和提交短哈希（如 `716ef12`）两个标签；
+- 推送 `v*` 标签（如 `v1.0.0`）：额外发布版本号标签（`1.0.0`）；
+- 同时提供 amd64 和 arm64 架构。
+
+服务器上运行两个容器：
+
+| 容器 | 作用 | 端口 |
 |---|---|---|
-| web | nginx：前端静态文件、HTTPS、把 `/api` 转发到后端 | 80（跳转到 HTTPS）、443 |
-| api | Flask + gunicorn；启动时自动执行数据库迁移 | 不开放 |
+| app | 应用；启动时自动执行数据库迁移 | 默认只监听本机 `127.0.0.1:8000` |
 | db | PostgreSQL 16，数据在 `pg_data` 卷里 | 不开放 |
 
-以下命令都在项目根目录执行，`dc` 代表：
+HTTPS 由服务器上的反向代理负责（宝塔 / 1Panel / nginx），转发到 `127.0.0.1:8000`。
+
+**服务器上只需要两个文件**：`docker-compose.prod.yml` 和 `.env.prod`，不需要源码。以下 `dc` 代表：
 
 ```bash
 docker compose -f docker-compose.prod.yml --env-file .env.prod
 ```
 
-## 1. 准备配置和证书
+## 1. 准备配置
+
+把仓库里的 `docker-compose.prod.yml` 和 `.env.prod.example` 放到服务器的部署目录，然后：
 
 ```bash
 cp .env.prod.example .env.prod
-# 填写 SERVER_NAME，并用 openssl rand -hex 32 生成 POSTGRES_PASSWORD、JWT_SECRET_KEY、MEDIA_SIGNING_KEY、MODEL_KEY_SECRET
+# 用 openssl rand -hex 32 生成 POSTGRES_PASSWORD、JWT_SECRET_KEY、MEDIA_SIGNING_KEY、MODEL_KEY_SECRET 并填入
 ```
 
-把域名证书（nginx 格式）放到 `deploy/certs/`，文件名改为：
-
-- `fullchain.pem`：证书（含证书链）
-- `privkey.pem`：私钥
-
-密钥缺失或仍是开发默认值时，api 容器会启动失败，并在日志中说明原因（`dc logs api`）。
+密钥缺失或仍是开发默认值时，app 容器会启动失败，并在日志中说明原因（`dc logs app`）。
 
 ## 2. 恢复演示数据（从开发环境迁移）
 
@@ -37,7 +41,7 @@ docker exec chongqin_admin-db-1 pg_dump -U chongqin -d chongqin -Fc -f /tmp/chon
 docker cp chongqin_admin-db-1:/tmp/chongqin.dump ./chongqin.dump
 ```
 
-把 `chongqin.dump` 上传到服务器项目根目录，然后：
+把 `chongqin.dump` 上传到服务器部署目录，然后：
 
 ```bash
 dc up -d db
@@ -45,17 +49,55 @@ dc cp chongqin.dump db:/tmp/chongqin.dump
 dc exec db pg_restore -U chongqin -d chongqin --clean --if-exists --no-owner /tmp/chongqin.dump
 ```
 
-不迁移数据、从零初始化时跳过这一步，改为在第 3 步之后执行 `dc exec api flask seed all`。
+不迁移数据、从零初始化时跳过这一步，改为在第 3 步之后执行 `dc exec app flask seed all`。
 
-## 3. 构建并启动
+## 3. 拉取镜像并启动
 
 ```bash
-dc up -d --build
-dc ps          # 三个容器都应为 running / healthy
-dc logs -f api # 查看后端日志
+dc pull
+dc up -d
+dc ps            # 两个容器都应为 running，db 为 healthy
+dc logs -f app   # 查看应用日志
+curl http://127.0.0.1:8000/api/health   # {"status": "ok", "db": true}
 ```
 
-## 4. 启动后检查
+从 ghcr.io 拉取很慢时，可以在网络好的机器上 `docker pull` 后用 `docker save` / `docker load` 拷过去。
+
+## 4. 配置反向代理（HTTPS）
+
+宝塔 / 1Panel：新建站点并申请 SSL 证书，添加反向代理，目标地址 `http://127.0.0.1:8000`。
+
+手写 nginx 时参考：
+
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name example.com;
+    ssl_certificate     /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
+
+    client_max_body_size 10m;          # 与应用的上传上限一致
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 130s;       # AI 判读同步等待模型返回（最长 90 秒）
+    }
+}
+```
+
+`.env.prod` 里的 `TRUSTED_PROXIES=1` 表示前面有一层反向代理，应用会从 `X-Forwarded-For` 末尾取真实客户端 IP（登录限流、审计日志用），客户端伪造的部分不会被采用。
+
+## 5. 启动后检查
 
 1. 打开 `https://域名`，用管理员账号登录。
 2. **设置 → AI 模型：重新填写 API Key 并保存。** 生产环境的 `MODEL_KEY_SECRET` 与开发环境不同，从开发库迁移过来的 Key 无法解密；不重新填写的话，AI 判读和 AI 学情分析会提示「已保存的 API Key 无法读取」。
@@ -64,12 +106,19 @@ dc logs -f api # 查看后端日志
 ## 更新版本
 
 ```bash
-git pull
-dc up -d --build
+dc pull
+dc up -d
 ```
 
-数据库迁移在 api 容器启动时自动执行。
+数据库迁移在 app 容器启动时自动执行。要固定某个版本，把 `.env.prod` 的 `APP_VERSION` 改为提交短哈希或版本号。
 
 ## 演示结束后
 
-`.env.prod` 中把 `ALLOW_DEMO_LOGIN` 改为 `false`，再执行 `dc up -d --build`。演示账号密码是公开的，开放期间任何知道网址的人都能用演示管理员账号登录。
+`.env.prod` 中把 `ALLOW_DEMO_LOGIN` 改为 `false`，再执行 `dc up -d`（不需要重新打包，登录页的演示账号按钮会一起隐藏）。演示账号密码是公开的，开放期间任何知道网址的人都能用演示管理员账号登录。
+
+## 本地构建镜像（可选）
+
+```bash
+docker build -t ghcr.io/peanut2001/chongqin_admin:local .
+# .env.prod 中设置 APP_VERSION=local 后 dc up -d
+```

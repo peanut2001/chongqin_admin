@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.config import CONFIGS
 from app.errors import register_error_handlers
@@ -32,4 +33,13 @@ def create_app(config_name: str | None = None) -> Flask:
     from app.cli import register_cli
 
     register_cli(app)
+
+    # 生产单镜像：同一进程提供前端页面（必须在接口蓝图之后注册，未匹配的 /api 路径仍返回 JSON 404）
+    from app.web import init_web
+
+    init_web(app)
+
+    proxies = app.config["TRUSTED_PROXIES"]
+    if proxies > 0:
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=proxies, x_proto=proxies)
     return app

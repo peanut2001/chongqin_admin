@@ -14,9 +14,9 @@ from app.services.timeutil import now_utc
 def client_ip() -> str | None:
     if not has_request_context():
         return None
-    # 开发环境经 Vite 代理转发；生产环境应由可信反向代理设置 X-Forwarded-For
-    forwarded = request.headers.get("X-Forwarded-For", "")
-    return (forwarded.split(",")[0].strip() or request.remote_addr) or None
+    # 不直接读 X-Forwarded-For（客户端可伪造）：配置了可信反向代理（TRUSTED_PROXIES）时，
+    # ProxyFix 已按代理层数把真实客户端 IP 写进 remote_addr
+    return request.remote_addr or None
 
 
 def log(

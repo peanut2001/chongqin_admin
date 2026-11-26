@@ -52,6 +52,12 @@ class Config:
 
     UPLOAD_DIR = Path(_env("UPLOAD_DIR", str(BASE_DIR / "uploads")))
     CONTENT_DIR = Path(_env("CONTENT_DIR", str(BASE_DIR / "content")))
+    # 前端打包产物目录：设置后由 Flask 直接提供前端页面（生产镜像），开发环境由 Vite 提供
+    WEB_DIST_DIR = os.environ.get("WEB_DIST_DIR") or None
+
+    # 前面有几层可信反向代理（宝塔 / nginx 等）。>0 时从 X-Forwarded-For 末尾取对应层数得到客户端 IP，
+    # 客户端自己伪造的部分不会被采用；没有反向代理、直接对外时必须为 0
+    TRUSTED_PROXIES = int(_env("TRUSTED_PROXIES", "0"))
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024
     AVATAR_MAX_BYTES = 1 * 1024 * 1024
     AI_IMAGE_MAX_BYTES = 8 * 1024 * 1024
@@ -98,7 +104,8 @@ class TestConfig(Config):
 
 
 class ProdConfig(Config):
-    JWT_COOKIE_SECURE = True
+    # refresh cookie 只走 HTTPS；只有临时用 http://IP 访问时才设为 false
+    JWT_COOKIE_SECURE = _env("JWT_COOKIE_SECURE", "true").lower() == "true"
 
     # 这些值有开发默认值（公开在源码中），正式环境必须显式设置为随机长字符串
     SECRETS = ("JWT_SECRET_KEY", "MEDIA_SIGNING_KEY", "MODEL_KEY_SECRET")
