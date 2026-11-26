@@ -1,6 +1,7 @@
 """学情统计：全部由行为记录实时计算（练习作答、病例浏览、AI 判读），统计范围为当前学期。
 
 口径说明：
+- 统计对象：按班级 / 全体统计时，只包含该学期授课班级（semester_classes）的学生。
 - 教学周：按 APP_TZ（北京时间）的日期计算，(日期 - 学期开始日) // 7 + 1；只统计第 1 周到当前周。
 - practice：该周作答的题目数；accuracy：该周 正确数 / 作答数 × 100，无作答时为 None（图表显示空缺而非 0）。
 - 学习时长：练习时长（每次练习最多计 60 分钟；未交卷的按每题 1 分钟估算）
@@ -39,7 +40,7 @@ def _name(row) -> str:
 @dataclass
 class Scope:
     """统计范围：某个班级（class_id）、全体学生（都为 None）、某一个用户（user_id）
-    或指定的一批学生（user_ids）。"""
+    或指定的一批学生（user_ids）。班级 / 全体范围只包含学期授课班级的学生（:sem_id 由 semester_window 提供）。"""
 
     class_id: int | None = None
     user_id: uuid.UUID | None = None
@@ -52,6 +53,7 @@ class Scope:
             return "SELECT id FROM users WHERE role = 'student' AND id = ANY(CAST(:scope_users AS uuid[]))"
         return (
             "SELECT id FROM users WHERE role = 'student' "
+            "AND class_id IN (SELECT class_id FROM semester_classes WHERE semester_id = CAST(:sem_id AS integer)) "
             "AND (CAST(:scope_class AS integer) IS NULL OR class_id = CAST(:scope_class AS integer))"
         )
 
@@ -70,7 +72,13 @@ def _tz() -> str:
 def semester_window(sem: Semester, current_week: int) -> dict:
     tz = ZoneInfo(_tz())
     start = datetime.combine(sem.start_date, time.min, tzinfo=tz)
-    return {"tz": _tz(), "start_date": sem.start_date, "start_ts": start, "current_week": current_week}
+    return {
+        "tz": _tz(),
+        "sem_id": sem.id,
+        "start_date": sem.start_date,
+        "start_ts": start,
+        "current_week": current_week,
+    }
 
 
 def _week_expr(col: str) -> str:

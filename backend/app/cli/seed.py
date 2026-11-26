@@ -68,8 +68,12 @@ def ensure_classes() -> list[SchoolClass]:
 
 def seed_accounts() -> dict[str, int]:
     """幂等：按邮箱 / 学号判断是否已存在。"""
-    ensure_semester()
+    sem = ensure_semester()
     classes = ensure_classes()
+    # 演示班级作为当前学期的授课班级，学情统计才能统计到演示学生
+    for cls in classes:
+        if cls not in sem.classes:
+            sem.classes.append(cls)
     created = 0
     pw = hash_password(DEMO_PASSWORD)
 
@@ -112,7 +116,7 @@ def _echo(label: str, counts: dict) -> None:
 
 @seed_cli.command("accounts")
 def accounts_cmd():
-    """创建当前学期、2 个班级、演示账号（admin/teacher/student@demo.com）与 30 名演示学生。"""
+    """创建当前学期、2 个授课班级、演示账号（admin/teacher/student@demo.com）与 30 名演示学生。"""
     result = seed_accounts()
     click.echo(f"accounts: created {result['created']}, total users {result['users']}")
     click.echo(f"演示账号密码：{DEMO_PASSWORD}")

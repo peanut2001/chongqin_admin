@@ -54,9 +54,18 @@ def meta():
         ).all()
     )
     classes = db.session.scalars(select(SchoolClass).order_by(SchoolClass.name)).all()
+    sem = current_semester()
+    # 学情统计的班级下拉只列当前学期的授课班级；用户表单仍可选择全部班级
+    in_semester = {c.id for c in sem.classes} if sem else set()
     return {
-        "semester": semester_dict(current_semester()),
+        "semester": semester_dict(sem),
         "classes": [
-            {"id": c.id, "name": c.name, "studentCount": counts.get(c.id, 0)} for c in classes
+            {
+                "id": c.id,
+                "name": c.name,
+                "studentCount": counts.get(c.id, 0),
+                "inCurrentSemester": c.id in in_semester,
+            }
+            for c in classes
         ],
     }

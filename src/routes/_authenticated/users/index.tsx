@@ -24,6 +24,8 @@ const usersSearchSchema = z.object({
     .catch([]),
   // Per-column text filter (example for username)
   username: z.string().optional().catch(''),
+  // 从班级管理跳转过来时按班级筛选
+  classId: z.number().int().optional().catch(undefined),
 })
 
 export const Route = createFileRoute('/_authenticated/users/')({

@@ -85,3 +85,56 @@ def test_switch_current_edit_and_delete(client, make_user, auth_headers):
     assert client.delete(f"/api/semesters/{autumn['id']}", headers=h).status_code == 204
     assert client.delete("/api/semesters/99999", headers=h).status_code == 404
     assert [s["id"] for s in client.get("/api/semesters", headers=h).get_json()] == [spring["id"]]
+
+
+def test_semester_classes_scope_stats(client, make_user, auth_headers):
+    h = _admin(make_user, auth_headers)
+    c1 = client.post("/api/classes", json={"name": "1 班"}, headers=h).get_json()
+    assert c1["semesters"] == []  # 还没有学期
+
+    # 新建学期不传 classIds：默认全部班级
+    sem = client.post("/api/semesters", json=AUTUMN, headers=h).get_json()
+    assert [c["id"] for c in sem["classes"]] == [c1["id"]]
+
+    # 新建班级自动加入当前学期
+    c2 = client.post("/api/classes", json={"name": "2 班"}, headers=h).get_json()
+    assert c2["semesters"] == [{"id": sem["id"], "name": AUTUMN["name"], "isCurrent": True}]
+
+    make_user("s1@test.com", student_no="S1", class_id=c1["id"])
+    make_user("s2@test.com", student_no="S2", class_id=c2["id"])
+    make_user("s3@test.com", student_no="S3")  # 未分班：不属于任何授课班级
+
+    def stats_ids(**params):
+        rows = client.get("/api/stats/students", query_string=params, headers=h).get_json()
+        return sorted(s["id"] for s in rows)
+
+    assert stats_ids() == ["S1", "S2"]
+    assert stats_ids(classId=c2["id"]) == ["S2"]
+    assert client.get("/api/dashboard", headers=h).get_json()["studentCount"] == 2
+
+    # 把 2 班移出当前学期：统计、仪表盘、班级下拉同步变化
+    resp = client.patch(f"/api/semesters/{sem['id']}", json={"classIds": [c1["id"]]}, headers=h)
+    assert resp.status_code == 200, resp.get_json()
+    assert resp.get_json()["classes"] == [{"id": c1["id"], "name": "1 班", "studentCount": 1}]
+    assert stats_ids() == ["S1"]
+    assert stats_ids(classId=c2["id"]) == []
+    assert client.get("/api/stats/overview", headers=h).get_json()["kpis"]["studentCount"] == 1
+    assert client.get("/api/dashboard", headers=h).get_json()["studentCount"] == 1
+    meta = client.get("/api/meta", headers=h).get_json()["classes"]
+    assert {c["id"]: c["inCurrentSemester"] for c in meta} == {c1["id"]: True, c2["id"]: False}
+
+    # 只改名称：授课班级保持不变
+    renamed = client.patch(f"/api/semesters/{sem['id']}", json={"name": "秋季"}, headers=h).get_json()
+    assert [c["id"] for c in renamed["classes"]] == [c1["id"]]
+
+    # 不存在的班级
+    bad = client.patch(f"/api/semesters/{sem['id']}", json={"classIds": [99999]}, headers=h)
+    assert bad.status_code == 422 and "classIds" in bad.get_json()["fields"]
+
+    # 新建学期可指定授课班级（含空列表）
+    spring = client.post("/api/semesters", json={**SPRING, "classIds": []}, headers=h).get_json()
+    assert spring["classes"] == []
+
+    # 用户列表按班级筛选（班级管理跳转用）
+    users = client.get("/api/users", query_string={"classId": c2["id"]}, headers=h).get_json()
+    assert users["total"] == 1 and users["items"][0]["studentNo"] == "S2"

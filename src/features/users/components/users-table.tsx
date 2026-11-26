@@ -10,8 +10,11 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+import { X } from 'lucide-react'
+import { useMeta } from '@/lib/api/meta'
 import { cn } from '@/lib/utils'
 import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
+import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -81,6 +84,18 @@ export function UsersTable({ search, navigate }: DataTableProps) {
     setSorting(u)
   }
 
+  // 班级筛选只从班级管理的链接进入，这里只展示与清除
+  const classId =
+    typeof search.classId === 'number' ? search.classId : undefined
+  const { data: meta } = useMeta()
+  const className = meta?.classes.find((c) => c.id === classId)?.name
+  const clearClass = () => {
+    setRowSelection({})
+    navigate({
+      search: (prev) => ({ ...prev, classId: undefined, page: undefined }),
+    })
+  }
+
   const filterValue = (id: string) =>
     columnFilters.find((f) => f.id === id)?.value
   const keyword = useDebounced(String(filterValue('username') ?? ''))
@@ -90,6 +105,7 @@ export function UsersTable({ search, navigate }: DataTableProps) {
     status: (filterValue('status') as UsersQuery['status']) ?? [],
     role: (filterValue('role') as UsersQuery['role']) ?? [],
     username: keyword.trim(),
+    classId,
     sort: sorting[0]
       ? `${sorting[0].id}.${sorting[0].desc ? 'desc' : 'asc'}`
       : undefined,
@@ -145,6 +161,21 @@ export function UsersTable({ search, navigate }: DataTableProps) {
         'flex flex-1 flex-col gap-4'
       )}
     >
+      {classId !== undefined && (
+        <div>
+          <Badge variant='secondary' className='gap-1 font-normal'>
+            班级：{meta ? (className ?? '已删除的班级') : '…'}
+            <button
+              type='button'
+              aria-label='清除班级筛选'
+              className='rounded-sm opacity-70 hover:opacity-100'
+              onClick={clearClass}
+            >
+              <X className='size-3' />
+            </button>
+          </Badge>
+        </div>
+      )}
       <DataTableToolbar
         table={table}
         searchPlaceholder='搜索用户名 / 姓名 / 邮箱…'

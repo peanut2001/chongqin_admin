@@ -16,6 +16,7 @@ from app.models.identity import (
     Semester,
     Upload,
     User,
+    semester_classes,
 )
 
 __all__ = [
@@ -37,4 +38,5 @@ __all__ = [
     "Semester",
     "Upload",
     "User",
+    "semester_classes",
 ]

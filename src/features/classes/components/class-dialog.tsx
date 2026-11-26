@@ -98,7 +98,9 @@ export function ClassDialog({ open, onOpenChange, current }: Props) {
         <DialogHeader className='text-start'>
           <DialogTitle>{isEdit ? '编辑班级' : '新建班级'}</DialogTitle>
           <DialogDescription>
-            创建后可在用户管理中把学生分配到该班级。
+            {isEdit
+              ? '学生在用户管理中分班，授课学期在学期管理中调整。'
+              : '新建的班级会自动加入当前学期的授课班级；创建后可在用户管理中把学生分配到该班级。'}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

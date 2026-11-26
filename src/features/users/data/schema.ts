@@ -38,6 +38,8 @@ export type UsersQuery = {
   status: UserStatus[]
   role: Role[]
   username: string
+  /** 按班级筛选（从班级管理跳转过来） */
+  classId?: number
   /** 如 createdAt.desc、username.asc */
   sort?: string
 }

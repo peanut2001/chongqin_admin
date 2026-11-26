@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
+import { getRouteApi } from '@tanstack/react-router'
 import {
   Award,
   CalendarX,
@@ -69,6 +70,7 @@ const sortText: Record<SortKey, string> = {
 }
 
 const ALL = 'all'
+const route = getRouteApi('/_authenticated/learning-stats/')
 
 /** 联动筛选：学生分组卡片、散点图框选、正确率区间（同一时间只生效一种） */
 type Selection =
@@ -248,14 +250,26 @@ function Hint({
 
 export function LearningStats() {
   const { data: meta } = useMeta()
-  const [klass, setKlass] = useState(ALL)
+  const search = route.useSearch()
+  const navigate = route.useNavigate()
+  // 班级下拉只列当前学期的授课班级（统计口径与后端一致）
+  const semesterClasses = useMemo(
+    () => (meta?.classes ?? []).filter((c) => c.inCurrentSemester),
+    [meta?.classes]
+  )
+  // 班级筛选以地址栏为准；不是当前学期授课班级的忽略（meta 未加载时先按地址栏请求）
+  const classId =
+    search.classId !== undefined &&
+    (!meta || semesterClasses.some((c) => c.id === search.classId))
+      ? search.classId
+      : undefined
+  const klass = classId === undefined ? ALL : String(classId)
   const [sortKey, setSortKey] = useState<SortKey>('accuracy')
   const [selection, setSelection] = useState<Selection | null>(null)
   const [adviceOpen, setAdviceOpen] = useState(false)
   // 打开详情抽屉的学生
   const [pickedId, setPickedId] = useState<string | null>(null)
   const scatterRef = useRef<echarts.ECharts | null>(null)
-  const classId = klass === ALL ? undefined : Number(klass)
 
   const overview = useStatsOverview(classId)
   const studentsQuery = useStudentStats(classId)
@@ -299,10 +313,16 @@ export function LearningStats() {
   const changePageSize = (size: number) =>
     setPager({ key: filterKey, page: 1, size })
 
-  const changeClass = useCallback((value: string) => {
-    setKlass(value)
-    setSelection(null)
-  }, [])
+  const changeClass = useCallback(
+    (value: string) => {
+      void navigate({
+        search: value === ALL ? {} : { classId: Number(value) },
+        replace: true,
+      })
+      setSelection(null)
+    },
+    [navigate]
+  )
 
   const onBrush = useCallback((ids: string[] | null) => {
     setSelection((cur) => {
@@ -416,7 +436,7 @@ export function LearningStats() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={ALL}>全部班级</SelectItem>
-              {(meta?.classes ?? []).map((c) => (
+              {semesterClasses.map((c) => (
                 <SelectItem key={c.id} value={String(c.id)}>
                   {c.name}
                 </SelectItem>

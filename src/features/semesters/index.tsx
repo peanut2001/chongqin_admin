@@ -39,7 +39,7 @@ export function Semesters() {
 
   const deleting = dialog?.type === 'delete' ? dialog.row : undefined
   const activating = dialog?.type === 'activate' ? dialog.row : undefined
-  const hasCurrent = (data ?? []).some((s) => s.isCurrent)
+  const current = (data ?? []).find((s) => s.isCurrent)
 
   const confirmDelete = () => {
     if (!deleting) return
@@ -70,7 +70,7 @@ export function Semesters() {
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>学期管理</h2>
             <p className='text-muted-foreground'>
-              当前学期决定教学总览与学情统计的统计范围和教学周。
+              当前学期的起止日期与授课班级，决定教学总览和学情统计统计哪些学生、按第几教学周统计。
             </p>
           </div>
           <Button onClick={() => setDialog({ type: 'create' })}>
@@ -79,10 +79,18 @@ export function Semesters() {
           </Button>
         </div>
 
-        {!isLoading && !isError && !hasCurrent && (
+        {!isLoading && !isError && !current && (
           <Alert variant='destructive'>
             <AlertDescription>
               还没有当前学期，教学总览和学情统计暂时无法使用。请新建一个学期。
+            </AlertDescription>
+          </Alert>
+        )}
+        {current && current.classes.length === 0 && (
+          <Alert variant='destructive'>
+            <AlertDescription>
+              当前学期「{current.name}
+              」还没有授课班级，教学总览和学情统计里不会有学生数据。请编辑该学期，勾选授课班级。
             </AlertDescription>
           </Alert>
         )}
@@ -94,6 +102,7 @@ export function Semesters() {
                 <TableRow>
                   <TableHead>学期名称</TableHead>
                   <TableHead>课程</TableHead>
+                  <TableHead>授课班级</TableHead>
                   <TableHead>起止日期</TableHead>
                   <TableHead className='text-end'>教学周</TableHead>
                   <TableHead className='w-36 text-end'>操作</TableHead>
@@ -109,6 +118,22 @@ export function Semesters() {
                       </span>
                     </TableCell>
                     <TableCell>{s.course}</TableCell>
+                    <TableCell>
+                      {s.classes.length === 0 ? (
+                        <span className='text-muted-foreground'>未设置</span>
+                      ) : (
+                        <div className='flex max-w-72 flex-wrap items-center gap-1'>
+                          {s.classes.map((c) => (
+                            <Badge key={c.id} variant='secondary'>
+                              {c.name}
+                            </Badge>
+                          ))}
+                          <span className='text-xs text-muted-foreground'>
+                            {`共 ${s.classes.reduce((n, c) => n + c.studentCount, 0)} 人`}
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className='text-muted-foreground'>
                       {s.startDate} 至 {s.endDate}
                     </TableCell>
@@ -160,7 +185,7 @@ export function Semesters() {
                 {!isLoading && (data?.length ?? 0) === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={6}
                       className='h-20 text-center text-muted-foreground'
                     >
                       {isError ? '学期列表加载失败。' : '还没有学期。'}

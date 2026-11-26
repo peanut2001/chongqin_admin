@@ -58,7 +58,9 @@ vi.mock('@/lib/api/meta', () => ({
   useMeta: () => ({
     data: {
       semester: null,
-      classes: [{ id: 1, name: '1 班', studentCount: 3 }],
+      classes: [
+        { id: 1, name: '1 班', studentCount: 3, inCurrentSemester: true },
+      ],
     },
   }),
 }))

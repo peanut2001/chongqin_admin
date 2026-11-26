@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiErrorTitle, apiFieldErrors } from '@/lib/api/client'
+import { useMeta } from '@/lib/api/meta'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -45,6 +46,7 @@ const formSchema = z
         (v) => v === '' || (/^\d+$/.test(v) && +v >= 1 && +v <= 30),
         '请输入 1–30 之间的整数，或留空自动计算。'
       ),
+    classIds: z.array(z.number()),
     setCurrent: z.boolean(),
   })
   .refine((d) => !d.startDate || !d.endDate || d.endDate > d.startDate, {
@@ -72,6 +74,7 @@ export function SemesterDialog({
   const create = useCreateSemester()
   const update = useUpdateSemester()
   const pending = create.isPending || update.isPending
+  const classes = useMeta().data?.classes ?? []
 
   const form = useForm<SemesterForm>({
     resolver: zodResolver(formSchema),
@@ -81,6 +84,8 @@ export function SemesterDialog({
       startDate: current?.startDate ?? '',
       endDate: current?.endDate ?? '',
       totalWeeks: current ? String(current.totalWeeks) : '',
+      // 新建时默认全部班级参加
+      classIds: (current?.classes ?? classes).map((c) => c.id),
       setCurrent: false,
     },
   })
@@ -217,6 +222,48 @@ export function SemesterDialog({
                     {autoWeeks
                       ? `起止日期共覆盖 ${autoWeeks} 周，教学周数不能超过它。`
                       : '选好起止日期后会自动计算。'}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='classIds'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>授课班级</FormLabel>
+                  {classes.length === 0 ? (
+                    <p className='text-sm text-muted-foreground'>
+                      还没有班级，可先到班级管理中新建。
+                    </p>
+                  ) : (
+                    <div className='grid max-h-40 gap-2 overflow-y-auto rounded-md border p-3 sm:grid-cols-2'>
+                      {classes.map((c) => (
+                        <label
+                          key={c.id}
+                          className='flex min-w-0 items-center gap-2 text-sm'
+                        >
+                          <Checkbox
+                            checked={field.value.includes(c.id)}
+                            onCheckedChange={(v) =>
+                              field.onChange(
+                                v === true
+                                  ? [...field.value, c.id]
+                                  : field.value.filter((id) => id !== c.id)
+                              )
+                            }
+                          />
+                          <span className='truncate'>{c.name}</span>
+                          <span className='shrink-0 text-muted-foreground'>
+                            {c.studentCount} 人
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                  <FormDescription>
+                    教学总览与学情统计只统计授课班级的学生。
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

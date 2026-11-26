@@ -1,17 +1,19 @@
 """班级管理（仅管理员）。
 
-GET    /classes        班级列表（含学生人数）
-POST   /classes        新建班级
+GET    /classes        班级列表（含学生人数、授课学期）
+POST   /classes        新建班级（自动加入当前学期的授课班级）
 PATCH  /classes/:id    修改班级
 DELETE /classes/:id    删除班级：班级内还有学生时拒绝（409），避免学生悄悄失去班级
 
-所有登录用户需要的班级下拉数据仍由 GET /meta 提供。
+所有登录用户需要的班级下拉数据仍由 GET /meta 提供；授课班级在学期管理中调整。
 """
 
 from flask import Blueprint
 from pydantic import Field
 from sqlalchemy import func, select
+from sqlalchemy.orm import selectinload
 
+from app.api.meta import current_semester
 from app.auth.decorators import auth_required, me
 from app.errors import ApiError, not_found
 from app.extensions import db
@@ -23,7 +25,7 @@ from app.services.timeutil import iso
 bp = Blueprint("classes", __name__)
 
 
-def _student_counts() -> dict[int, int]:
+def student_counts() -> dict[int, int]:
     return dict(
         db.session.execute(
             select(User.class_id, func.count())
@@ -41,6 +43,7 @@ def class_dict(c: SchoolClass, student_count: int) -> dict:
         "studentCount": student_count,
         "isDemo": c.is_demo,
         "createdAt": iso(c.created_at),
+        "semesters": [{"id": s.id, "name": s.name, "isCurrent": s.is_current} for s in c.semesters],
     }
 
 
@@ -72,8 +75,10 @@ def _check_name(name: str, exclude: int | None = None) -> None:
 @bp.get("/classes")
 @auth_required("admin")
 def list_classes():
-    counts = _student_counts()
-    rows = db.session.scalars(select(SchoolClass).order_by(SchoolClass.name)).all()
+    counts = student_counts()
+    rows = db.session.scalars(
+        select(SchoolClass).options(selectinload(SchoolClass.semesters)).order_by(SchoolClass.name)
+    ).all()
     return [class_dict(c, counts.get(c.id, 0)) for c in rows]
 
 
@@ -84,6 +89,10 @@ def create_class():
     _check_name(body.name)
     cls = SchoolClass(name=body.name, cohort_year=body.cohort_year)
     db.session.add(cls)
+    # 新班级默认参加当前学期，学情统计里能直接看到；不需要时在学期管理中取消
+    sem = current_semester()
+    if sem is not None:
+        sem.classes.append(cls)
     db.session.flush()
     audit.log("class.create", me().id, "class", str(cls.id), {"name": cls.name})
     db.session.commit()
@@ -103,14 +112,14 @@ def update_class(class_id: int):
         setattr(cls, key, value)
     audit.log("class.update", me().id, "class", str(cls.id), {"name": cls.name})
     db.session.commit()
-    return class_dict(cls, _student_counts().get(cls.id, 0))
+    return class_dict(cls, student_counts().get(cls.id, 0))
 
 
 @bp.delete("/classes/<int:class_id>")
 @auth_required("admin")
 def delete_class(class_id: int):
     cls = _get_class(class_id)
-    count = _student_counts().get(cls.id, 0)
+    count = student_counts().get(cls.id, 0)
     if count:
         raise ApiError(
             409,

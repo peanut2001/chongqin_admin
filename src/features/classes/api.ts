@@ -8,6 +8,8 @@ export type SchoolClassRow = {
   studentCount: number
   isDemo: boolean
   createdAt: string
+  /** 授课学期（最新的在前），在学期管理中调整 */
+  semesters: { id: number; name: string; isCurrent: boolean }[]
 }
 
 export type ClassInput = { name: string; cohortYear: number | null }
@@ -19,12 +21,22 @@ export function useClasses() {
   })
 }
 
-/** 班级变动会影响：班级列表、/meta 中的班级下拉、用户列表里的班级名、学情统计筛选 */
+/**
+ * 班级变动会影响：班级列表、/meta 中的班级下拉、用户列表里的班级名、学情统计筛选，
+ * 以及学期的授课班级（新建班级会自动加入当前学期）和教学总览人数
+ */
 function useInvalidateClasses() {
   const qc = useQueryClient()
   // 不返回 Promise：弹窗立即关闭，列表在后台刷新
   return () => {
-    for (const key of ['classes', 'meta', 'users', 'stats']) {
+    for (const key of [
+      'classes',
+      'meta',
+      'users',
+      'stats',
+      'semesters',
+      'dashboard',
+    ]) {
       void qc.invalidateQueries({ queryKey: [key] })
     }
   }

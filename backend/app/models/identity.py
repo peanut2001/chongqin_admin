@@ -1,4 +1,4 @@
-"""用户、班级、学期、令牌吊销、审计日志、上传文件。"""
+"""用户、班级、学期（含学期的授课班级）、令牌吊销、审计日志、上传文件。"""
 
 import uuid
 from datetime import date, datetime
@@ -7,6 +7,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     CheckConstraint,
+    Column,
     Date,
     DateTime,
     ForeignKey,
@@ -14,6 +15,7 @@ from sqlalchemy import (
     Integer,
     SmallInteger,
     String,
+    Table,
     Text,
     func,
     text,
@@ -31,6 +33,15 @@ def _in(col: str, values: tuple[str, ...]) -> str:
     return f"{col} IN ({', '.join(repr(v) for v in values)})"
 
 
+# 学期的授课班级（多对多）：学情统计只统计当前学期授课班级的学生
+semester_classes = Table(
+    "semester_classes",
+    db.metadata,
+    Column("semester_id", ForeignKey("semesters.id", ondelete="CASCADE"), primary_key=True),
+    Column("class_id", ForeignKey("classes.id", ondelete="CASCADE"), primary_key=True, index=True),
+)
+
+
 class SchoolClass(db.Model):
     __tablename__ = "classes"
 
@@ -41,6 +52,9 @@ class SchoolClass(db.Model):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     students: Mapped[list["User"]] = relationship(back_populates="school_class")
+    semesters: Mapped[list["Semester"]] = relationship(
+        secondary=semester_classes, back_populates="classes", order_by="Semester.start_date.desc()"
+    )
 
 
 class Semester(db.Model):
@@ -59,6 +73,10 @@ class Semester(db.Model):
     end_date: Mapped[date] = mapped_column(Date)
     total_weeks: Mapped[int] = mapped_column(SmallInteger)
     is_current: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+
+    classes: Mapped[list[SchoolClass]] = relationship(
+        secondary=semester_classes, back_populates="semesters", order_by=SchoolClass.name
+    )
 
 
 class User(db.Model):

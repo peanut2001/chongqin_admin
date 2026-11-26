@@ -12,7 +12,13 @@ export type Semester = {
   currentWeek: number
 }
 
-export type SchoolClass = { id: number; name: string; studentCount: number }
+export type SchoolClass = {
+  id: number
+  name: string
+  studentCount: number
+  /** 是否为当前学期的授课班级（学情统计只统计授课班级的学生） */
+  inCurrentSemester: boolean
+}
 
 export type Meta = {
   semester: Semester | null

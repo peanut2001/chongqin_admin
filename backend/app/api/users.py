@@ -102,8 +102,10 @@ def _get_user(user_id: str) -> User:
     return user
 
 
-def _filters(statuses, roles, keyword):
+def _filters(statuses, roles, keyword, class_id=None):
     conds = []
+    if class_id is not None:
+        conds.append(User.class_id == class_id)
     if statuses:
         conds.append(User.status.in_(statuses))
     if roles:
@@ -134,12 +136,14 @@ def list_users():
     statuses = [s for s in request.args.getlist("status") if s in STATUSES]
     roles = [r for r in request.args.getlist("role") if r in ROLES]
     keyword = (request.args.get("username") or "").strip()
+    # 从班级管理跳转过来时按班级筛选
+    class_id = request.args.get("classId", type=int)
 
     sort_field, _, direction = (request.args.get("sort") or "createdAt.desc").partition(".")
     column = SORTABLE.get(sort_field, User.created_at)
     order = column.asc() if direction == "asc" else column.desc()
 
-    conds = _filters(statuses, roles, keyword)
+    conds = _filters(statuses, roles, keyword, class_id)
     total = db.session.scalar(select(func.count()).select_from(User).where(*conds)) or 0
     items = db.session.scalars(
         select(User)
@@ -157,8 +161,8 @@ def list_users():
         "pageSize": page_size,
         # 分面计数：应用除自身以外的其他筛选条件
         "facets": {
-            "status": _facet(User.status, _filters([], roles, keyword)),
-            "role": _facet(User.role, _filters(statuses, [], keyword)),
+            "status": _facet(User.status, _filters([], roles, keyword, class_id)),
+            "role": _facet(User.role, _filters(statuses, [], keyword, class_id)),
         },
     }
 

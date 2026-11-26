@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { ChartNoAxesCombined, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -56,7 +57,7 @@ export function Classes() {
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>班级管理</h2>
             <p className='text-muted-foreground'>
-              维护班级信息；学生所属班级在用户管理中设置。
+              维护班级信息；学生所属班级在用户管理中设置，授课学期在学期管理中设置。
             </p>
           </div>
           <Button onClick={() => setDialog({ type: 'create' })}>
@@ -72,9 +73,10 @@ export function Classes() {
                 <TableRow>
                   <TableHead>班级名称</TableHead>
                   <TableHead>入学年份</TableHead>
+                  <TableHead>授课学期</TableHead>
                   <TableHead className='text-end'>学生人数</TableHead>
                   <TableHead>创建时间</TableHead>
-                  <TableHead className='w-24 text-end'>操作</TableHead>
+                  <TableHead className='w-32 text-end'>操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -87,11 +89,64 @@ export function Classes() {
                       </span>
                     </TableCell>
                     <TableCell>{c.cohortYear ?? '—'}</TableCell>
-                    <TableCell className='text-end'>{c.studentCount}</TableCell>
+                    <TableCell>
+                      {c.semesters.length === 0 ? (
+                        <span className='text-muted-foreground'>—</span>
+                      ) : (
+                        <div className='flex max-w-72 flex-wrap gap-1'>
+                          {c.semesters.map((s) => (
+                            <Badge
+                              key={s.id}
+                              variant={s.isCurrent ? 'default' : 'secondary'}
+                              title={s.isCurrent ? '当前学期' : undefined}
+                            >
+                              {s.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className='text-end'>
+                      {c.studentCount > 0 ? (
+                        <Link
+                          to='/users'
+                          search={{ classId: c.id }}
+                          title='查看该班学生'
+                          className='font-medium text-primary underline-offset-4 hover:underline'
+                        >
+                          {c.studentCount}
+                        </Link>
+                      ) : (
+                        0
+                      )}
+                    </TableCell>
                     <TableCell className='text-muted-foreground'>
                       {dateFmt.format(new Date(c.createdAt))}
                     </TableCell>
                     <TableCell className='text-end'>
+                      {c.semesters.some((s) => s.isCurrent) ? (
+                        <Button
+                          variant='ghost'
+                          size='icon'
+                          asChild
+                          aria-label={`查看 ${c.name} 的学情`}
+                          title='查看学情'
+                        >
+                          <Link to='/learning-stats' search={{ classId: c.id }}>
+                            <ChartNoAxesCombined />
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button
+                          variant='ghost'
+                          size='icon'
+                          aria-label={`查看 ${c.name} 的学情`}
+                          title='该班级不是当前学期的授课班级，请先在学期管理中勾选'
+                          disabled
+                        >
+                          <ChartNoAxesCombined />
+                        </Button>
+                      )}
                       <Button
                         variant='ghost'
                         size='icon'
@@ -121,7 +176,7 @@ export function Classes() {
                 {!isLoading && (data?.length ?? 0) === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={6}
                       className='h-20 text-center text-muted-foreground'
                     >
                       {isError ? '班级列表加载失败。' : '还没有班级。'}

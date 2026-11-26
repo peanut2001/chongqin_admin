@@ -2,7 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api/client'
 import { type Semester } from '@/lib/api/meta'
 
-export type SemesterRow = Semester & { isCurrent: boolean }
+export type SemesterRow = Semester & {
+  isCurrent: boolean
+  /** 授课班级：学情统计只统计这些班级的学生 */
+  classes: { id: number; name: string; studentCount: number }[]
+}
 
 export type SemesterInput = {
   name: string
@@ -11,6 +15,7 @@ export type SemesterInput = {
   endDate: string
   /** 为空时后端按起止日期自动计算 */
   totalWeeks: number | null
+  classIds: number[]
 }
 
 export function useSemesters() {
@@ -20,11 +25,11 @@ export function useSemesters() {
   })
 }
 
-/** 学期变动会影响 /meta（当前学期、教学周）与所有统计 */
+/** 学期变动会影响 /meta（当前学期、教学周、授课班级）、班级列表的授课学期与所有统计 */
 function useInvalidateSemesters() {
   const qc = useQueryClient()
   return () => {
-    for (const key of ['semesters', 'meta', 'stats', 'dashboard']) {
+    for (const key of ['semesters', 'classes', 'meta', 'stats', 'dashboard']) {
       void qc.invalidateQueries({ queryKey: [key] })
     }
   }

@@ -10,7 +10,7 @@ from app.api.meta import current_semester, current_week, semester_dict
 from app.auth.decorators import auth_required, me
 from app.errors import ApiError, not_found
 from app.extensions import db
-from app.models import Case, DiseaseTopic, Question, QuestionSet, User
+from app.models import Case, DiseaseTopic, Question, QuestionSet, User, semester_classes
 from app.schemas import CamelModel, parse_body
 from app.services import learning_advice as advice
 from app.services import stats as svc
@@ -136,8 +136,17 @@ def dashboard():
     set_count = db.session.scalar(
         select(func.count()).select_from(QuestionSet).where(QuestionSet.is_published.is_(True))
     ) or 0
+    # 与学情统计口径一致：只数当前学期授课班级的在读学生
     student_count = db.session.scalar(
-        select(func.count()).select_from(User).where(User.role == "student", User.status == "active")
+        select(func.count())
+        .select_from(User)
+        .where(
+            User.role == "student",
+            User.status == "active",
+            User.class_id.in_(
+                select(semester_classes.c.class_id).where(semester_classes.c.semester_id == sem.id)
+            ),
+        )
     ) or 0
 
     weekly = svc.weekly_activity(sem, week, scope)
