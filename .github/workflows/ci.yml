@@ -12,6 +12,10 @@ on:
 jobs:
   install-lint-build:
     runs-on: ubuntu-latest
+    # 在 Playwright 官方镜像里运行：浏览器与系统依赖已预装，不依赖 runner 系统版本。
+    # 版本须与 pnpm-lock.yaml 中的 playwright 一致，升级 playwright 时一起改
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
 
     steps:
       - name: Checkout code
@@ -37,9 +41,6 @@ jobs:
 
       - name: Run Prettier check
         run: pnpm format:check
-
-      - name: Install browsers
-        run: pnpm test:browser:install
 
       - name: Run tests
         run: pnpm test
