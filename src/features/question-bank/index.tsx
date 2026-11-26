@@ -50,8 +50,6 @@ export function QuestionBank() {
   const startSet = (setId: string) =>
     start.mutate(setId, { onSuccess: setSession })
 
-  const totalQuestions = (sets ?? []).reduce((sum, s) => sum + s.total, 0)
-
   return (
     <>
       <DefaultHeader />
@@ -67,14 +65,6 @@ export function QuestionBank() {
           />
         ) : (
           <>
-            <div className='mb-4'>
-              <h1 className='text-2xl font-bold tracking-tight'>题库练习</h1>
-              <p className='text-muted-foreground'>
-                共 {sets?.length ?? 0} 个练习集、{totalQuestions}{' '}
-                道题目，支持单选、多选、判断题与真实病例诊断题，提交后即时显示解析。
-              </p>
-            </div>
-
             <Tabs defaultValue='sets' className='space-y-4'>
               <TabsList>
                 <TabsTrigger value='sets'>章节练习</TabsTrigger>

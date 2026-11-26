@@ -65,23 +65,7 @@ export function Cases() {
       <DefaultHeader />
 
       <Main fixed>
-        <div>
-          <h1 className='text-2xl font-bold tracking-tight'>病例库浏览</h1>
-          <p className='text-muted-foreground'>
-            按病种、系统、检查类型与难度检索真实病例，查看病史、影像与诊断要点。病例来自{' '}
-            <a
-              href={datasetSource.recordUrl}
-              target='_blank'
-              rel='noreferrer'
-              className='underline underline-offset-4 hover:text-primary'
-            >
-              {datasetSource.name}
-            </a>
-            （PubMed Central 开放获取病例报告），仅供教学使用。
-          </p>
-        </div>
-
-        <div className='my-4 flex flex-wrap items-center gap-3'>
+        <div className='mb-4 flex flex-wrap items-center gap-3'>
           <div className='relative'>
             <SearchIcon className='absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground' />
             <Input
@@ -120,7 +104,16 @@ export function Cases() {
             options={caseDifficulties}
           />
           <span className='ms-auto text-sm text-muted-foreground'>
-            共 {filtered.length} 个病例
+            共 {filtered.length} 个病例 · 来源{' '}
+            <a
+              href={datasetSource.recordUrl}
+              target='_blank'
+              rel='noreferrer'
+              title='PubMed Central 开放获取病例报告，仅供教学使用'
+              className='underline underline-offset-4 hover:text-primary'
+            >
+              {datasetSource.name}
+            </a>
           </span>
         </div>
 

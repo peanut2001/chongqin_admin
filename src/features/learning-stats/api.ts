@@ -94,6 +94,19 @@ export function useStudentStats(classId?: number) {
   })
 }
 
+export type MyStats = Omit<StatsOverview, 'kpis' | 'recentActivities'> & {
+  kpis: Kpis
+}
+
+/** 学生本人的学情（章节掌握度、模块时长等） */
+export function useMyStats(enabled = true) {
+  return useQuery({
+    queryKey: ['stats', 'me'],
+    queryFn: async () => (await api.get<MyStats>('/stats/me')).data,
+    enabled,
+  })
+}
+
 export function useDashboard() {
   return useQuery({
     queryKey: ['dashboard'],

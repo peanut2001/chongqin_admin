@@ -73,7 +73,7 @@ describe('SearchProvider and CommandMenu', () => {
     await expect.element(getByText('浅色')).toBeInTheDocument()
     await expect.element(getByText('深色')).toBeInTheDocument()
     await expect.element(getByText('跟随系统')).toBeInTheDocument()
-    await expect.element(getByText('仪表盘')).toBeInTheDocument()
+    await expect.element(getByText('教学总览')).toBeInTheDocument()
   })
 
   it('does not show the dialog content when search is closed', async () => {

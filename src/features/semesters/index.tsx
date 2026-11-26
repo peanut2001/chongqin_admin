@@ -70,7 +70,7 @@ export function Semesters() {
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>学期管理</h2>
             <p className='text-muted-foreground'>
-              当前学期决定仪表盘与学情统计的统计范围和教学周。
+              当前学期决定教学总览与学情统计的统计范围和教学周。
             </p>
           </div>
           <Button onClick={() => setDialog({ type: 'create' })}>
@@ -82,7 +82,7 @@ export function Semesters() {
         {!isLoading && !isError && !hasCurrent && (
           <Alert variant='destructive'>
             <AlertDescription>
-              还没有当前学期，仪表盘和学情统计暂时无法使用。请新建一个学期。
+              还没有当前学期，教学总览和学情统计暂时无法使用。请新建一个学期。
             </AlertDescription>
           </Alert>
         )}
@@ -184,7 +184,7 @@ export function Semesters() {
         open={!!activating}
         onOpenChange={(open) => !open && setDialog(null)}
         title='切换当前学期'
-        desc={`确定把「${activating?.name ?? ''}」设为当前学期吗？仪表盘和学情统计将改为统计该学期的数据（已有学习记录不会删除）。`}
+        desc={`确定把「${activating?.name ?? ''}」设为当前学期吗？教学总览和学情统计将改为统计该学期的数据（已有学习记录不会删除）。`}
         confirmText='设为当前学期'
         isLoading={activate.isPending}
         handleConfirm={confirmActivate}

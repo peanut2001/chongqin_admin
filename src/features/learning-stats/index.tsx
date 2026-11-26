@@ -67,7 +67,6 @@ export function LearningStats() {
     [studentsQuery.data, sortKey]
   )
 
-  const semester = overview.data?.semester ?? meta?.semester
   const kpis = overview.data?.kpis
 
   return (
@@ -75,15 +74,7 @@ export function LearningStats() {
       <DefaultHeader />
 
       <Main className='space-y-4'>
-        <div className='flex flex-wrap items-end justify-between gap-2'>
-          <div>
-            <h1 className='text-2xl font-bold tracking-tight'>学情统计</h1>
-            <p className='text-muted-foreground'>
-              {semester
-                ? `${semester.course} · ${semester.name} · 第 ${semester.currentWeek}/${semester.totalWeeks} 教学周`
-                : '尚未设置当前学期'}
-            </p>
-          </div>
+        <div className='flex flex-wrap items-end justify-end gap-2'>
           <Select value={klass} onValueChange={setKlass}>
             <SelectTrigger className='w-52'>
               <SelectValue />

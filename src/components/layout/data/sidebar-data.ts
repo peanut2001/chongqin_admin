@@ -41,7 +41,7 @@ export const sidebarData: SidebarData = {
       title: '通用',
       items: [
         {
-          title: '仪表盘',
+          title: '教学总览',
           url: '/',
           icon: LayoutDashboard,
         },

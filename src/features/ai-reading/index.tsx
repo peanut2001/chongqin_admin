@@ -158,18 +158,14 @@ export function AiReading() {
     <>
       <DefaultHeader />
 
-      <Main fluid className='space-y-4'>
-        {/* ===== 标题 + 当前判读引擎 ===== */}
-        <div className='flex flex-wrap items-start justify-between gap-2'>
-          <div>
-            <h1 className='text-2xl font-bold tracking-tight'>AI 图像判读</h1>
-            <p className='text-sm text-muted-foreground'>
-              先独立写下判读意见，再与 AI 辅助结果对照学习。
-              {engineModel
-                ? 'AI 结果可能有误，仅供教学参考，不可用于临床诊断。'
-                : '当前未启用 AI 模型，判读结果为演示数据，不可用于临床诊断。'}
-            </p>
-          </div>
+      <Main className='space-y-4'>
+        {/* ===== 当前判读引擎 + 免责提示 ===== */}
+        <div className='flex flex-wrap items-center justify-end gap-2'>
+          <span className='me-auto text-xs text-muted-foreground'>
+            {engineModel
+              ? 'AI 结果可能有误，仅供教学参考，不可用于临床诊断。'
+              : '当前未启用 AI 模型，判读结果为演示数据，不可用于临床诊断。'}
+          </span>
           <div className='flex items-center gap-2'>
             {meta && (
               <Badge
