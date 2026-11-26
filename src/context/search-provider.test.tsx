@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, type RenderResult } from 'vitest-browser-react'
 import { userEvent } from 'vitest/browser'
+import { type AuthUser, useAuthStore } from '@/stores/auth-store'
 import { SearchProvider } from '@/context/search-provider'
 
 const COMMAND_MENU_PLACEHOLDER = '输入命令或搜索…'
@@ -23,6 +24,20 @@ vi.mock('@/context/theme-provider', () => ({
 }))
 
 type ShortcutModifier = 'Control' | 'Meta'
+
+// 菜单项按登录用户的角色过滤（useNavGroups），未登录时一个导航项都没有
+function signInAs(role: AuthUser['role']) {
+  useAuthStore.getState().auth.setSession('t', {
+    id: 'u-1',
+    name: '测试用户',
+    email: `${role}@example.com`,
+    username: role,
+    role,
+    avatarUrl: null,
+    studentNo: null,
+    className: null,
+  })
+}
 
 async function renderWithSearchProvider() {
   return await render(<SearchProvider>{null}</SearchProvider>)
@@ -58,6 +73,23 @@ async function openCommandPalette(
 describe('SearchProvider and CommandMenu', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    signInAs('admin')
+  })
+
+  afterEach(() => {
+    useAuthStore.getState().auth.reset()
+  })
+
+  it('hides admin-only menu items from students', async () => {
+    signInAs('student')
+    const screen = await renderWithSearchProvider()
+
+    await openCommandPalette(screen)
+
+    await expect.element(screen.getByText('病例库浏览')).toBeInTheDocument()
+    await expect
+      .element(screen.getByText('班级', { exact: true }))
+      .not.toBeInTheDocument()
   })
 
   it('renders the command palette when the palette is open', async () => {
