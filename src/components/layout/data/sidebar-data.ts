@@ -18,22 +18,22 @@ import {
   CalendarRange,
   // MessagesSquare,
   // ShieldCheck,
-  GraduationCap,
   FolderHeart,
   ClipboardList,
   ScanEye,
   ChartNoAxesCombined,
   Bot,
 } from 'lucide-react'
+import { APP_SHORT_NAME, APP_SUBTITLE, Logo } from '@/assets/logo'
 import { type SidebarData } from '../types'
 
 // 菜单的角色可见性由 src/lib/permissions.ts 的路由规则统一控制
 export const sidebarData: SidebarData = {
   teams: [
     {
-      name: '智慧课程平台',
-      logo: GraduationCap,
-      plan: '研究生教学',
+      name: APP_SHORT_NAME,
+      logo: Logo,
+      plan: APP_SUBTITLE,
     },
   ],
   navGroups: [

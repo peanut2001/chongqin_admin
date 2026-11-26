@@ -1,24 +1,21 @@
-import { type SVGProps } from 'react'
+import { type ImgHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
+import emblem from './images/hospital-emblem.png'
 
-export function Logo({ className, ...props }: SVGProps<SVGSVGElement>) {
+export const APP_NAME = '重庆医科大学附属第二医院'
+export const APP_SHORT_NAME = '重医附二院'
+export const APP_SUBTITLE = '智慧课程平台'
+
+export function Logo({
+  className,
+  ...props
+}: ImgHTMLAttributes<HTMLImageElement>) {
   return (
-    <svg
-      id='shadcn-admin-logo'
-      viewBox='0 0 24 24'
-      xmlns='http://www.w3.org/2000/svg'
-      height='24'
-      width='24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      className={cn('size-6', className)}
+    <img
+      src={emblem}
+      alt={APP_NAME}
+      className={cn('size-6 object-contain', className)}
       {...props}
-    >
-      <title>Shadcn-Admin</title>
-      <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
-    </svg>
+    />
   )
 }
