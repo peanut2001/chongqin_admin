@@ -1,6 +1,7 @@
 import { useSearch } from '@tanstack/react-router'
 import hospitalEmblem from '@/assets/images/hospital-logo.svg'
 import hospitalLogo from '@/assets/images/hospital_logo.svg'
+import loginBg from '@/assets/images/login-bg.png'
 import { APP_NAME, APP_SUBTITLE } from '@/assets/logo'
 import { UserAuthForm } from './components/user-auth-form'
 
@@ -46,8 +47,22 @@ export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })
 
   return (
-    <div className='flex min-h-svh items-center justify-center bg-muted/40 p-4 sm:p-8'>
-      <div className='relative flex w-full max-w-[68rem] overflow-hidden rounded-2xl border bg-card shadow-sm lg:h-[min(680px,calc(100svh-4rem))] lg:bg-primary dark:lg:bg-muted'>
+    <div className='relative flex min-h-svh items-center justify-center bg-muted/40 p-4 sm:p-8'>
+      {/* 页面背景图（浅色模式），深色模式下隐藏沿用 muted 底色 */}
+      <img
+        src={loginBg}
+        alt=''
+        aria-hidden
+        className='pointer-events-none absolute inset-0 size-full object-cover object-bottom select-none dark:hidden'
+      />
+      <div className='relative flex w-full max-w-[68rem] overflow-hidden rounded-2xl border border-white/70 bg-card shadow-[0_30px_80px_-24px_rgba(24,79,149,0.35)] lg:h-[min(680px,calc(100svh-4rem))] lg:bg-primary lg:bg-linear-135 lg:from-[#2b6bb8] lg:to-[#153f7a] dark:border-border dark:shadow-sm dark:lg:bg-muted dark:lg:bg-none'>
+        {/* 右侧品牌区底纹：复用页面背景图，以柔光叠加，让波浪延续进卡片 */}
+        <img
+          src={loginBg}
+          alt=''
+          aria-hidden
+          className='pointer-events-none absolute inset-0 hidden size-full object-cover object-bottom opacity-50 mix-blend-soft-light select-none lg:block dark:hidden'
+        />
         {/* 右侧品牌区：主题主色 + 低透明度层叠三角 */}
         <div
           aria-hidden
