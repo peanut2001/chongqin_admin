@@ -38,21 +38,29 @@ def _name(row) -> str:
 
 @dataclass
 class Scope:
-    """统计范围：某个班级（class_id）、全体学生（都为 None）或某一个用户（user_id）。"""
+    """统计范围：某个班级（class_id）、全体学生（都为 None）、某一个用户（user_id）
+    或指定的一批学生（user_ids）。"""
 
     class_id: int | None = None
     user_id: uuid.UUID | None = None
+    user_ids: list[uuid.UUID] | None = None
 
     def users_sql(self) -> str:
         if self.user_id is not None:
             return "SELECT CAST(:scope_user AS uuid) AS id"
+        if self.user_ids is not None:
+            return "SELECT id FROM users WHERE role = 'student' AND id = ANY(CAST(:scope_users AS uuid[]))"
         return (
             "SELECT id FROM users WHERE role = 'student' "
             "AND (CAST(:scope_class AS integer) IS NULL OR class_id = CAST(:scope_class AS integer))"
         )
 
     def params(self) -> dict:
-        return {"scope_user": str(self.user_id) if self.user_id else None, "scope_class": self.class_id}
+        return {
+            "scope_user": str(self.user_id) if self.user_id else None,
+            "scope_class": self.class_id,
+            "scope_users": list(self.user_ids or []),
+        }
 
 
 def _tz() -> str:
@@ -264,6 +272,22 @@ def recent_activities(sem: Semester, current_week: int, scope: Scope, limit: int
             action, detail = "提交 AI 判读对照", f"{r.a}" + (f" · 自评{r.b}" if r.b else "")
         items.append({"name": name, "action": action, "detail": detail, "time": iso(r.at)})
     return items
+
+
+def ai_agreement(sem: Semester, current_week: int, scope: Scope) -> dict:
+    """AI 判读后学生自评与 AI 结论的一致程度分布（未自评的计入「未自评」）。"""
+    params = {**semester_window(sem, current_week), **scope.params()}
+    sql = f"""
+        WITH scope AS ({scope.users_sql()})
+        SELECT COALESCE(agreement, '未自评') AS k, COUNT(*) AS n
+        FROM ai_readings
+        WHERE created_at >= :start_ts AND user_id IN (SELECT id FROM scope)
+        GROUP BY 1
+    """
+    counts = {"一致": 0, "部分一致": 0, "不一致": 0, "未自评": 0}
+    for r in db.session.execute(text(sql), params):
+        counts[r.k] = int(r.n)
+    return counts
 
 
 def summarize(students: list[dict]) -> dict:

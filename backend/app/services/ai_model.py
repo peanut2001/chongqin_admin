@@ -1,4 +1,5 @@
-"""AI 判读模型：配置（app_settings.ai_model，API Key 加密保存）、获取模型列表、调用模型判读图像。
+"""AI 判读模型：配置（app_settings.ai_model，API Key 加密保存）、获取模型列表、调用模型判读图像，
+以及纯文本调用（complete_text，供学情分析使用）。
 
 支持两种接口格式，均使用官方 SDK，可自定义服务地址（兼容中转 / 私有部署）：
 - anthropic：Messages API（/v1/messages、/v1/models），服务地址填到域名即可，不含 /v1；
@@ -262,15 +263,26 @@ def _clamp(v: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, v))
 
 
-def parse_result(text: str) -> dict:
-    """从模型输出中解析判读 JSON，并把数值限制在合法范围内。"""
+def extract_json(text: str, what: str = "判读结果") -> dict:
+    """从模型输出中取出 JSON 对象（容忍 Markdown 代码块和前后多余文字）。"""
     cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip())
     start, end = cleaned.find("{"), cleaned.rfind("}")
     if start < 0 or end <= start:
-        raise _model_error("模型没有按要求返回判读结果，请重试或更换模型。")
+        raise _model_error(f"模型没有按要求返回{what}，请重试或更换模型。")
     try:
-        raw = _Result.model_validate(json.loads(cleaned[start : end + 1]))
-    except (json.JSONDecodeError, ValidationError) as exc:
+        data = json.loads(cleaned[start : end + 1])
+    except json.JSONDecodeError as exc:
+        raise _model_error(f"模型返回的{what}格式不正确，请重试或更换模型。") from exc
+    if not isinstance(data, dict):
+        raise _model_error(f"模型返回的{what}格式不正确，请重试或更换模型。")
+    return data
+
+
+def parse_result(text: str) -> dict:
+    """从模型输出中解析判读 JSON，并把数值限制在合法范围内。"""
+    try:
+        raw = _Result.model_validate(extract_json(text))
+    except ValidationError as exc:
         raise _model_error("模型返回的判读结果格式不正确，请重试或更换模型。") from exc
 
     findings = []
@@ -375,34 +387,24 @@ def _switch_format(cfg: dict, provider: str, base_url: str) -> None:
     save_config({**current, "provider": provider, "baseUrl": base_url, "updatedAt": iso(now_utc())})
 
 
-def analyze(cfg: dict, image: bytes, content_type: str, modality: str, show_detail: bool = False) -> dict:
-    """调用已配置的模型判读图像，返回与演示结果相同结构的 dict。失败时抛出 ApiError(502)。
+def _invoke(cfg: dict, show_detail: bool, call) -> str:
+    """按配置调用模型，call(provider, client) 返回模型输出的文本。
 
-    show_detail：失败提示是否附带上游原文（仅管理员）。
+    中转服务常只开放一种接口格式（如分组不允许 /v1/messages）：被拒时换另一种格式重试一次，
+    成功则保存可用的格式，之后直接使用。
     """
     provider = cfg.get("provider")
     if provider not in PROVIDERS:
         raise _model_error("AI 模型配置无效，请管理员检查设置。")
-    try:
-        image, media_type = prepare_image(image, content_type)
-    except Exception as exc:
-        raise ApiError(422, "invalid_file", "图片无法识别，请更换图片。") from exc
-
     api_key = decrypt_key(cfg)
     base_url = cfg.get("baseUrl", "")
-    prompt = f"检查类型：{modality}。请判读这张影像，并严格按要求只输出 JSON。"
 
     def run(prov: str, base: str) -> str:
-        client = _client(prov, base, api_key, current_app.config["AI_MODEL_TIMEOUT"])
-        call = _call_anthropic if prov == "anthropic" else _call_openai
-        return call(client, cfg["model"], image, media_type, prompt)
+        return call(prov, _client(prov, base, api_key, current_app.config["AI_MODEL_TIMEOUT"]))
 
-    started = time.monotonic()
     try:
-        text = run(provider, base_url)
+        return run(provider, base_url)
     except _SDK_ERRORS as exc:
-        # 中转服务常只开放一种接口格式（如分组不允许 /v1/messages）：换另一种格式重试一次，
-        # 成功则保存可用的格式，之后直接使用
         alt = _alternate(provider, base_url) if _status(exc) in _FORMAT_REJECTED else None
         if alt is None:
             raise _translate(exc, show_detail) from exc
@@ -411,6 +413,67 @@ def analyze(cfg: dict, image: bytes, content_type: str, modality: str, show_deta
         except _SDK_ERRORS:
             raise _translate(exc, show_detail) from exc
         _switch_format(cfg, *alt)
+        return text
+
+
+def analyze(cfg: dict, image: bytes, content_type: str, modality: str, show_detail: bool = False) -> dict:
+    """调用已配置的模型判读图像，返回与演示结果相同结构的 dict。失败时抛出 ApiError(502)。
+
+    show_detail：失败提示是否附带上游原文（仅管理员）。
+    """
+    if cfg.get("provider") not in PROVIDERS:
+        raise _model_error("AI 模型配置无效，请管理员检查设置。")
+    try:
+        image, media_type = prepare_image(image, content_type)
+    except Exception as exc:
+        raise ApiError(422, "invalid_file", "图片无法识别，请更换图片。") from exc
+
+    prompt = f"检查类型：{modality}。请判读这张影像，并严格按要求只输出 JSON。"
+
+    def call(prov: str, client) -> str:
+        fn = _call_anthropic if prov == "anthropic" else _call_openai
+        return fn(client, cfg["model"], image, media_type, prompt)
+
+    started = time.monotonic()
+    text = _invoke(cfg, show_detail, call)
     result = parse_result(text)
     result["elapsedMs"] = int((time.monotonic() - started) * 1000)
     return result
+
+
+# ===== 纯文本对话（学情分析等） =====
+
+
+def _text_anthropic(client, model: str, system: str, prompt: str) -> str:
+    resp = client.messages.create(
+        model=model,
+        max_tokens=8000,
+        system=system,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    if resp.stop_reason == "refusal":
+        raise _model_error("模型拒绝了本次请求，请稍后重试或更换模型。")
+    return "".join(b.text for b in resp.content if b.type == "text")
+
+
+def _text_openai(client, model: str, system: str, prompt: str) -> str:
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
+    )
+    if not resp.choices:
+        raise _model_error("模型没有返回内容，请重试。")
+    msg = resp.choices[0].message
+    if getattr(msg, "refusal", None):
+        raise _model_error("模型拒绝了本次请求，请稍后重试或更换模型。")
+    return msg.content or ""
+
+
+def complete_text(cfg: dict, system: str, prompt: str, show_detail: bool = False) -> str:
+    """纯文本调用已配置的模型，返回模型输出文本。失败时抛出 ApiError(502)。"""
+
+    def call(prov: str, client) -> str:
+        fn = _text_anthropic if prov == "anthropic" else _text_openai
+        return fn(client, cfg["model"], system, prompt)
+
+    return _invoke(cfg, show_detail, call)

@@ -3,15 +3,19 @@
 from datetime import timedelta
 
 from flask import Blueprint, request
+from pydantic import Field
 from sqlalchemy import distinct, func, select
 
 from app.api.meta import current_semester, current_week, semester_dict
 from app.auth.decorators import auth_required, me
-from app.errors import ApiError
+from app.errors import ApiError, not_found
 from app.extensions import db
 from app.models import Case, DiseaseTopic, Question, QuestionSet, User
+from app.schemas import CamelModel, parse_body
+from app.services import learning_advice as advice
 from app.services import stats as svc
 from app.services.timeutil import now_utc
+from app.services.users import parse_uuid
 
 bp = Blueprint("stats", __name__)
 
@@ -52,6 +56,46 @@ def overview():
 def students():
     sem, week = _semester_or_error()
     return svc.student_stats(sem, week, _class_scope())
+
+
+def _student_or_404(user_id: str) -> User:
+    uid = parse_uuid(user_id)
+    user = db.session.get(User, uid) if uid else None
+    if user is None or user.role != "student":
+        raise not_found("学生")
+    return user
+
+
+@bp.get("/stats/students/<user_id>")
+@auth_required("admin", "teacher")
+def student_detail(user_id: str):
+    """单个学生的学情详情：明细、每周趋势、章节掌握度（含班级平均）、模块时长、AI 判读自评。"""
+    sem, week = _semester_or_error()
+    return advice.student_detail(sem, week, _student_or_404(user_id))
+
+
+@bp.post("/stats/students/<user_id>/ai-advice")
+@auth_required("admin", "teacher")
+def student_ai_advice(user_id: str):
+    """单人 AI 学情分析（未启用模型时为演示结果）。"""
+    sem, week = _semester_or_error()
+    user = _student_or_404(user_id)
+    return advice.student_advice(sem, week, user, show_detail=me().role == "admin")
+
+
+class GroupAdviceBody(CamelModel):
+    user_ids: list[str] = Field(min_length=1, max_length=advice.MAX_GROUP)
+
+
+@bp.post("/stats/ai-advice")
+@auth_required("admin", "teacher")
+def group_ai_advice():
+    """群体 AI 学情分析：分析指定的一批学生（未启用模型时为演示结果）。"""
+    sem, week = _semester_or_error()
+    ids = [parse_uuid(u) for u in parse_body(GroupAdviceBody).user_ids]
+    if any(u is None for u in ids):
+        raise ApiError(422, "validation_error", "学生编号无效。")
+    return advice.group_advice(sem, week, ids, show_detail=me().role == "admin")
 
 
 @bp.get("/stats/me")
